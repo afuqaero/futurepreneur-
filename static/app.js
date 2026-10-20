@@ -919,6 +919,8 @@ async function viewModule(my, moduleId = 'strategy') {
     { b: 'Scenario test', s: st.scenario ? `Best ${st.scenario.score}%` : `Pass ${st.standards.scenario_pass}%`, done: st.scenario_passed },
     { b: 'Practical', s: practical ? (practical.status === 'reviewed' ? `Scored ${practical.average}/4` : 'Awaiting review') : `Rubric ${st.standards.rubric_min}/4`, done: st.practical_passed },
   ] : [{ b: 'Lessons', s: lessonCheck, done: st.lessons_done === st.lessons_total }];
+  const LESSON_ART = ['/static/img/lesson-map.svg', '/static/img/lesson-lens.svg', '/static/img/lesson-check.svg', '/static/img/lesson-boost.svg'];
+  const LESSON_EMOJI = ['🧠', '🔍', '✅', '🚀'];
 
   mount(`
     <div class="row" style="gap:8px;margin-bottom:14px">
@@ -963,39 +965,59 @@ async function viewModule(my, moduleId = 'strategy') {
     </div>
 
     <div class="section">
-      <div class="section-head"><div><h2>Lessons</h2><p>Work through in order, or jump to what you need. Each lesson ends with an exercise.</p></div></div>
-      ${m.lessons.map((l, i) => `
-        <details class="lesson ${done.has(l.id) ? 'done' : ''}" ${i === Math.min(st.lessons_done, m.lessons.length - 1) && !done.has(l.id) ? 'open' : (i === 0 && st.lessons_done === 0 ? 'open' : '')}>
-          <summary>
-            <span class="lnum">${done.has(l.id) ? icon('check', 13) : String(l.number).padStart(2, '0')}</span>
-            <span class="lsum"><b>${esc(l.title)}</b><span>${esc(l.summary)}</span></span>
-            <span class="lmeta">${done.has(l.id) ? '<span class="chip chip-teal">Complete</span>' : ''}<span class="min">${l.minutes} min</span>${icon('chevron', 16)}</span>
-          </summary>
-          <div class="lesson-body">
-            <div class="prose">${l.explanation.map(p => `<p>${esc(p)}</p>`).join('')}</div>
-            <div class="example-box">
-              <div class="lbl">Practical example</div>
-              <h4>${esc(l.example.title)}</h4>
-              <p>${esc(l.example.text)}</p>
-            </div>
-            <div class="pair-grid">
-              <div class="pair-box do"><h5>What to do</h5><ul>${l.do.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
-              <div class="pair-box dont"><h5>What not to do</h5><ul>${l.dont.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
-              <div class="pair-box why"><h5>Why it matters</h5><p class="tiny" style="margin:0;color:#40556B">${esc(l.why)}</p></div>
-              <div class="pair-box mistakes"><h5>Common mistakes</h5><ul>${l.mistakes.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
-            </div>
-            <div class="exercise-box">
-              <h4>${icon('edit', 14)} Exercise · ${esc(l.exercise.prompt)}</h4>
-              <ol>${l.exercise.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
-            </div>
-            <div class="lesson-foot">
-              <span class="tiny muted">${esc(l.summary)}</span>
-              ${done.has(l.id)
-                ? `<span class="chip chip-teal">${icon('check', 11)} Marked complete</span>`
-                : `<button class="btn btn-soft btn-sm" type="button" data-action="lesson-complete" data-id="${l.id}">Mark lesson complete ${icon('check', 13)}</button>`}
+      <div class="section-head"><div><h2>Lessons</h2><p>Short reps, not a textbook. Open one, read the story, do the move.</p></div></div>
+      ${m.lessons.map((l, i) => {
+        const isOpen = (i === Math.min(st.lessons_done, m.lessons.length - 1) && !done.has(l.id)) || (i === 0 && st.lessons_done === 0);
+        return `<details class="lesson ${done.has(l.id) ? 'done' : ''}" ${isOpen ? 'open' : ''}>
+        <summary>
+          <span class="lesson-emoji" aria-hidden="true">${LESSON_EMOJI[i % 4]}</span>
+          <span class="lsum"><span class="lesson-kicker">Lesson ${String(l.number).padStart(2, '0')}</span><b>${esc(l.title)}</b><span>${esc(l.summary)}</span></span>
+          <span class="lmeta">${done.has(l.id) ? '<span class="chip chip-teal">Done</span>' : ''}<span class="min">${l.minutes} min</span>${icon('chevron', 16)}</span>
+        </summary>
+        <div class="lesson-body">
+          <div class="lesson-hero">
+            <img class="lesson-art" src="${LESSON_ART[i % 4]}" alt="" width="360" height="220" loading="lazy">
+            <div class="lesson-hero-copy">
+              <span class="story-kicker">Why it matters</span>
+              <p>${esc(l.why)}</p>
             </div>
           </div>
-        </details>`).join('')}
+
+          <div class="lesson-copy">
+            ${l.explanation.map((text, k) => `<p class="${k === 0 ? 'lead' : ''}">${esc(text)}</p>`).join('')}
+          </div>
+
+          <div class="case-file">
+            <div class="case-tag">📌 Case file</div>
+            <h4>${esc(l.example.title)}</h4>
+            <p>${esc(l.example.text)}</p>
+          </div>
+
+          <div class="pair-grid">
+            <div class="pair-box do"><h5>✅ Do this</h5><ul>${l.do.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
+            <div class="pair-box dont"><h5>🚫 Not this</h5><ul>${l.dont.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
+          </div>
+
+          <details class="redflags">
+            <summary>⚠️ Common mistakes <span>${l.mistakes.length}</span></summary>
+            <ul>${l.mistakes.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+          </details>
+
+          <div class="mission">
+            <div class="mission-head">
+              <span class="mission-icon" aria-hidden="true">🎯</span>
+              <div><span class="story-kicker">Your move</span><h4>${esc(l.exercise.prompt)}</h4></div>
+            </div>
+            <ol>${l.exercise.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+            <div class="mission-foot">
+              ${done.has(l.id)
+                ? `<span class="chip chip-teal">${icon('check', 11)} Lesson complete</span>`
+                : `<button class="btn btn-primary btn-sm" type="button" data-action="lesson-complete" data-id="${l.id}">Mark complete ${icon('check', 13)}</button>`}
+            </div>
+          </div>
+        </div>
+      </details>`;
+      }).join('')}
     </div>
 
     <div class="section split">

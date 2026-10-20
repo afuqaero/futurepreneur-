@@ -32,7 +32,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 ## Design system
 
-Deep blue `#0F2A66`, yellow `#FFC93C`, ink `#0A1733` on cloud `#F6F7FB`. Display type is Bricolage Grotesque, body is DM Sans. The Gen-Z layer lives in `static/theme.css` (loaded after `styles.css`) with illustrations in `static/img/`. Keep card copy to one line; depth belongs inside the lessons.
+Deep blue `#0F2A66`, yellow `#FFC93C`, ink `#0A1733` on cloud `#F6F7FB`. Display type is Bricolage Grotesque, body is DM Sans. The Gen-Z layer lives in `static/theme.css` (loaded after `styles.css`) with illustrations in `static/img/`. Lessons use story cards: illustrated “why it matters”, a big-idea card, case file, colour-coded do/don’t, folded mistakes and a mission, instead of a wall of text.
 
 ## Your own template files
 
