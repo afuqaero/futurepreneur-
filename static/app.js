@@ -82,6 +82,24 @@ const DIAG_RECS = {
   digital: 'Choose one digital channel, measure cost per order and repeat orders for 30 days, and drop anything you cannot measure.',
 };
 
+/* Owner-facing grouping of the eight diagnostic components. Scores are
+   diagnostic baselines only; verified badges come from passed modules. */
+const ASPECTS = [
+  { id: 'marketing', label: 'Marketing', components: ['marketing'], blurb: 'Customers, offer, channels and repeat sales' },
+  { id: 'finance', label: 'Finance', components: ['finance'], blurb: 'Cash, margins and pricing decisions' },
+  { id: 'operations', label: 'Operations', components: ['operations'], blurb: 'Quality, capacity and reliable delivery' },
+  { id: 'management', label: 'Management', components: ['strategy', 'systems'], blurb: 'Direction, priorities and how work gets done' },
+  { id: 'people-growth', label: 'People & Growth', components: ['people', 'digital'], blurb: 'Team, digital tools and expansion' },
+];
+
+function aspectSummary(progress, aspect) {
+  const comps = aspect.components.map((id) => progress.components.find((c) => c.id === id)).filter(Boolean);
+  const scored = comps.filter((c) => typeof c.score === 'number');
+  const score = scored.length ? Math.round(scored.reduce((sum, c) => sum + c.score, 0) / scored.length) : null;
+  const verified = comps.filter((c) => c.status === 'passed').length;
+  return { score, verified, total: comps.length };
+}
+
 function cookieValue(name) {
   const match = document.cookie.split('; ').find((row) => row.startsWith(name + '='));
   return match ? decodeURIComponent(match.slice(name.length + 1)) : '';
@@ -1292,7 +1310,25 @@ async function viewProgress(my) {
     </div>
 
     <div class="section">
-      <div class="section-head"><div><h2>All eight components</h2><p>Diagnostic scores, verified module status and mastery level per area.</p></div></div>
+      <div class="section-head"><div><h2>Five business aspects</h2><p>Your check-up grouped the way owners think about the business. Scores are self-assessed; a verified badge only appears where a module has been fully passed.</p></div></div>
+      <div class="aspect-grid">
+        ${ASPECTS.map((a) => {
+          const s = aspectSummary(p, a);
+          return `<div class="stat">
+            <div class="k">${esc(a.label)}</div>
+            <div class="v">${s.score != null ? s.score : '—'}<small>${s.score != null ? '%' : ''}</small></div>
+            <div class="s">${s.score != null ? 'Self-assessed baseline' : 'Not assessed yet'}</div>
+            <div style="margin-top:9px">${bar(s.score == null ? 0 : s.score)}</div>
+            <p class="tiny muted" style="margin:8px 0 0;line-height:1.45">${esc(a.blurb)}</p>
+            ${s.verified ? `<div style="margin-top:8px"><span class="chip chip-teal" style="font-size:9.5px;padding:2px 7px">${s.verified}/${s.total} verified</span></div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <p class="tiny muted" style="margin-top:10px">Legal &amp; Risk is not part of these five owner-facing aspects; it is tracked in the detailed breakdown below.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><div><h2>Detailed breakdown</h2><p>All eight components, including Legal &amp; Risk: diagnostic score, verified module status and mastery level.</p></div></div>
       <div class="card"><div class="table-wrap"><table class="table">
         <thead><tr><th>Component</th><th>Diagnostic</th><th>Module</th><th>Mastery</th><th>Source</th><th></th></tr></thead>
         <tbody>

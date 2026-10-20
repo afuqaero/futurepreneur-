@@ -693,3 +693,10 @@ svg { flex: none; }
   .qcard h2 { font-size: 17px; }
   .reader-meta { display: none; }
 }
+
+/* Five owner-facing business aspects (Progress) */
+.aspect-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.aspect-grid .stat { padding: 15px 16px; }
+@media (max-width: 1180px) { .aspect-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .aspect-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .aspect-grid { grid-template-columns: 1fr; } }

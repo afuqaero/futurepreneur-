@@ -93,7 +93,9 @@ class Handler(BaseHTTPRequestHandler):
         data = file.read_bytes()
         ctype = MIME.get(file.suffix.lower(), "application/octet-stream")
         if file.suffix.lower() in (".html", ".css", ".js"):
-            extra = {"Cache-Control": "no-cache"}
+            # No-store: this app is edited in place, and stale CSS/JS during a
+            # session is a real source of phantom bugs.
+            extra = {"Cache-Control": "no-store"}
         else:
             extra = {"Cache-Control": "public, max-age=3600"}
         cookies = None

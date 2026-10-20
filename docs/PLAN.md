@@ -263,6 +263,7 @@ Three modes with distinct system prompts; provider config in admin (OpenAI-compa
 
 ### Phase 7 — My Business Progress (≈ 3 h)
 Verified-only mastery, per-component score cards, modules passed / needs improvement, assessment timeline, score trends, recommended next steps engine, editable action plan with due dates and completion, print/PDF export of the plan.
+**Shipped early (on request):** five owner-facing aspect cards — Marketing, Finance, Operations, Management (Strategy + Systems), People & Growth (People + Digitalisation) — each showing a labelled self-assessed baseline and a verified badge only where a module is fully passed. The full eight-component table stays underneath, including Legal & Risk.
 **Acceptance:** mastery cannot rise without a verified pass (tested); a learner with only a diagnostic shows Beginner; progress percentages match attempt records; export produces a readable one-page plan.
 
 ### Phase 8 — Admin area (≈ 3 h)
