@@ -1260,6 +1260,24 @@ async function viewProgress(my) {
       <a class="btn btn-outline btn-sm" href="#/test">${icon('test', 13)} Go to assessments</a>
     </div>
 
+    <div class="section">
+      <div class="section-head"><div><h2>Five business aspects</h2><p>Your check-up grouped the way owners think about the business. Scores are self-assessed; a verified badge only appears where a module has been fully passed.</p></div></div>
+      <div class="aspect-grid">
+        ${ASPECTS.map((a) => {
+          const s = aspectSummary(p, a);
+          return `<div class="stat">
+            <div class="k">${esc(a.label)}</div>
+            <div class="v">${s.score != null ? s.score : '—'}<small>${s.score != null ? '%' : ''}</small></div>
+            <div class="s">${s.score != null ? 'Self-assessed baseline' : 'Not assessed yet'}</div>
+            <div style="margin-top:9px">${bar(s.score == null ? 0 : s.score)}</div>
+            <p class="tiny muted" style="margin:8px 0 0;line-height:1.45">${esc(a.blurb)}</p>
+            ${s.verified ? `<div style="margin-top:8px"><span class="chip chip-teal" style="font-size:9.5px;padding:2px 7px">${s.verified}/${s.total} verified</span></div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <p class="tiny muted" style="margin-top:10px">Legal &amp; Risk is not part of these five owner-facing aspects; it is tracked in the detailed breakdown below.</p>
+    </div>
+
     <div class="split">
       <div>
         <div class="card card-pad">
@@ -1307,24 +1325,6 @@ async function viewProgress(my) {
           <span style="color:#9FBDD5">Components without a scored assessment show “Not assessed”.</span>
         </div>
       </div>
-    </div>
-
-    <div class="section">
-      <div class="section-head"><div><h2>Five business aspects</h2><p>Your check-up grouped the way owners think about the business. Scores are self-assessed; a verified badge only appears where a module has been fully passed.</p></div></div>
-      <div class="aspect-grid">
-        ${ASPECTS.map((a) => {
-          const s = aspectSummary(p, a);
-          return `<div class="stat">
-            <div class="k">${esc(a.label)}</div>
-            <div class="v">${s.score != null ? s.score : '—'}<small>${s.score != null ? '%' : ''}</small></div>
-            <div class="s">${s.score != null ? 'Self-assessed baseline' : 'Not assessed yet'}</div>
-            <div style="margin-top:9px">${bar(s.score == null ? 0 : s.score)}</div>
-            <p class="tiny muted" style="margin:8px 0 0;line-height:1.45">${esc(a.blurb)}</p>
-            ${s.verified ? `<div style="margin-top:8px"><span class="chip chip-teal" style="font-size:9.5px;padding:2px 7px">${s.verified}/${s.total} verified</span></div>` : ''}
-          </div>`;
-        }).join('')}
-      </div>
-      <p class="tiny muted" style="margin-top:10px">Legal &amp; Risk is not part of these five owner-facing aspects; it is tracked in the detailed breakdown below.</p>
     </div>
 
     <div class="section">
