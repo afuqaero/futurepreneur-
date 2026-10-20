@@ -320,9 +320,9 @@ Playwright (or scripted browser) smoke: register → checkup → module → quiz
 
 ## 10. Demo data to ship
 
-- `aina@demo.bizready.app / Demo1234!` — food business, diagnostic done, strategy module passed, plan in progress.
-- `raj@demo.bizready.app / Demo1234!` — service business, diagnostic done, mid-module, one failed quiz.
-- `admin@bizready.app / Admin1234!` — admin with a pending practical submission to review.
+- `aina@futurepreneur.app / Demo1234!` — food business, diagnostic done, strategy module passed, plan in progress.
+- `raj@futurepreneur.app / Demo1234!` — service business, diagnostic done, mid-module, one failed quiz.
+- `admin@futurepreneur.app / Admin1234!` — admin with a pending practical submission to review.
 - Question banks for all 8 components, 4 templates per completed module, one unpublished draft module to demonstrate the draft state.
 
 ---

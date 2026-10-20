@@ -291,9 +291,9 @@ function renderAuth() {
             <span class="tiny muted">Pre-loaded with realistic data</span>
           </div>
           <div class="row wrap" style="gap:6px">
-            <button type="button" class="demo-btn" data-action="demo-login" data-email="aina@demo.bizready.app" data-password="Demo1234!">Learner · Aina</button>
-            <button type="button" class="demo-btn" data-action="demo-login" data-email="admin@bizready.app" data-password="Admin1234!">Admin</button>
-            <span class="tiny muted" style="margin-left:auto">aina@demo.bizready.app / Demo1234!</span>
+            <button type="button" class="demo-btn" data-action="demo-login" data-email="aina@futurepreneur.app" data-password="Demo1234!">Learner · Aina</button>
+            <button type="button" class="demo-btn" data-action="demo-login" data-email="admin@futurepreneur.app" data-password="Admin1234!">Admin</button>
+            <span class="tiny muted" style="margin-left:auto">aina@futurepreneur.app / Demo1234!</span>
           </div>
         </div>
         <p class="tiny muted" style="margin-top:18px">Progress is stored on the server. The AI coach runs in clearly labelled demo mode until an API key is configured.</p>

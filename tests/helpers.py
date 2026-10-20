@@ -165,13 +165,13 @@ class ServerCase(unittest.TestCase):
 
     def login_demo(self):
         client = self.client()
-        status, body, _ = client.login("aina@demo.bizready.app", "Demo1234!")
+        status, body, _ = client.login("aina@futurepreneur.app", "Demo1234!")
         self.assertEqual(status, 200, body)
         return client
 
     def login_admin(self):
         client = self.client()
-        status, body, _ = client.login("admin@bizready.app", "Admin1234!")
+        status, body, _ = client.login("admin@futurepreneur.app", "Admin1234!")
         self.assertEqual(status, 200, body)
         return client
 

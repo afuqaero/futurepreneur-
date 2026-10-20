@@ -115,11 +115,11 @@ def seed_demo(conn):
     now = utcnow()
     conn.execute(
         "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?,?,?,?,?)",
-        ("Platform Admin", "admin@bizready.app", hash_password("Admin1234!"), "admin", iso(now)),
+        ("Platform Admin", "admin@futurepreneur.app", hash_password("Admin1234!"), "admin", iso(now)),
     )
     learner = conn.execute(
         "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?,?,?,?,?)",
-        ("Aina Rahman", "aina@demo.bizready.app", hash_password("Demo1234!"), "learner", iso(now - timedelta(days=21))),
+        ("Aina Rahman", "aina@futurepreneur.app", hash_password("Demo1234!"), "learner", iso(now - timedelta(days=21))),
     ).lastrowid
 
     conn.execute(

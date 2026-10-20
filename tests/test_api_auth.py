@@ -56,7 +56,7 @@ class AuthTests(ServerCase):
         client = self.client()
         status, out, _ = client.post(
             "/api/auth/login",
-            {"email": "aina@demo.bizready.app", "password": "Demo1234!"},
+            {"email": "aina@futurepreneur.app", "password": "Demo1234!"},
             csrf=False,
         )
         self.assertEqual(status, 403)
@@ -66,7 +66,7 @@ class AuthTests(ServerCase):
         client = self.client()
         status, out, _ = client.post(
             "/api/auth/login",
-            {"email": "aina@demo.bizready.app", "password": "Demo1234!"},
+            {"email": "aina@futurepreneur.app", "password": "Demo1234!"},
             token="0" * 32 + "." + "0" * 64,
         )
         self.assertEqual(status, 403)

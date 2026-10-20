@@ -17,8 +17,8 @@ Demo accounts:
 
 | Role | Email | Password |
 |---|---|---|
-| Learner | `aina@demo.bizready.app` | `Demo1234!` |
-| Admin | `admin@bizready.app` | `Admin1234!` |
+| Learner | `aina@futurepreneur.app` | `Demo1234!` |
+| Admin | `admin@futurepreneur.app` | `Admin1234!` |
 
 The database lives at `data/bizready.db`. A timestamped backup is written to `data/backups/` on every start (last 5 kept).
 
