@@ -202,7 +202,7 @@
       "title": "13-week cash flow forecast",
       "description": "CSV with opening balance, receipts, payments and closing balance for 13 weeks.",
       "format": "CSV",
-      "filename": "bizready-finance-13-week-cashflow.csv",
+      "filename": "futurepreneur-finance-13-week-cashflow.csv",
       "body": "week,week_start,opening_balance,receipts,payments,closing_balance,notes\n1,2026-11-02,5000,4200,3800,5400,normal week\n2,2026-11-09,5400,3900,4100,5200,supplier payment\n3,2026-11-16,5200,3600,5600,3200,rent + wages\n"
     },
     {
@@ -210,7 +210,7 @@
       "title": "Pricing & break-even worksheet",
       "description": "Calculate direct cost, contribution, margin, fixed costs and break-even in one page.",
       "format": "Markdown",
-      "filename": "bizready-finance-pricing-worksheet.md",
+      "filename": "futurepreneur-finance-pricing-worksheet.md",
       "body": "# Pricing & break-even worksheet\n\n## Offer\n- Offer name:\n- Price:\n\n## Direct costs per sale\n- Materials / stock:\n- Packaging:\n- Delivery / platform fee:\n- Other direct:\n- Total direct cost:\n\n## Contribution\n- Contribution = price − direct cost:\n- Contribution margin % = contribution ÷ price:\n\n## Fixed costs (monthly)\n- Rent:\n- Wages / owner draw:\n- Utilities:\n- Loan / lease:\n- Other:\n- Total fixed:\n\n## Break-even\n- Break-even units = fixed costs ÷ contribution:\n- Slow-month break-even:\n- Buffer target (1–3 months fixed costs):\n\n## Price floor\n- Minimum contribution per sale:\n- Current price vs floor:\n"
     }
   ],

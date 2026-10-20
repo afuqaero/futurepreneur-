@@ -1,4 +1,4 @@
-# BizReady
+# futurePreneur
 
 A practical business-readiness platform for micro and small business owners: diagnostic check-up, eight learning modules, a coach, verified assessments, and an honest progress record.
 
@@ -32,7 +32,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 ## Design system
 
-Blue `#1B4DFF`, yellow `#FFD23F`, ink `#0A1733` on cloud `#F6F7FB`. Display type is Bricolage Grotesque, body is DM Sans. The Gen-Z layer lives in `static/theme.css` (loaded after `styles.css`) with illustrations in `static/img/`. Keep card copy to one line; depth belongs inside the lessons.
+Deep blue `#0F2A66`, yellow `#FFC93C`, ink `#0A1733` on cloud `#F6F7FB`. Display type is Bricolage Grotesque, body is DM Sans. The Gen-Z layer lives in `static/theme.css` (loaded after `styles.css`) with illustrations in `static/img/`. Keep card copy to one line; depth belongs inside the lessons.
 
 ## Your own template files
 

@@ -39,5 +39,5 @@ DEFAULT_SETTINGS = {
     "scenario_pass": "70",
     "rubric_min": "3.0",
     "rubric_floor": "2",
-    "platform_name": "BizReady",
+    "platform_name": "futurePreneur",
 }

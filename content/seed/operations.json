@@ -202,7 +202,7 @@
       "title": "One-page process map",
       "description": "Steps, owners, inputs, outputs, handoffs and failure points for one process.",
       "format": "Markdown",
-      "filename": "bizready-operations-process-map.md",
+      "filename": "futurepreneur-operations-process-map.md",
       "body": "# One-page process map\n\nProcess:\nOwner:\nTrigger (customer request):\nDelivered result:\n\n| # | Step | Owner | Input | Output | Handoff to | Recorded? |\n|---|------|-------|-------|--------|------------|-----------|\n| 1 | | | | | | |\n| 2 | | | | | | |\n| 3 | | | | | | |\n| 4 | | | | | | |\n| 5 | | | | | | |\n\n## Failure points\n- Where errors are noticed:\n- Where errors actually start:\n- Workarounds staff use:\n\n## Capacity\n- Units per normal hour:\n- Bottleneck step:\n- Peak demand:\n"
     },
     {
@@ -210,7 +210,7 @@
       "title": "Error & quality log",
       "description": "Two-week CSV log for errors and near-misses, grouped by time and step.",
       "format": "CSV",
-      "filename": "bizready-operations-quality-log.csv",
+      "filename": "futurepreneur-operations-quality-log.csv",
       "body": "date,time,step,what_happened,near_miss,noticed_by,cause,action\n2026-11-01,12:40,Packing,One box missing drink,yes,Driver,Verbal order during rush,Added packing check\n2026-11-01,13:05,Handover,Garment count mismatch,no,Plant staff,No counted handover,Counted handover trial\n"
     }
   ],

@@ -1,4 +1,4 @@
-/* BizReady — frontend application (vanilla JS, hash router, server-backed) */
+/* futurePreneur — frontend application (vanilla JS, hash router, server-backed) */
 'use strict';
 
 /* ------------------------------------------------------------------ utils */
@@ -236,16 +236,16 @@ function mount(html, mySeq) {
 
 /* ------------------------------------------------------------------ auth */
 function renderAuth() {
-  document.title = 'Sign in · BizReady';
+  document.title = 'Sign in · futurePreneur';
   const isLogin = state.authMode === 'login';
   const err = state.authError ? `<div class="auth-error">${esc(state.authError)}</div>` : '';
   $('#app').innerHTML = `
   <div class="auth">
     <section class="auth-art">
       <div class="auth-brand">
-        <div class="brand-mark">B</div>
+        <div class="brand-mark">f</div>
         <div class="auth-brand-text">
-          <div class="brand-name">BizReady</div>
+          <div class="brand-name">futurePreneur</div>
           <div class="brand-sub" style="color:#7FA2C4">Business readiness platform</div>
         </div>
       </div>
@@ -265,8 +265,8 @@ function renderAuth() {
     <section class="auth-panel">
       <div class="auth-card">
         <div class="auth-mobile-brand">
-          <div class="brand-mark">B</div>
-          <div style="margin-left:10px"><div class="brand-name" style="color:#0A2342;font-size:20px">BizReady</div>
+          <div class="brand-mark">f</div>
+          <div style="margin-left:10px"><div class="brand-name" style="color:#0F2A66;font-size:20px">futurePreneur</div>
           <div class="brand-sub">Business readiness</div></div>
         </div>
         <h2>${isLogin ? 'Welcome back' : 'Create your account'}</h2>
@@ -373,8 +373,8 @@ function renderShell(active) {
   <div class="app">
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="#/dashboard">
-        <div class="brand-mark">B</div>
-        <div class="brand-text"><span class="brand-name">BizReady</span><span class="brand-sub">Business readiness</span></div>
+        <div class="brand-mark">f</div>
+        <div class="brand-text"><span class="brand-name">futurePreneur</span><span class="brand-sub">Business readiness</span></div>
       </a>
       <div class="nav-label">Workspace</div>
       <nav class="nav">
@@ -428,7 +428,7 @@ async function router() {
     progress: 'My Business Progress',
     admin: 'Admin',
   };
-  document.title = (titles[root] || 'Workspace') + ' · BizReady';
+  document.title = (titles[root] || 'Workspace') + ' · futurePreneur';
   renderShell(['dashboard', 'checkup', 'learn', 'coach', 'test', 'progress', 'admin'].includes(navKey) ? navKey : 'dashboard');
   const my = begin();
   if (raw !== lastRoute) {
@@ -1000,7 +1000,7 @@ async function viewModule(my, moduleId = 'strategy') {
 
     <div class="section split">
       <div class="card card-pad">
-        <div class="card-head"><div><h2>Downloadable templates</h2><p>Use these with your own numbers. Files are served directly from BizReady.</p></div></div>
+        <div class="card-head"><div><h2>Downloadable templates</h2><p>Use these with your own numbers. Files are served directly from futurePreneur.</p></div></div>
         ${m.templates.map(t => `<div class="template-row">
           <span class="file-icon">${esc((t.format || 'FILE').slice(0, 3).toUpperCase())}</span>
           <div style="min-width:0"><div class="fname">${esc(t.title)}</div><div class="fmeta">${esc(t.description)}${t.source === 'file' ? ' · Your file' : ''}</div></div>
@@ -1444,7 +1444,7 @@ function renderCoach(my) {
       <div class="card chat-card">
         <div class="chat-head">
           <div class="avatar-bot">${icon('spark', 19)}</div>
-          <div style="flex:1"><b>BizReady Coach</b><span>${live ? 'Connected through the server-side API key' : 'Scripted demo guidance — no external AI connected'}</span></div>
+          <div style="flex:1"><b>futurePreneur Coach</b><span>${live ? 'Connected through the server-side API key' : 'Scripted demo guidance — no external AI connected'}</span></div>
           <button class="btn btn-ghost btn-sm" type="button" data-action="coach-reset">${icon('refresh', 13)} New chat</button>
         </div>
         <div class="chat-modes" role="tablist" aria-label="Coaching mode">
@@ -1782,7 +1782,7 @@ function moduleEditorHTML(module, lesson, template, revisions) {
       ${state.admin.newTemplate || template ? `<form data-form="template-save">
         <div class="field-row">
           <div class="field"><label>Slug (lowercase, dashes)</label><input class="input" name="slug" value="${esc(template ? template.slug : '')}" ${template ? 'readonly' : ''} required></div>
-          <div class="field"><label>File name</label><input class="input" name="filename" value="${esc(template ? template.filename : '')}" placeholder="bizready-template.md" required></div>
+          <div class="field"><label>File name</label><input class="input" name="filename" value="${esc(template ? template.filename : '')}" placeholder="futurepreneur-template.md" required></div>
         </div>
         <div class="field"><label>Title</label><input class="input" name="title" value="${esc(template ? template.title : '')}" required></div>
         <div class="field"><label>Description</label><input class="input" name="description" value="${esc(template ? template.description : '')}"></div>
@@ -2275,8 +2275,8 @@ window.__bizready = { state, router };
   } catch (err) {
     $('#app').innerHTML = `<div style="min-height:100vh;display:grid;place-items:center;padding:24px">
       <div class="card card-pad" style="max-width:420px;text-align:center">
-        <div class="brand-mark" style="margin:0 auto 14px">B</div>
-        <h2>BizReady could not start</h2>
+        <div class="brand-mark" style="margin:0 auto 14px">f</div>
+        <h2>futurePreneur could not start</h2>
         <p class="small muted">${esc(err.message)}</p>
         <p class="tiny muted">Make sure the server is running: <code>python run.py</code></p>
         <button class="btn btn-primary btn-sm" type="button" id="boot-reload">Reload</button>

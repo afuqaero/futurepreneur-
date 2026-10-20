@@ -24,7 +24,7 @@ MIME = {
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "BizReady/1.0"
+    server_version = "futurePreneur/1.0"
     protocol_version = "HTTP/1.1"
 
     def log_message(self, format, *args):

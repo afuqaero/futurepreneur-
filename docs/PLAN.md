@@ -1,8 +1,8 @@
-# BizReady — Build Plan (v1)
+# futurePreneur — Build Plan (v1)
 
 **Status:** Phase 1 complete (20 October 2026). Phases 2–10 planned, awaiting go-ahead.
 **Date:** 19 October 2026
-**Purpose:** Turn the existing working prototype into the complete BizReady platform described in the brief — 8 components, verified assessments, real progress tracking, admin-managed content, and a coach that never pretends.
+**Purpose:** Turn the existing working prototype into the complete futurePreneur platform described in the brief — 8 components, verified assessments, real progress tracking, admin-managed content, and a coach that never pretends.
 
 ---
 
@@ -150,7 +150,7 @@ audit_log(id, actor_id, action, entity, entity_id, detail_json, created_at)    +
 
 ## 5. Design system — biru, putih, kuning (Gen Z-leaning)
 
-**Direction:** a bright, confident study-app feel — white cards, electric blue action, yellow highlighter and sticker accents, chunky outlines, big friendly type. Still calm enough for a 45-year-old warung owner on a mid-range Android phone. Teal is **removed** from the brief's palette; yellow takes over completion and highlight duty.
+**Direction:** a bright, confident study-app feel — white cards, deep blue action, yellow highlighter and sticker accents, chunky outlines, big friendly type. Still calm enough for a 45-year-old warung owner on a mid-range Android phone. Teal is **removed** from the brief's palette; yellow takes over completion and highlight duty.
 
 ### 5.1 Tokens
 

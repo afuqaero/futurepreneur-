@@ -201,7 +201,7 @@
       "title": "Customer & offer canvas",
       "description": "One page: primary customer, problem, alternatives, offer sentence, proof, price and next step.",
       "format": "Markdown",
-      "filename": "bizready-marketing-customer-offer-canvas.md",
+      "filename": "futurepreneur-marketing-customer-offer-canvas.md",
       "body": "# Customer & offer canvas\n\n## 1. Primary customer\n- Who exactly (role, location, situation):\n- When do they need you:\n- What are they trying to get done:\n\n## 2. Problem and alternatives\n- Problem in their words:\n- What they use today:\n- Why that is not good enough:\n\n## 3. Offer sentence\nFor [customer] who [need], we provide [outcome] for [price], proven by [proof].\n\nNext step: [book / reply / visit / order]\n\n## 4. Proof\n- Number, photo, guarantee or named result:\n\n## 5. Price and contribution\n- Price:\n- Direct cost per sale:\n- Contribution per sale:\n\n## 6. Channel\n- One channel:\n- Why they are already there:\n\n## 7. Follow-up\n- First follow-up date:\n- Message reason:\n"
     },
     {
@@ -209,7 +209,7 @@
       "title": "14-day channel test tracker",
       "description": "CSV for daily spend, enquiries, orders and contribution. Open in Excel or Sheets.",
       "format": "CSV",
-      "filename": "bizready-marketing-channel-test.csv",
+      "filename": "futurepreneur-marketing-channel-test.csv",
       "body": "date,channel,spend_rm,enquiries,orders,revenue_rm,direct_cost_rm,contribution_rm,notes\n2026-11-01,WhatsApp broadcast,0,12,3,255,90,165,repeat customers first\n2026-11-02,WhatsApp broadcast,50,9,2,170,60,110,boost started\n2026-11-03,WhatsApp broadcast,50,6,1,85,30,55,\n"
     }
   ],

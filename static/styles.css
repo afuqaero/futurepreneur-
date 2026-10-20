@@ -3,12 +3,13 @@
 
 :root {
   /* BizReady 2.0 — blue / white / yellow, Gen-Z energy, still legible */
-  --blue: #1B4DFF;
-  --blue-700: #0F37D6;
-  --blue-800: #0A2AB0;
-  --blue-50: #EEF2FF;
-  --sun: #FFD23F;
-  --sun-soft: #FFF7D6;
+  --blue: #0F2A66;
+  --blue-600: #1B3D86;
+  --blue-700: #091D4A;
+  --blue-800: #061633;
+  --blue-50: #EDF1FA;
+  --sun: #FFC93C;
+  --sun-soft: #FFF4CB;
   --cream: #FFFBF0;
 
   --navy-950: #07122C;
@@ -25,11 +26,11 @@
   --line-strong: #D3D9EC;
 
   /* legacy names intentionally mapped to blue so older components reskin */
-  --teal: #1B4DFF;
-  --teal-600: #0F37D6;
-  --teal-50: #EEF2FF;
-  --yellow: #FFD23F;
-  --yellow-50: #FFF7D6;
+  --teal: #0F2A66;
+  --teal-600: #091D4A;
+  --teal-50: #EDF1FA;
+  --yellow: #FFC93C;
+  --yellow-50: #FFF4CB;
   --green: #0E9F6E;
   --red: #D64545;
   --red-50: #FDECEC;

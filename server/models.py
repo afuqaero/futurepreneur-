@@ -27,7 +27,7 @@ def settings_public(conn):
         "scenario_pass": _as_int(s.get("scenario_pass"), 70),
         "rubric_min": _as_float(s.get("rubric_min"), 3.0),
         "rubric_floor": _as_int(s.get("rubric_floor"), 2),
-        "platform_name": s.get("platform_name", "BizReady"),
+        "platform_name": s.get("platform_name", "futurePreneur"),
     }
 
 

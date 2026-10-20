@@ -1,4 +1,4 @@
-"""Seed content for BizReady.
+"""Seed content for futurePreneur.
 
 Eight business components, a 24-question diagnostic, and one fully built
 learning module (Business Strategy & Model) with lessons, quiz, scenario
@@ -456,28 +456,28 @@ MODULE = {
             "title": "One-page business model canvas",
             "description": "Nine prompts to capture customers, promise, channels, costs and revenue on a single page.",
             "format": "Markdown",
-            "filename": "bizready-business-model-canvas.md",
+            "filename": "futurepreneur-business-model-canvas.md",
         },
         {
             "slug": "break-even-worksheet",
             "title": "Break-even worksheet",
             "description": "A simple CSV you can open in Excel or Sheets: fixed costs, contribution and break-even volume.",
             "format": "CSV",
-            "filename": "bizready-break-even-worksheet.csv",
+            "filename": "futurepreneur-break-even-worksheet.csv",
         },
         {
             "slug": "weekly-priority-planner",
             "title": "30-day priority planner",
             "description": "Choose three priorities, set leading indicators, and record what you will stop.",
             "format": "Markdown",
-            "filename": "bizready-30-day-priority-planner.md",
+            "filename": "futurepreneur-30-day-priority-planner.md",
         },
         {
             "slug": "strategy-checklist",
             "title": "Strategy health checklist",
             "description": "Twelve checks to see whether your model is clear enough to manage.",
             "format": "Markdown",
-            "filename": "bizready-strategy-checklist.md",
+            "filename": "futurepreneur-strategy-checklist.md",
         },
     ],
     "practical": {

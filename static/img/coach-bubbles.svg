@@ -2,14 +2,14 @@
   <path d="M28 44c0-15 12-27 27-27h74c15 0 27 12 27 27v34c0 15-12 27-27 27H79l-28 22 5-26c-16-2-28-13-28-27V44Z" fill="#fff" stroke="#0A1733" stroke-width="3.5" stroke-linejoin="round"/>
   <rect x="52" y="42" width="76" height="9" rx="4.5" fill="#0A1733" opacity=".82"/>
   <rect x="52" y="60" width="52" height="8" rx="4" fill="#0A1733" opacity=".28"/>
-  <circle cx="52" cy="84" r="5" fill="#1B4DFF"/>
-  <circle cx="68" cy="84" r="5" fill="#1B4DFF"/>
-  <circle cx="84" cy="84" r="5" fill="#1B4DFF"/>
+  <circle cx="52" cy="84" r="5" fill="#0F2A66"/>
+  <circle cx="68" cy="84" r="5" fill="#0F2A66"/>
+  <circle cx="84" cy="84" r="5" fill="#0F2A66"/>
 
-  <path d="M232 104c0-12-10-22-22-22h-52c-12 0-22 10-22 22v24c0 12 10 22 22 22h44l24 18-4-22c7-3 10-11 10-20v-22Z" fill="#FFD23F" stroke="#0A1733" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M232 104c0-12-10-22-22-22h-52c-12 0-22 10-22 22v24c0 12 10 22 22 22h44l24 18-4-22c7-3 10-11 10-20v-22Z" fill="#FFC93C" stroke="#0A1733" stroke-width="3.5" stroke-linejoin="round"/>
   <path d="M156 120l8 8 16-16" stroke="#0A1733" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <path d="M206 26l5 12 12 5-12 5-5 12-5-12-12-5 12-5 5-12Z" fill="#1B4DFF" stroke="#0A1733" stroke-width="2.5" stroke-linejoin="round"/>
-  <circle cx="40" cy="146" r="7" fill="#1B4DFF"/>
-  <circle cx="18" cy="120" r="4" fill="#FFD23F"/>
+  <path d="M206 26l5 12 12 5-12 5-5 12-5-12-12-5 12-5 5-12Z" fill="#0F2A66" stroke="#0A1733" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="40" cy="146" r="7" fill="#0F2A66"/>
+  <circle cx="18" cy="120" r="4" fill="#FFC93C"/>
 </svg>

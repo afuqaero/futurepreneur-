@@ -63,9 +63,9 @@ def backup_database(keep=5):
         return None
     config.BACKUP_DIR.mkdir(parents=True, exist_ok=True)
     stamp = utcnow().strftime("%Y%m%d-%H%M%S-%f")
-    dest = config.BACKUP_DIR / f"bizready-{stamp}.db"
+    dest = config.BACKUP_DIR / f"futurepreneur-{stamp}.db"
     shutil.copy2(config.DB_PATH, dest)
-    backups = sorted(config.BACKUP_DIR.glob("bizready-*.db"))
+    backups = sorted(config.BACKUP_DIR.glob("futurepreneur-*.db"))
     for old in backups[:-keep]:
         try:
             old.unlink()

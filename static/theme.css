@@ -5,8 +5,8 @@
 
 body {
   background:
-    radial-gradient(900px 520px at 88% -12%, #FFF3C4 0%, transparent 58%),
-    radial-gradient(760px 520px at 4% 108%, #E7ECFF 0%, transparent 62%),
+    radial-gradient(900px 520px at 88% -12%, #FFF2C4 0%, transparent 58%),
+    radial-gradient(760px 520px at 4% 108%, #E6ECF8 0%, transparent 62%),
     var(--bg);
   background-attachment: fixed;
   font-size: 14.5px;
@@ -73,7 +73,7 @@ a:hover { color: var(--blue-700); }
 /* --- buttons & chips --------------------------------------------------- */
 .btn { border-radius: 13px; font-weight: 700; letter-spacing: -.01em; }
 .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 4px 0 var(--blue-700); }
-.btn-primary:hover { background: #2E5CFF; color: #fff; transform: translateY(-1px); box-shadow: 0 5px 0 var(--blue-700); }
+.btn-primary:hover { background: #1B3D86; color: #fff; transform: translateY(-1px); box-shadow: 0 5px 0 var(--blue-700); }
 .btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--blue-700); }
 .btn-teal { background: var(--sun); color: var(--ink); box-shadow: 0 4px 0 #DEAE12; }
 .btn-teal:hover { background: #FFDC66; color: var(--ink); transform: translateY(-1px); }
@@ -183,7 +183,7 @@ a:hover { color: var(--blue-700); }
 .comp-row .nm { font-weight: 600; }
 .coach-mini {
   position: relative; overflow: hidden; border-radius: 22px; padding: 18px;
-  background: radial-gradient(360px 200px at 100% 0%, #3E67FF 0%, transparent 65%), var(--blue);
+  background: radial-gradient(360px 200px at 100% 0%, #173A85 0%, transparent 65%), var(--blue);
   color: #fff; border: 1.5px solid var(--blue-700);
 }
 .coach-mini h3 { color: #fff; font-size: 18px; }
@@ -206,7 +206,7 @@ a:hover { color: var(--blue-700); }
   width: 50px; height: 50px; border-radius: 16px; display: grid; place-items: center;
   font-size: 25px; background: var(--sun-soft); border: 1.5px solid #FFE7A0; flex: none;
 }
-.comp-card:nth-child(even) .comp-emoji { background: var(--blue-50); border-color: #D9E1FF; }
+.comp-card:nth-child(even) .comp-emoji { background: var(--blue-50); border-color: #D7E0F2; }
 .comp-card h3 { font-size: 16.5px; }
 .comp-card p { font-size: 12.8px; line-height: 1.5; }
 .comp-card .topics span { background: #F4F6FC; color: #66708B; border-radius: 999px; padding: 3px 9px; font-size: 10.2px; }
@@ -216,7 +216,7 @@ a:hover { color: var(--blue-700); }
 
 /* --- module hero ------------------------------------------------------- */
 .module-hero {
-  background: radial-gradient(640px 320px at 92% -10%, #4C72FF 0%, transparent 62%), var(--blue);
+  background: radial-gradient(640px 320px at 92% -10%, #24509E 0%, transparent 62%), var(--blue);
   border: 1.5px solid var(--blue-700); border-radius: 28px; padding: 32px;
   box-shadow: 0 6px 0 var(--blue-700); position: relative; overflow: hidden;
 }
@@ -241,8 +241,8 @@ a:hover { color: var(--blue-700); }
 /* --- auth -------------------------------------------------------------- */
 .auth-art {
   background:
-    radial-gradient(900px 600px at 88% 0%, #4C72FF 0%, transparent 58%),
-    linear-gradient(155deg, #0A2AB0 0%, #1B4DFF 58%, #153FE0 100%);
+    radial-gradient(900px 600px at 88% 0%, #24509E 0%, transparent 58%),
+    linear-gradient(155deg, #061633 0%, #0F2A66 58%, #173A85 100%);
 }
 .auth-art::after { border-color: rgba(255, 210, 63, .3); }
 .auth-copy h1 em { color: var(--sun); }
@@ -256,7 +256,7 @@ a:hover { color: var(--blue-700); }
 .icon-tile.teal { background: var(--blue-50); color: var(--blue-700); }
 .empty .icon { background: var(--blue-50); color: var(--blue-700); }
 .spinner { border-color: #DFE5F8; border-top-color: var(--blue); }
-.toast-item.ok { background: #0F37D6; }
+.toast-item.ok { background: #091D4A; }
 
 @media (max-width: 1080px) {
   .hero { grid-template-columns: 1fr; padding: 28px; }
@@ -290,13 +290,13 @@ a:hover { color: var(--blue-700); }
 /* coach + mastery blocks */
 .mode-btn { border: 1.5px solid var(--line-strong); border-radius: 999px; }
 .mode-btn.on { background: var(--blue); border-color: var(--blue); color: #fff; }
-.chat-head .avatar-bot { background: linear-gradient(150deg, #4C72FF, var(--blue)); color: var(--sun); }
+.chat-head .avatar-bot { background: linear-gradient(150deg, #24509E, var(--blue)); color: var(--sun); }
 .chat-modes { background: #FBFCFF; }
 .bubble .bsym { background: var(--blue-50); color: var(--blue-700); }
 .bubble.user .bsym { background: var(--blue); color: #fff; }
 .bubble.user .bcontent { background: var(--blue); border-color: var(--blue); color: #F1F4FF; }
 .level-card {
-  background: radial-gradient(520px 260px at 100% 0%, #4C72FF 0%, transparent 62%), var(--blue);
+  background: radial-gradient(520px 260px at 100% 0%, #24509E 0%, transparent 62%), var(--blue);
   border: 1.5px solid var(--blue-700); border-radius: 22px;
 }
 .level-card p, .level-card .small { color: #DCE4FF; }
