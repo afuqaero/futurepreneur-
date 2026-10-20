@@ -9,3 +9,5 @@ __pycache__/
 server.log
 config.json
 .env
+test-output.txt
+*.log

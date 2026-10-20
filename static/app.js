@@ -82,12 +82,37 @@ const DIAG_RECS = {
   digital: 'Choose one digital channel, measure cost per order and repeat orders for 30 days, and drop anything you cannot measure.',
 };
 
+function cookieValue(name) {
+  const match = document.cookie.split('; ').find((row) => row.startsWith(name + '='));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : '';
+}
+
+async function readBody(res) {
+  const type = res.headers.get('content-type') || '';
+  return type.includes('application/json') ? res.json() : res.text();
+}
+
 async function api(path, options = {}) {
   const opts = Object.assign({ credentials: 'same-origin' }, options);
+  const method = (opts.method || 'GET').toUpperCase();
   opts.headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
-  const res = await fetch(path, opts);
-  const type = res.headers.get('content-type') || '';
-  const data = type.includes('application/json') ? await res.json() : await res.text();
+
+  // Every state-changing request needs the double-submit CSRF token.
+  if (method !== 'GET' && !cookieValue('br_csrf')) {
+    await fetch('/api/bootstrap', { credentials: 'same-origin' });
+  }
+  if (method !== 'GET') opts.headers['X-CSRF-Token'] = cookieValue('br_csrf');
+
+  let res = await fetch(path, opts);
+  let data = await readBody(res);
+
+  if (res.status === 403 && data && data.code === 'csrf_invalid') {
+    await fetch('/api/bootstrap', { credentials: 'same-origin' });
+    opts.headers['X-CSRF-Token'] = cookieValue('br_csrf');
+    res = await fetch(path, opts);
+    data = await readBody(res);
+  }
+
   if (!res.ok) {
     if (res.status === 401 && state.user) {
       state.user = null;
@@ -1894,8 +1919,10 @@ window.__bizready = { state, router };
         <div class="brand-mark" style="margin:0 auto 14px">B</div>
         <h2>BizReady could not start</h2>
         <p class="small muted">${esc(err.message)}</p>
-        <p class="tiny muted">Make sure the server is running: <code>python server.py</code></p>
-        <button class="btn btn-primary btn-sm" type="button" onclick="location.reload()">Reload</button>
+        <p class="tiny muted">Make sure the server is running: <code>python run.py</code></p>
+        <button class="btn btn-primary btn-sm" type="button" id="boot-reload">Reload</button>
       </div></div>`;
+    const reload = document.getElementById('boot-reload');
+    if (reload) reload.addEventListener('click', () => location.reload());
   }
 })();

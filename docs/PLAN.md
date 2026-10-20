@@ -1,6 +1,6 @@
 # BizReady — Build Plan (v1)
 
-**Status:** Planning only. No code will be written until this plan is approved.
+**Status:** Phase 1 complete (20 October 2026). Phases 2–10 planned, awaiting go-ahead.
 **Date:** 19 October 2026
 **Purpose:** Turn the existing working prototype into the complete BizReady platform described in the brief — 8 components, verified assessments, real progress tracking, admin-managed content, and a coach that never pretends.
 
@@ -63,24 +63,21 @@ Current data: 3 users, 2 profiles, 2 diagnostic results, 4 attempts, 5 lesson co
 bizready/
   run.py                      # entry point: python run.py [--port 8000]
   server/
-    app.py                    # HTTP routing only, thin
-    db.py                     # connection, migrations, transactions
-    auth.py                   # sessions, CSRF, rate limits, roles
-    scoring.py                # pure functions: score, pass rules, mastery
-    content_service.py        # read/write modules, lessons, questions, revisions
-    routes/
-      public.py  checkup.py  learn.py  assess.py  progress.py  coach.py  admin.py
-    ai.py                     # provider adapters (OpenAI-compatible), demo fallback
-  content/
-    seed/                     # JSON per module (source of truth for seeding)
-    templates/                # downloadable files
-  static/                     # SPA: index.html, app.js (split into modules), styles.css
-  tests/
-    test_scoring.py  test_auth.py  test_assessments.py  test_admin.py
-    test_e2e_api.py
-  data/bizready.db
-  docs/PLAN.md  docs/RUN.md  docs/CONTENT_STANDARD.md
-  .env.example
+    config.py  clock.py  errors.py
+    db.py                     # connection, migrations, backups, seeds
+    security.py               # passwords, sessions, CSRF, throttling, headers
+    models.py                 # settings + public user
+    content_service.py        # module reads and overrides
+    scoring.py                # scoring, pass rules, progress, mastery
+    ai.py                     # coach proxy + labelled demo fallback
+    http.py                   # handler, static files, dispatch
+    routes/                   # auth, checkup, learn, assess, progress, coach, admin
+    migrations/001_init.sql
+  content/                    # seed JSON (Phase 2); content.py today
+  static/                     # SPA: index.html, app.js, styles.css
+  tests/                      # unittest suite + live-server harness
+  data/bizready.db            # gitignored
+  docs/PLAN.md  README.md
 ```
 
 **Why Python + SQLite stays:** zero install friction on this machine, transactional integrity for scoring, and single-writer SQLite is fine for a training platform with tens of learners. If concurrent users exceed ~50, move to Postgres — the schema and service layer are written to allow it.
@@ -236,9 +233,13 @@ Each phase ends with a **checkpoint**: I show evidence (test output, screenshots
 Deliverable: this plan. You choose stack path, AI provider, deployment target.
 **Exit:** written approval.
 
-### Phase 1 — Foundation hardening (≈ 3–4 h)
-Split `server.py` into modules without changing behaviour; add `run.py`; add migration runner; SQLite WAL + foreign keys + backup-on-start; CSRF token on all state-changing routes; login rate limiting (5 attempts / 15 min / IP+email); security headers (CSP, X-Content-Type-Options, Referrer-Policy, frame-ancestors); structured error responses; pytest harness with fixtures.
-**Acceptance:** every existing flow still works; `pytest` green; login/register/lesson/quiz/practical/progress smoke test passes; no endpoint lost.
+### Phase 1 — Foundation hardening ✅ (20 Oct 2026)
+Split `server.py` into modules without changing behaviour; add `run.py`; add migration runner; SQLite WAL + foreign keys + backup-on-start; CSRF token on all state-changing routes; login rate limiting (5 attempts / 15 min / IP+email); security headers (CSP, X-Content-Type-Options, Referrer-Policy, frame-ancestors); structured error responses; stdlib `unittest` harness with a live-server fixture (pytest is not installed on this machine).
+**Acceptance:** every existing flow still works; suite green; login/register/lesson/quiz/practical/progress smoke test passes; no endpoint lost.
+
+**Delivered:** `server/` package (14 modules), `run.py`, `001_init.sql`, backups (5 kept), signed double-submit CSRF, throttling, CSP/security headers, typed error codes, 39 tests, `README.md`.
+**Evidence:** 39/39 tests pass (14.5 s); parity check against the old server — 10 of 12 endpoints byte-identical, the 2 differences were learner counts from extra test users only; existing `data/bizready.db` migrated in place with a backup written first; browser smoke test logged in through the form and persisted an action-plan update (97% → 98%) with no JS errors.
+**Bug found and fixed while testing:** the old admin settings endpoint wrote `rubric_floor` as `"2.0"`, which crashed `int()` on every later settings read (500). Now stored as an integer and parsed defensively.
 
 ### Phase 2 — Content engine + real admin authoring (≈ 4–5 h)
 Move modules, lessons, templates and questions into the DB, seeded from `content/*.json`; admin CRUD with validation (correct index in range, unique ids, required fields), draft/publish, revision history, preview; passing thresholds editable with audit trail.
