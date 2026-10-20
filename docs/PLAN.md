@@ -1,0 +1,324 @@
+# BizReady — Build Plan (v1)
+
+**Status:** Planning only. No code will be written until this plan is approved.
+**Date:** 19 October 2026
+**Purpose:** Turn the existing working prototype into the complete BizReady platform described in the brief — 8 components, verified assessments, real progress tracking, admin-managed content, and a coach that never pretends.
+
+---
+
+## 0. Executive summary
+
+A working prototype already exists at `C:\Users\user\bizready` and is running on `http://localhost:8000`. It already implements the full journey with **one** component built (Business Strategy & Model). The remaining work is not "build a website from zero" — it is:
+
+1. **Harden the foundation** (structure, security, automated tests, content moved into the database).
+2. **Complete all 8 components** to the same standard as the strategy module.
+3. **Finish the admin area** so content, questions and passing rules are editable without code.
+4. **Prove correctness** — server-side scoring, boundary tests, verified-only mastery levels, labelled demo mode.
+
+**Recommendation: extend the existing app rather than rebuild it.** The prototype already does the hard, easy-to-get-wrong parts correctly (server-side scoring, PBKDF2 passwords, session cookies, rubric review, AI key kept server-side, honest demo mode). A rewrite in a new stack would burn the ~30% that works and delay the real bottleneck, which is **content volume and content quality**.
+
+If you want a different stack, say so now — that decision changes Phase 1 completely.
+
+---
+
+## 1. Audit of what already exists
+
+**Location:** `C:\Users\user\bizready`
+**Stack:** Python 3.14 standard library (`ThreadingHTTPServer`) + SQLite + vanilla JS SPA (hash router) + hand-written CSS. No build step, no npm dependencies, runs with `python server.py`.
+**Size:** ~4,900 lines (`server.py` 1,557 / `content.py` 736 / `app.js` 1,901 / `styles.css` 695).
+
+| Area | State | Evidence |
+|---|---|---|
+| Auth (register/login/logout, hashed passwords, server sessions) | Working | PBKDF2-SHA256, 200k iterations, HttpOnly cookie, expiry check |
+| Business profile | Working | `profiles` table + `PUT /api/profile` |
+| Diagnostic check-up (8 components, 24 questions) | Working | 3 questions per component, scored server-side |
+| Learning module UI (lessons, do/don't, why, mistakes, exercises) | Working for 1 of 8 | Strategy module: 4 lessons |
+| Downloadable templates | Working | 4 templates (canvas, break-even sheet, planner, checklist) |
+| Knowledge quiz (80% pass) | Working for 1 component | 10 questions |
+| Scenario test (70% pass) | Working for 1 component | 5 questions |
+| Practical assignment + rubric (≥3/4 avg, floor 2) | Working, admin-reviewed | `practical_submissions` + review endpoint |
+| Progress dashboard + mastery levels | Working | `build_progress()`, `mastery_level()` |
+| Action plan | Working | `plan_items` table, add/toggle |
+| AI coach, 3 modes | Working, **demo mode** (no key) | Server-side proxy, config in `data/config.json` or env |
+| Admin: learners, submissions review, questions, settings, content overrides | Partial | `/api/admin/*` |
+| Automated tests | **None** | — |
+| Deployment / backups | **None** | — |
+| Modules 2–8 content | **Missing** | `available: false` on 7 components |
+
+Current data: 3 users, 2 profiles, 2 diagnostic results, 4 attempts, 5 lesson completions, 8 plan items, 39 questions. This is test data, not a clean demo set.
+
+**Honest gaps:**
+- 7 of 8 modules are empty placeholders; their quizzes/scenarios/practicals do not exist.
+- Content lives in `content.py`; the admin can only override snippets, not author a module.
+- `server.py` is a single 1,557-line file — every new endpoint makes it worse.
+- No CSRF protection, no login rate limiting, no audit log.
+- No tests, so "pass/fail logic is correct" is currently an assertion, not a proven fact.
+- No migration path from the current schema, no backup routine.
+
+---
+
+## 2. Target architecture
+
+```
+bizready/
+  run.py                      # entry point: python run.py [--port 8000]
+  server/
+    app.py                    # HTTP routing only, thin
+    db.py                     # connection, migrations, transactions
+    auth.py                   # sessions, CSRF, rate limits, roles
+    scoring.py                # pure functions: score, pass rules, mastery
+    content_service.py        # read/write modules, lessons, questions, revisions
+    routes/
+      public.py  checkup.py  learn.py  assess.py  progress.py  coach.py  admin.py
+    ai.py                     # provider adapters (OpenAI-compatible), demo fallback
+  content/
+    seed/                     # JSON per module (source of truth for seeding)
+    templates/                # downloadable files
+  static/                     # SPA: index.html, app.js (split into modules), styles.css
+  tests/
+    test_scoring.py  test_auth.py  test_assessments.py  test_admin.py
+    test_e2e_api.py
+  data/bizready.db
+  docs/PLAN.md  docs/RUN.md  docs/CONTENT_STANDARD.md
+  .env.example
+```
+
+**Why Python + SQLite stays:** zero install friction on this machine, transactional integrity for scoring, and single-writer SQLite is fine for a training platform with tens of learners. If concurrent users exceed ~50, move to Postgres — the schema and service layer are written to allow it.
+
+**What changes conceptually:** content moves out of Python and into the database, seeded from JSON. That is what makes the admin area real instead of decorative.
+
+---
+
+## 3. Data model (target)
+
+Existing tables kept and extended. New tables marked **+**.
+
+```
+users(id, email, name, password_hash, role, created_at, last_login_at)
+sessions(token, user_id, created_at, expires_at, ip, user_agent)
+profiles(user_id PK, business_name, business_type, stage, employees,
+         customers, monthly_revenue_band, main_challenge, updated_at)
+components(id, name, short, description, topics_json, position, enabled)   +
+modules(id, component_id, title, tagline, level, minutes, outcome,
+        intro_json, status[draft|published], version, updated_at)          +
+lessons(id, module_id, position, title, minutes, summary, body_json, version) +
+templates(id, module_id, slug, filename, mime, body, version)              +
+questions(id, module_id, kind[diagnostic|quiz|scenario], topic, difficulty,
+          prompt, options_json, correct_index, explanation, lesson_ref,
+          active, version)                                                 +
+diagnostic_results(id, user_id, answers_json, component_scores_json,
+                   overall, version, created_at)
+attempts(id, user_id, kind, module_id, answers_json, score, passed,
+         detail_json, duration_s, created_at)
+practical_submissions(id, user_id, module_id, responses_json, status,
+                      rubric_json, average, passed, reviewer_id,
+                      reviewer_note, created_at, reviewed_at)
+lesson_progress(user_id, module_id, lesson_id, completed_at)
+plan_items(id, user_id, title, detail, due_date, done, source, created_at)
+settings(key, value, updated_at)
+content_revisions(id, entity, entity_id, snapshot_json, editor_id, created_at) +
+audit_log(id, actor_id, action, entity, entity_id, detail_json, created_at)    +
+```
+
+**Rules**
+- Every module's questions carry `lesson_ref`, so a failed topic can point at the exact lesson to revisit.
+- `attempts.detail_json` stores per-question results at submit time; re-scoring reads the stored `correct_index` version, so editing a question later cannot silently rewrite history.
+- Deleting content is a status change (`active=0` / `status=archived`), never a hard delete.
+- All content edits write a row to `content_revisions`.
+
+---
+
+## 4. Scoring, pass rules and mastery (exact)
+
+**Knowledge quiz:** `score = round(correct / total × 100)`. Pass ≥ 80 (configurable in admin).
+**Scenario test:** same formula. Pass ≥ 70.
+**Practical assignment:** reviewer scores 4 criteria 1–4. Pass requires **average ≥ 3.0 AND no criterion < 2**.
+**Module pass:** all three criteria met. Partial completion is shown as partial, never as passed.
+**Diagnostic:** self-reported, unscored against a pass mark. It produces priority ranking only.
+
+**Mastery levels (per component) — verified evidence only**
+
+| Level | Rule |
+|---|---|
+| Not assessed | No diagnostic and no attempts |
+| Beginner | Diagnostic complete, no passed quiz |
+| Developing | Quiz attempt exists but not passed, or quiz passed without scenario/practical |
+| Structured | Module fully passed (quiz + scenario + practical) |
+| Optimising | Module fully passed **and** a later quiz retake ≥ 90 **and** ≥ 1 action-plan item completed |
+
+**Overall level** = level of the lowest *passed* module count, never an average that hides a gap. Diagnostic self-report can never lift a learner above Beginner on its own.
+**Test proof:** unit tests at 49/50/69/70/79/80/89/90 and rubric boundaries (2.75/3.0/3.25), plus a test that editing a question after an attempt does not change that attempt's stored result.
+
+---
+
+## 5. Design system — biru, putih, kuning (Gen Z-leaning)
+
+**Direction:** a bright, confident study-app feel — white cards, electric blue action, yellow highlighter and sticker accents, chunky outlines, big friendly type. Still calm enough for a 45-year-old warung owner on a mid-range Android phone. Teal is **removed** from the brief's palette; yellow takes over completion and highlight duty.
+
+### 5.1 Tokens
+
+| Token | Value | Use |
+|---|---|---|
+| Ink | `#0A1733` | All body text, headings, 2px outlines |
+| Blue 600 | `#1B4DFF` | Primary buttons, active nav, progress fill, pass state |
+| Blue 700 | `#0D33C4` | Pressed / hover on blue |
+| Blue tint | `#EAF0FF` | Section washes, next-step cards, selected rows |
+| Yellow 400 | `#FFD23F` | Highlighter marks, badges, stickers, milestones |
+| Yellow 600 | `#F0B400` | Yellow text/border on tinted backgrounds only |
+| White | `#FFFFFF` | Cards, sheets, sidebar |
+| Cloud | `#F6F7FB` | App background |
+| Line | `#E3E7F2` | Hairline borders, tracks |
+| Muted | `#5B6480` | Secondary text, meta |
+| Error | `#C6293A` | Errors and failed attempts **only**, always with an icon (5.6:1 on white) |
+
+**Contrast rules:** `#1B4DFF` on white is 5.9:1 (safe even at 14px bold and 16px regular). Yellow is **never** text on white or a thin border for meaning — it appears as a background block, highlighter stroke, sticker or badge, always paired with ink text (ink on yellow = 12.3:1). Body copy is always Ink on White/Cloud (17.8:1 / 16.5:1). Muted is 5.5:1 on Cloud and never used for critical status.
+
+### 5.2 Type
+
+- **Display: Bricolage Grotesque 700/800**, tight tracking (−0.03em), sentence case, max 3 lines. Used for page titles, module titles, score numbers, empty-state headlines.
+- **Body: DM Sans 400/500/700**, 16px / 1.6, max ~68 characters per line. All lesson content, forms, buttons.
+- Numbers use `font-variant-numeric: tabular-nums` so scores don't jump.
+- Fallback stack: `system-ui, -apple-system, Segoe UI, sans-serif` — no layout shift if Google Fonts fails.
+
+### 5.3 The "Gen Z" layer (bounded)
+
+- **Sticker language:** rotated 2–3° pill labels ("no jargon", "6 minutes", "module passed"), 1.5px ink border, 2px offset shadow. Max two per screen, never on top of text.
+- **Offset shadows**, not blur: `3px 3px 0 #0A1733` on primary CTAs and key cards; hover lifts to `5px 5px 0`.
+- **Highlighter:** yellow marker behind one key phrase in a headline (gradient underline), never whole paragraphs.
+- **Shapes:** 22–26px card radius, 999px pills, 2px ink borders on hero/CTA cards, 1.5px soft borders elsewhere.
+- **Numbered chips** for steps and priorities; dashed dividers between meta rows.
+- **Microcopy voice:** direct, warm, lightly cheeky in empty states — *"No check-up yet. 6 minutes, no judgement."* — but plain language everywhere content teaches. No slang that dates, no emoji as status.
+- **Motion:** 150–200ms ease-out, `translate(-1px,-1px)` lift, progress bars animate once on load. Confetti fires **only** on a server-confirmed module pass (a real event, never on page load).
+- **Guardrails:** one loud element per screen; no gradient soup; no neon-on-neon; no custom cursor; no icon-only status; no yellow text; display type never used below 18px.
+
+### 5.4 Layout
+
+Light app shell: white sidebar with a 2px ink right edge on desktop, active item as a blue pill with white text and a small yellow dot; mobile keeps a white bottom tab bar (5 sections) with blue active icon + label, admin tucked into the avatar menu. Content max-width 1180px, 24px gutters (16px mobile). Hero band on Dashboard and Check-Up results uses white card + ink border + yellow circle motif.
+
+### 5.5 Accessibility targets
+
+Every control keyboard reachable; 3px blue focus ring with 2px white offset; label on every input (no placeholder-as-label); contrast ≥ 4.5:1 for body, ≥ 3:1 for large text and UI edges; status always icon + text + colour; tap targets ≥ 44px; `prefers-reduced-motion` kills lift/confetti; lesson content readable at 200% zoom.
+
+### 5.6 Visual reference
+
+`docs/style-preview.html` is the approved-direction mock: palette chips, type specimen, mastery pills, progress card, hero. It is a **style frame**, not the application — Phase 1 ports these tokens into `styles.css`, it does not copy the file.
+
+**No decorative features.** Every visible control does something or is clearly marked "coming in a later phase" and disabled.
+
+---
+
+## 6. Content plan — 8 modules
+
+Each module: 5–6 lessons × (explanation, real example, What to Do, What Not to Do, Why It Matters, Common Mistakes, exercise), 2 templates, 10-question quiz, 5 scenario questions, 1 practical assignment with a 4-criterion rubric. Written at roughly a 9th-grade reading level, second person, RM and Malaysian micro-business context.
+
+| # | Component | Anchor examples (food / online / service) |
+|---|---|---|
+| 1 | Business Strategy & Model | Aina's Kitchen (food), Norli's skincare shop (online), Raj's aircon servicing (service) — **already written** |
+| 2 | Marketing & Sales | Warung lunch set vs delivery apps; TikTok seller with no repeat buyers; plumber with WhatsApp leads |
+| 3 | Operations & Quality | Café prep-line bottleneck; laundry turnaround; cleaning crew checklist |
+| 4 | Financial Management | Daily cash reconciliation; pricing for profit; separating personal and business money |
+| 5 | People & Leadership | Part-timer rostering; first hire; training a cook to standard |
+| 6 | Systems & SOP | Writing a 1-page SOP; handover; checklist that staff actually use |
+| 7 | Legal & Risk | SSM registration, halal/health permits, basic contracts, insurance — with a clear "not legal advice" disclaimer and local-verification note |
+| 8 | Digitalisation & Growth | WhatsApp catalogue, Google Business Profile, simple POS, when *not* to buy software |
+
+**Content standard (goes in `docs/CONTENT_STANDARD.md`):** one idea per lesson, every claim illustrated by a number or a named business, no filler, no jargon without a plain-language gloss, each exercise finishes in under 20 minutes.
+
+**Content is the long pole.** Writing 7 modules to the standard of module 1 is ~60% of total build effort. It will be done module by module, each one reviewed before moving on.
+
+---
+
+## 7. Phases
+
+Each phase ends with a **checkpoint**: I show evidence (test output, screenshots, a seeded demo walkthrough) and stop for your go-ahead. No phase starts early.
+
+### Phase 0 — Decision gate (now)
+Deliverable: this plan. You choose stack path, AI provider, deployment target.
+**Exit:** written approval.
+
+### Phase 1 — Foundation hardening (≈ 3–4 h)
+Split `server.py` into modules without changing behaviour; add `run.py`; add migration runner; SQLite WAL + foreign keys + backup-on-start; CSRF token on all state-changing routes; login rate limiting (5 attempts / 15 min / IP+email); security headers (CSP, X-Content-Type-Options, Referrer-Policy, frame-ancestors); structured error responses; pytest harness with fixtures.
+**Acceptance:** every existing flow still works; `pytest` green; login/register/lesson/quiz/practical/progress smoke test passes; no endpoint lost.
+
+### Phase 2 — Content engine + real admin authoring (≈ 4–5 h)
+Move modules, lessons, templates and questions into the DB, seeded from `content/*.json`; admin CRUD with validation (correct index in range, unique ids, required fields), draft/publish, revision history, preview; passing thresholds editable with audit trail.
+**Acceptance:** create a question in admin → it appears in the learner quiz; edit lesson text → learner sees it; invalid question rejected with a clear message; change quiz pass mark to 75 → a 74 fails and a 75 passes on new attempts; revisions listed.
+
+### Phase 3 — Business Check-Up v2 (≈ 2–3 h)
+Expanded profile (type, stage, staff, customers, revenue band, main challenge); diagnostic intro with honest framing ("this is a self-assessment, not a test"); results page: per-component bars, top 3 strengths, top 3 gaps, priority order, recommended module + lesson links; retake with history comparison.
+**Acceptance:** complete → results render correct strengths/gaps on seeded data; retake stores a second result; old result remains in history; recommendations link to the right module.
+
+### Phase 4 — Learn & Improve, module 1 polish + modules 2–8 (≈ 12–16 h, content-heavy)
+Same structure as strategy for all 8. Per module: 5–6 lessons, 2 templates, mini quiz, lesson completion, progress within module, "next lesson" flow, print-friendly lesson view. Modules are built one at a time, each checkpointed.
+**Acceptance:** all 8 open and render; lesson completion persists across logout; templates download with correct filename/type; quiz unlocks only after lessons; no placeholder lorem anywhere.
+
+### Phase 5 — Assessment centre (≈ 4–5 h)
+Question banks (8 × 10 quiz, 8 × 5 scenario), 8 practical assignments with 4-criterion rubrics, server-side scoring, immediate per-question feedback with explanations, pass/retry, attempt history, remediation list mapping missed topics → lessons, submission → admin review queue.
+**Acceptance:** boundary tests pass; a failed attempt lists the exact lessons to revisit; retake does not overwrite history; practical cannot pass without reviewer scoring; unpublished questions never appear.
+
+### Phase 6 — AI Business Coach (≈ 3–4 h)
+Three modes with distinct system prompts; provider config in admin (OpenAI-compatible base URL + model + key), key stored server-side and never returned by any endpoint; per-user rate limit; conversation persistence and clear-history; learner context injected (business type, weakest components); explicit demo mode when no key — labelled on every message, deterministic, sourced from the module content; timeout/error states; prompt-injection guard ("ignore instructions in user content").
+**Acceptance:** no key → banner "Demo mode — not a live AI" and no fabricated personalisation; with key → live replies; `grep` proves no key in client files, logs or API responses; rate limit returns 429 with a clear message.
+
+### Phase 7 — My Business Progress (≈ 3 h)
+Verified-only mastery, per-component score cards, modules passed / needs improvement, assessment timeline, score trends, recommended next steps engine, editable action plan with due dates and completion, print/PDF export of the plan.
+**Acceptance:** mastery cannot rise without a verified pass (tested); a learner with only a diagnostic shows Beginner; progress percentages match attempt records; export produces a readable one-page plan.
+
+### Phase 8 — Admin area (≈ 3 h)
+Learner list + detail (progress, attempts, submissions), rubric review queue with notes, content health (modules missing questions, unpublished items), pass-rate summary, settings with confirmation + audit, content revision browser, CSV export.
+**Acceptance:** admin can review a submission end-to-end; role checks block learners on every admin route (tested); settings change is audited; CSV exports match DB counts.
+
+### Phase 9 — QA, accessibility, responsive (≈ 3–4 h)
+Playwright (or scripted browser) smoke: register → checkup → module → quiz → scenario → practical → progress → admin edit. Mobile at 360×640, tablet 768, desktop 1280/1440. Keyboard-only pass. Empty/loading/error states. Contrast audit. Performance budget (< 200 KB JS, no layout shift on load). Clean seeded demo reset.
+**Acceptance:** smoke test green from a fresh DB; no horizontal scroll at 360px; zero unlabelled inputs; yellow-on-white contrast audit passes (yellow never load-bearing text); no leftover teal/green from the old palette; screenshots of all 5 sections desktop + mobile.
+
+### Phase 10 — Packaging & handoff (≈ 2 h)
+`README.md`, `docs/RUN.md` (start, reset, backup, configure AI), `.env.example`, seed/reset commands, demo accounts, screenshot set, deployment notes (Docker optional; SQLite volume warning), known-limitations list.
+**Acceptance:** a fresh clone runs with two commands; demo data loads; limitations documented honestly.
+
+**Total: ≈ 40–50 h of build, with content authoring dominating.** Checkpoints after every phase; Phases 4 and 5 have per-module checkpoints.
+
+---
+
+## 8. Risks and how the plan handles them
+
+| Risk | Handling |
+|---|---|
+| Content quality collapses into generic filler | Fixed content standard, one module reviewed before the next, real numbers and named businesses required |
+| Scoring/pass logic silently wrong | Pure functions + boundary tests in Phase 1/5, server-authoritative scoring, stored per-attempt detail |
+| Admin area becomes decorative | Phase 2 makes content DB-backed first, so admin edits are the real source of truth |
+| AI coach fabricates confidence | Demo mode labelled on every message; no fake personalisation; live mode only when a key exists |
+| Legal module gives unsafe advice | "General education, not legal advice" disclaimer; Malaysian-specific items flagged for local verification; no definitive compliance claims |
+| SQLite corruption / data loss | WAL, foreign keys, backup-on-start, documented restore, CSV export |
+| Self-hosted server exposed to internet | Bind localhost by default; deploy notes require HTTPS reverse proxy, secure cookies, rate limits |
+| Scope creep (certificates, payments, multi-tenant) | Explicitly out of scope in v1 (below) |
+
+---
+
+## 9. Explicitly out of scope for v1
+
+- Certificates of completion (the brief forbids fabricated certificates; a real one needs identity + verified completion + issuance records — a later, separate feature).
+- Payments, subscriptions, multi-organisation accounts.
+- Email verification, password reset by email, SSO (needs an email provider).
+- Native mobile apps.
+- Video content.
+- AI-generated assessment grading (practical work is human-reviewed).
+- Bahasa Melayu interface (v1 is English with Malaysian context; copy can be localised later).
+
+---
+
+## 10. Demo data to ship
+
+- `aina@demo.bizready.app / Demo1234!` — food business, diagnostic done, strategy module passed, plan in progress.
+- `raj@demo.bizready.app / Demo1234!` — service business, diagnostic done, mid-module, one failed quiz.
+- `admin@bizready.app / Admin1234!` — admin with a pending practical submission to review.
+- Question banks for all 8 components, 4 templates per completed module, one unpublished draft module to demonstrate the draft state.
+
+---
+
+## 11. Decisions I need before Phase 1
+
+1. **Stack path** — (A) extend this Python/SQLite app *[recommended]*, (B) rebuild on Next.js + Postgres, (C) extend now, migrate later.
+2. **AI coach** — do you have an OpenAI-compatible API key/provider to configure, or should v1 ship demo-mode-first and stay clearly labelled until a key is added?
+3. **Deployment** — local demo only for now, or does it need to be reachable by real learners (which adds HTTPS, hosting, backups and a security pass)?
+4. **Language** — English-only v1, or English + Bahasa Melayu from the start? (Affects every content phase, so it must be decided before Phase 4.)

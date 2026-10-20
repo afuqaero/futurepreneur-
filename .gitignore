@@ -1,0 +1,11 @@
+data/*.db
+data/*.db-*
+data/backups/
+data/csrf.key
+cookies.txt
+admin.txt
+__pycache__/
+*.pyc
+server.log
+config.json
+.env
