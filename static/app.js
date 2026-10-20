@@ -593,19 +593,24 @@ function profileForm(profile) {
         </select></div>
     </div>
     <div class="field-row">
+      <div class="field"><label for="customer_type">Who do you mainly serve?</label>
+        <select class="select" id="customer_type" name="customer_type" required>
+          ${['', 'Consumers (B2C)', 'Businesses (B2B)', 'Both consumers and businesses', 'Mostly online buyers'].map(v => `<option value="${esc(v)}" ${v === (p.customer_type || '') ? 'selected' : ''}>${v ? esc(v) : 'Choose one…'}</option>`).join('')}
+        </select>
+        <div class="hint">This shapes the examples and the offer advice you get.</div></div>
       <div class="field"><label for="stage">Stage</label>
         <select class="select" id="stage" name="stage" required>${['Idea', 'Starting', 'Growing', 'Established'].map(v => opt(v, p.stage)).join('')}</select></div>
-      <div class="field"><label for="team_size">Team size</label>
-        <select class="select" id="team_size" name="team_size" required>${['Just me', '2–5', '6–10', '11–20', '20+'].map(v => opt(v, p.team_size)).join('')}</select></div>
     </div>
     <div class="field-row">
-      <div class="field"><label for="revenue_band">Monthly revenue</label>
-        <select class="select" id="revenue_band" name="revenue_band" required>
-          ${['Pre-revenue', 'Under RM10,000', 'RM10,000–RM20,000', 'RM20,000–RM50,000', 'RM50,000–RM100,000', 'Above RM100,000'].map(v => opt(v, p.revenue_band)).join('')}
-        </select></div>
+      <div class="field"><label for="team_size">Team size</label>
+        <select class="select" id="team_size" name="team_size" required>${['Just me', '2–5', '6–10', '11–20', '20+'].map(v => opt(v, p.team_size)).join('')}</select></div>
       <div class="field"><label for="years">Years operating</label>
         <select class="select" id="years" name="years" required>${['Under 1 year', '1–3 years', '3–5 years', '5–10 years', '10+ years'].map(v => opt(v, p.years)).join('')}</select></div>
     </div>
+    <div class="field"><label for="revenue_band">Monthly revenue</label>
+      <select class="select" id="revenue_band" name="revenue_band" required>
+        ${['Pre-revenue', 'Under RM10,000', 'RM10,000–RM20,000', 'RM20,000–RM50,000', 'RM50,000–RM100,000', 'Above RM100,000'].map(v => opt(v, p.revenue_band)).join('')}
+      </select></div>
     <div class="field"><label for="main_challenge">What is the main challenge you want to fix?</label>
       <textarea class="textarea" id="main_challenge" name="main_challenge" placeholder="e.g. Profit is inconsistent even when sales look busy." required>${esc(p.main_challenge || '')}</textarea>
       <div class="hint">Be specific. This is used to frame your results and coaching, not shared publicly.</div></div>
@@ -653,8 +658,8 @@ function checkupResults(data, profile, history = []) {
   </div>
 
   <div class="section">
-    <div class="section-head"><div><h2>Recommended learning priorities</h2><p>Three areas where a small change is likely to produce the clearest improvement.</p></div></div>
-    <div class="grid auto-260">
+    <div class="section-head"><div><h2>Recommended learning priorities</h2><p>Areas scoring below 85% where a small change is likely to help most.</p></div></div>
+    ${priorities.length ? `<div class="grid auto-260">
       ${priorities.map((pr, i) => `<div class="priority-card ${i === 0 ? 'top' : ''}">
         <div class="row-between"><span class="rank">Priority ${i + 1}</span><span class="chip ${i === 0 ? 'chip-yellow' : 'chip-grey'}">${pr.score}%</span></div>
         <h4>${esc(pr.name)}</h4>
@@ -663,7 +668,10 @@ function checkupResults(data, profile, history = []) {
           ${pr.lessons && pr.lessons.length ? `<div class="tiny muted" style="margin-top:6px">Starts with: ${pr.lessons.map(esc).join(' · ')}</div>` : ''}`
           : `<span class="chip chip-grey">Module in development</span>`}
       </div>`).join('')}
-    </div>
+    </div>` : `<div class="card card-pad">
+      <p class="small" style="margin:0 0 10px"><b>No urgent gaps.</b> Every component scored 85% or higher. Pick one area to deepen rather than chasing a weakness.</p>
+      <a class="btn btn-outline btn-sm" href="#/learn">Open the modules ${icon('right', 13)}</a>
+    </div>`}
   </div>
 
   <div class="section split">
@@ -738,7 +746,7 @@ async function viewCheckup(my) {
       </div>
       <div class="profile-summary" style="margin-bottom:18px">
         <div><div class="k">Business</div><div class="v">${esc(profile.business_name)}</div></div>
-        <div><div class="k">Sector</div><div class="v">${esc(profile.sector)}</div></div>
+        <div><div class="k">Sector</div><div class="v">${esc(profile.sector)}</div>${profile.customer_type ? `<div class="tiny muted">${esc(profile.customer_type)}</div>` : ''}</div>
         <div><div class="k">Stage</div><div class="v">${esc(profile.stage)} · ${esc(profile.team_size)} people</div></div>
         <div><div class="k">Main challenge</div><div class="v" style="font-weight:500;font-size:12px">${esc(profile.main_challenge)}</div></div>
       </div>
@@ -762,6 +770,10 @@ async function viewCheckup(my) {
             <div><div class="k">Revenue</div><div class="v">${esc(profile.revenue_band)}</div></div>
           </div>
           <h2 style="font-size:18px;margin-bottom:8px">What the diagnostic covers</h2>
+          <div class="roadmap-note" style="margin-bottom:16px">
+            ${icon('info', 15)}
+            <div><b>This is a self-assessment, not a test.</b> There is no penalty for a low score and no certificate for a high one. Answer as your business actually runs today — that is the only way the priorities will be useful.</div>
+          </div>
           <div class="diag-cats" style="margin-bottom:20px">
             ${state.components.map((c, i) => `<div class="diag-cat"><span class="num">${String(i + 1).padStart(2, '0')}</span>${esc(c.name)}</div>`).join('')}
           </div>
@@ -2078,7 +2090,7 @@ document.addEventListener('submit', async (e) => {
   if (kind === 'register') { doRegister(form); return; }
   if (kind === 'profile') {
     const body = {};
-    ['business_name', 'sector', 'stage', 'team_size', 'revenue_band', 'years', 'main_challenge'].forEach(k => { body[k] = form.elements[k].value.trim(); });
+    ['business_name', 'sector', 'customer_type', 'stage', 'team_size', 'revenue_band', 'years', 'main_challenge'].forEach(k => { body[k] = form.elements[k].value.trim(); });
     try {
       const data = await api('/api/profile', { method: 'PUT', body: JSON.stringify(body) });
       state.progress = data.progress;

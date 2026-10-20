@@ -31,6 +31,23 @@ def _priority_payload(conn, component_id, score):
     }
 
 
+GAP_THRESHOLD = 85
+
+
+def _rank(conn, per):
+    """Gaps are areas below the threshold, weakest first (max 3). Strengths are
+    the highest scores that are not already listed as gaps."""
+    ranked = sorted(per.items(), key=lambda kv: kv[1])
+    gaps = [(component, score) for component, score in ranked if score < GAP_THRESHOLD][:3]
+    gap_ids = {component for component, _ in gaps}
+    strengths = [
+        {"component": component, "name": content.COMPONENT_BY_ID[component]["name"], "score": score}
+        for component, score in sorted(per.items(), key=lambda kv: kv[1], reverse=True)
+        if component not in gap_ids
+    ][:3]
+    return [_priority_payload(conn, component, score) for component, score in gaps], strengths
+
+
 def handle(h, conn, method, path, user):
     if path == "/api/profile" and method == "PUT":
         body = h.read_json()
@@ -42,14 +59,15 @@ def handle(h, conn, method, path, user):
             if not val:
                 raise ApiError(400, "Please complete all profile fields.", "invalid_input")
             fields[key] = val
+        customer_type = clean_text(body.get("customer_type", ""), 40, "Customer type")
         conn.execute(
-            "INSERT INTO profiles (user_id, business_name, sector, stage, team_size, revenue_band, years, main_challenge, updated_at)"
-            " VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET"
-            " business_name=excluded.business_name, sector=excluded.sector, stage=excluded.stage,"
-            " team_size=excluded.team_size, revenue_band=excluded.revenue_band, years=excluded.years,"
-            " main_challenge=excluded.main_challenge, updated_at=excluded.updated_at",
-            (user["id"], fields["business_name"], fields["sector"], fields["stage"], fields["team_size"],
-             fields["revenue_band"], fields["years"], fields["main_challenge"], iso()),
+            "INSERT INTO profiles (user_id, business_name, sector, customer_type, stage, team_size, revenue_band, years, main_challenge, updated_at)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET"
+            " business_name=excluded.business_name, sector=excluded.sector, customer_type=excluded.customer_type,"
+            " stage=excluded.stage, team_size=excluded.team_size, revenue_band=excluded.revenue_band,"
+            " years=excluded.years, main_challenge=excluded.main_challenge, updated_at=excluded.updated_at",
+            (user["id"], fields["business_name"], fields["sector"], customer_type, fields["stage"],
+             fields["team_size"], fields["revenue_band"], fields["years"], fields["main_challenge"], iso()),
         )
         conn.commit()
         h.send_json({"ok": True, "progress": build_progress(conn, user)})
@@ -72,10 +90,28 @@ def handle(h, conn, method, path, user):
             "components": json.loads(r["component_scores"]),
             "created_at": r["created_at"],
         } for r in history_rows]
+        result = diagnostic_summary(conn, user["id"])
+        priorities, strengths, change, previous = [], [], None, None
+        if result:
+            per = result["components"]
+            priorities, strengths = _rank(conn, per)
+            if len(history) > 1:
+                previous = history[1]
+                change = {
+                    "overall": result["overall"] - previous["overall"],
+                    "components": {
+                        comp: per.get(comp, 0) - previous["components"].get(comp, 0)
+                        for comp in per
+                    },
+                }
         h.send_json({
             "questions": questions,
             "profile": dict(profile) if profile else None,
-            "result": diagnostic_summary(conn, user["id"]),
+            "result": result,
+            "priorities": priorities,
+            "strengths": strengths,
+            "previous": previous,
+            "change": change,
             "history": history,
         })
         return True
@@ -129,8 +165,7 @@ def handle(h, conn, method, path, user):
                 )
         conn.commit()
         result = diagnostic_summary(conn, user["id"])
-        priorities = sorted(per.items(), key=lambda kv: kv[1])[:3]
-        strengths = sorted(per.items(), key=lambda kv: kv[1], reverse=True)[:2]
+        priorities, strengths = _rank(conn, per)
         change = None
         if previous:
             change = {
@@ -140,15 +175,26 @@ def handle(h, conn, method, path, user):
                     for comp in per
                 },
             }
+        history_rows = conn.execute(
+            "SELECT overall, component_scores, created_at FROM diagnostic_results"
+            " WHERE user_id = ? ORDER BY id DESC LIMIT 10",
+            (user["id"],),
+        ).fetchall()
+        history = [{
+            "overall": r["overall"],
+            "components": json.loads(r["component_scores"]),
+            "created_at": r["created_at"],
+        } for r in history_rows]
         h.send_json({
             "result": result,
             "score": score,
             "correct": correct,
             "total": total,
-            "priorities": [_priority_payload(conn, c, s) for c, s in priorities],
-            "strengths": [{"component": c, "name": content.COMPONENT_BY_ID[c]["name"], "score": s} for c, s in strengths],
+            "priorities": priorities,
+            "strengths": strengths,
             "previous": previous,
             "change": change,
+            "history": history,
             "progress": build_progress(conn, user),
         })
         return True

@@ -248,9 +248,13 @@ Move modules, lessons, templates and questions into the DB, seeded from `content
 **Delivered:** `modules`, `lessons`, `templates`, `content_revisions` and `audit_log` tables (migration `002_content.sql`); seeding from the prototype; DB-backed module reads with published-only enforcement; admin module CRUD, publish gate (≥1 lesson, 5 quiz, 3 scenario, practical), lesson editor, template editor, practical editor, preview pane, revision history, audit rows for settings and reviews.
 **Evidence:** 47/47 tests pass, including draft-hidden-until-published, publish gate, lesson edit reaching the learner, revision snapshot, template download/delete, settings audit, and module-slug/lesson validation. Live server verified: module list, module save (v2), revision list, short-title rejection. UI verified in headless Chrome over CDP: 5 admin tabs, module list, lesson switching, preview pane, save toast, zero JS errors; 390px layout switches to one column with no horizontal scroll.
 
-### Phase 3 — Business Check-Up v2 (≈ 2–3 h)
+### Phase 3 — Business Check-Up v2 ✅ (20 Oct 2026)
 Expanded profile (type, stage, staff, customers, revenue band, main challenge); diagnostic intro with honest framing ("this is a self-assessment, not a test"); results page: per-component bars, top 3 strengths, top 3 gaps, priority order, recommended module + lesson links; retake with history comparison.
 **Acceptance:** complete → results render correct strengths/gaps on seeded data; retake stores a second result; old result remains in history; recommendations link to the right module.
+
+**Delivered:** `customer_type` profile field (`003_checkup.sql`); GET `/api/checkup` now returns priorities, strengths, previous, change and history on reload; strengths capped at 3 and never overlap gaps; gaps are areas below 85% (max 3), so a 100% area can no longer appear as a "priority"; history table with per-retake deltas; explicit "self-assessment, not a test" callout.
+**Evidence:** 51/51 tests pass, including customer-type round-trip, history ordering (83/67/50), +16 delta, old results retained, and priorities ordered weakest-first. Headless Chrome: 2 real gaps (0%, 67%), two history rows, +16 chip, customer type shown and editable, zero JS errors, 390px with no horizontal scroll.
+**Bug found and fixed:** the first cut listed the three lowest scores even when many were 100%, producing a "priority" card at 100% while also calling it a strength. Gap ranking now uses a threshold and excludes overlaps.
 
 ### Phase 4 — Learn & Improve, module 1 polish + modules 2–8 (≈ 12–16 h, content-heavy)
 Same structure as strategy for all 8. Per module: 5–6 lessons, 2 templates, mini quiz, lesson completion, progress within module, "next lesson" flow, print-friendly lesson view. Modules are built one at a time, each checkpointed.

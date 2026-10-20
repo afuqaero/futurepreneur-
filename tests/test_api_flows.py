@@ -30,8 +30,8 @@ class WorkflowTests(ServerCase):
         status, result, _ = client.post("/api/checkup/submit", {"answers": answers})
         self.assertEqual(status, 200, result)
         self.assertEqual(result["score"], 100)
-        self.assertEqual(len(result["strengths"]), 2)
-        self.assertEqual(len(result["priorities"]), 3)
+        self.assertEqual(len(result["strengths"]), 3)
+        self.assertEqual(len(result["priorities"]), 0, "perfect scores leave no gaps")
         self.assertEqual(len(result["progress"]["plan"]), 3)
         self.assertEqual(result["progress"]["mastery"]["level"], "Beginner")
 
