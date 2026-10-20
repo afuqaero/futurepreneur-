@@ -3,7 +3,7 @@
 import re
 
 import content
-from .. import security
+from .. import content_repo, security
 from ..clock import iso
 from ..errors import ApiError, clean_text
 from ..models import public_user, settings_public
@@ -76,7 +76,7 @@ def handle(h, conn, method, path, query):
     if path == "/api/bootstrap" and method == "GET":
         user = security.current_user(conn, h)
         data = {
-            "components": content.COMPONENTS,
+            "components": content_repo.components_public(conn),
             "settings": settings_public(conn),
             "ai": ai_status(),
             "user": public_user(user) if user else None,

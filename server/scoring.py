@@ -7,6 +7,7 @@ the database, and module/mastery state is derived from stored attempts.
 import json
 
 import content
+from . import content_repo
 from .ai import ai_status
 from .models import public_user, settings_public
 
@@ -103,9 +104,10 @@ def best_attempt(conn, user_id, kind):
     }
 
 
-def module_state(conn, user_id):
+def module_state(conn, user_id, module_id=content_repo.DEFAULT_MODULE_ID):
     s = settings_public(conn)
-    lessons = content.MODULE["lessons"]
+    module = content_repo.get_module(conn, module_id)
+    lessons = module["lessons"] if module else []
     done_rows = conn.execute(
         "SELECT lesson_id FROM lesson_progress WHERE user_id = ?", (user_id,)
     ).fetchall()
@@ -120,16 +122,17 @@ def module_state(conn, user_id):
     practical_passed = bool(practical and practical["passed"])
     module_passed = quiz_passed and scenario_passed and practical_passed
 
+    total = len(lessons)
     percent = (
-        (lessons_done / len(lessons)) * 20
-        + (30 if quiz_passed else 0)
-        + (25 if scenario_passed else 0)
-        + (25 if practical_passed else 0)
-    )
+        (lessons_done / total) * 20 if total else 0
+    ) + (30 if quiz_passed else 0) + (25 if scenario_passed else 0) + (25 if practical_passed else 0)
     return {
-        "id": "strategy",
+        "id": module_id,
+        "title": module["title"] if module else "",
+        "component": module["component"] if module else "",
+        "status": module["status"] if module else "missing",
         "lessons_done": lessons_done,
-        "lessons_total": len(lessons),
+        "lessons_total": total,
         "quiz": quiz,
         "scenario": scenario,
         "practical": practical,
@@ -169,7 +172,7 @@ def build_progress(conn, user):
         overall += 10
     if diag:
         overall += 20
-    overall += (mod["lessons_done"] / mod["lessons_total"]) * 15
+    overall += (mod["lessons_done"] / mod["lessons_total"] * 15) if mod["lessons_total"] else 0
     if mod["quiz_passed"]:
         overall += 20
     if mod["scenario_passed"]:
@@ -195,16 +198,16 @@ def build_progress(conn, user):
         basis = "No verified assessment yet"
 
     components = []
-    for comp in content.COMPONENTS:
+    for comp in content_repo.components_public(conn):
         score = (diag or {}).get("components", {}).get(comp["id"])
         status = "not-started"
         source = None
         level_c = "Not assessed"
-        if comp["id"] == "strategy" and mod["passed"]:
+        if comp["id"] == mod["component"] and mod["passed"]:
             status = "passed"
             level_c = "Optimising" if level == "Optimising" else "Structured"
             source = "Module verified"
-        elif comp["id"] == "strategy" and (mod["quiz_passed"] or mod["scenario_passed"]):
+        elif comp["id"] == mod["component"] and (mod["quiz_passed"] or mod["scenario_passed"]):
             status = "in-progress"
             level_c = "Developing"
             source = "Partial module results"

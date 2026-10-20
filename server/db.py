@@ -94,15 +94,16 @@ def seed_questions(conn):
     pos = 0
     for item in content.DIAGNOSTIC_QUESTIONS + content.QUIZ_QUESTIONS + content.SCENARIO_QUESTIONS:
         pos += 1
+        module_id = "strategy" if item["kind"] in ("quiz", "scenario") else None
         rows.append(
             (
-                item["id"], item["component"], item["kind"], item["topic"], item["prompt"],
+                item["id"], item["component"], module_id, item["kind"], item["topic"], item["prompt"],
                 json.dumps(item["options"]), item["correct"], item["explanation"], 1, pos,
             )
         )
     conn.executemany(
-        "INSERT INTO questions (id, component, kind, topic, prompt, options, correct, explanation, active, position)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?)",
+        "INSERT INTO questions (id, component, module_id, kind, topic, prompt, options, correct,"
+        " explanation, active, position) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         rows,
     )
 
@@ -184,6 +185,44 @@ def seed_demo(conn):
 # ---------------------------------------------------------------------------
 
 
+def seed_content(conn):
+    """Copy the prototype's Python content into the database once."""
+    if conn.execute("SELECT COUNT(*) FROM modules").fetchone()[0]:
+        return
+    module = content.MODULE
+    now = iso()
+    conn.execute(
+        "INSERT INTO modules (id, component, title, tagline, level, hours, outcome, intro_json,"
+        " practical_json, status, position, version, updated_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?, 'published', 1, 1, ?)",
+        (
+            module["id"], module["component"], module["title"], module["tagline"], module["level"],
+            module["hours"], module["outcome"], json.dumps(module["intro"], ensure_ascii=False),
+            json.dumps(module["practical"], ensure_ascii=False), now,
+        ),
+    )
+    for position, lesson in enumerate(module["lessons"], 1):
+        body = {
+            key: value for key, value in lesson.items()
+            if key not in ("id", "number", "title", "minutes", "summary")
+        }
+        conn.execute(
+            "INSERT INTO lessons (id, module_id, position, title, minutes, summary, body_json, updated_at)"
+            " VALUES (?,?,?,?,?,?,?,?)",
+            (lesson["id"], module["id"], position, lesson["title"], lesson["minutes"],
+             lesson["summary"], json.dumps(body, ensure_ascii=False), now),
+        )
+    for position, template in enumerate(module["templates"], 1):
+        conn.execute(
+            "INSERT INTO templates (id, module_id, slug, title, description, format, filename, body, position, updated_at)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (f"tpl-{module['id']}-{template['slug']}", module["id"], template["slug"], template["title"],
+             template["description"], template["format"], template["filename"],
+             content.TEMPLATE_FILES.get(template["slug"], ""), position, now),
+        )
+    conn.commit()
+
+
 def init_db(seed=True):
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     if os.environ.get("BIZREADY_SKIP_BACKUP") != "1":
@@ -198,6 +237,7 @@ def init_db(seed=True):
         if seed:
             seed_questions(conn)
             seed_demo(conn)
+            seed_content(conn)
         conn.commit()
     finally:
         conn.close()

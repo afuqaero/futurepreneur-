@@ -5,11 +5,19 @@ import re
 import secrets
 
 import content
+from .. import content_repo
 from ..clock import iso
-from ..content_service import get_module_content
 from ..errors import ApiError, clean_text
 from ..models import settings_public
 from ..scoring import build_progress
+
+
+def _repo(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except content_repo.ContentError as exc:
+        status = 404 if exc.code == "not_found" else 409 if exc.code == "conflict" else 400
+        raise ApiError(status, exc.message, exc.code)
 
 
 def _require_admin(user):
@@ -96,8 +104,112 @@ def handle(h, conn, method, path, user):
             " reviewer_note = ?, reviewed_at = ? WHERE id = ?",
             (json.dumps(rubric), avg, 1 if passed else 0, note, iso(), sub_id),
         )
+        content_repo.audit(conn, user["id"], "practical.review", "practical", str(sub_id),
+                           {"average": avg, "passed": passed})
         conn.commit()
         h.send_json({"ok": True, "average": avg, "passed": passed, "standard": s["rubric_min"]})
+        return True
+
+    # -- content: modules ---------------------------------------------------
+    if path == "/api/admin/modules" and method == "GET":
+        h.send_json({
+            "modules": content_repo.module_summaries(conn),
+            "components": content_repo.components_public(conn),
+        })
+        return True
+
+    if path == "/api/admin/modules" and method == "POST":
+        body = h.read_json()
+        module = _repo(
+            content_repo.create_module, conn,
+            clean_text(body.get("id", ""), 50, "Module id").lower(),
+            body.get("component", ""),
+            clean_text(body.get("title", ""), 120, "Title"),
+            user["id"],
+        )
+        conn.commit()
+        h.send_json({"ok": True, "module": module}, 201)
+        return True
+
+    match = re.fullmatch(r"/api/admin/modules/([\w-]+)/status", path)
+    if match and method == "POST":
+        body = h.read_json()
+        module = _repo(content_repo.set_module_status, conn, match.group(1), body.get("status", ""), user["id"])
+        conn.commit()
+        h.send_json({"ok": True, "module": module})
+        return True
+
+    match = re.fullmatch(r"/api/admin/modules/([\w-]+)/lessons", path)
+    if match and method == "POST":
+        lesson = _repo(content_repo.add_lesson, conn, match.group(1), user["id"])
+        conn.commit()
+        h.send_json({"ok": True, "lesson": lesson}, 201)
+        return True
+
+    match = re.fullmatch(r"/api/admin/modules/([\w-]+)/templates", path)
+    if match and method == "PUT":
+        body = h.read_json()
+        template = _repo(
+            content_repo.upsert_template, conn, match.group(1),
+            {
+                "slug": clean_text(body.get("slug", ""), 50, "Slug").lower(),
+                "title": clean_text(body.get("title", ""), 120, "Title"),
+                "description": clean_text(body.get("description", ""), 400, "Description"),
+                "format": clean_text(body.get("format", "Markdown"), 20, "Format"),
+                "filename": clean_text(body.get("filename", ""), 120, "Filename"),
+                "body": body.get("body", "") if isinstance(body.get("body", ""), str) else "",
+            },
+            user["id"],
+        )
+        conn.commit()
+        h.send_json({"ok": True, "template": template})
+        return True
+
+    match = re.fullmatch(r"/api/admin/modules/([\w-]+)", path)
+    if match:
+        module_id = match.group(1)
+        if method == "GET":
+            module = content_repo.get_module(conn, module_id)
+            if not module:
+                raise ApiError(404, "Module not found.", "not_found")
+            h.send_json({"module": module, "revisions": content_repo.list_revisions(conn, "module", module_id, 10)})
+            return True
+        if method == "PUT":
+            fields = validate_module_fields(h.read_json())
+            module = _repo(content_repo.update_module, conn, module_id, fields, user["id"])
+            conn.commit()
+            h.send_json({"ok": True, "module": module})
+            return True
+
+    match = re.fullmatch(r"/api/admin/lessons/([\w-]+)", path)
+    if match:
+        lesson_id = match.group(1)
+        if method == "PUT":
+            data = validate_lesson_payload(h.read_json())
+            lesson = _repo(content_repo.update_lesson, conn, lesson_id, data, user["id"])
+            conn.commit()
+            h.send_json({"ok": True, "lesson": lesson})
+            return True
+        if method == "DELETE":
+            _repo(content_repo.delete_lesson, conn, lesson_id, user["id"])
+            conn.commit()
+            h.send_json({"ok": True})
+            return True
+
+    match = re.fullmatch(r"/api/admin/templates/([\w-]+)", path)
+    if match and method == "DELETE":
+        _repo(content_repo.delete_template, conn, match.group(1), user["id"])
+        conn.commit()
+        h.send_json({"ok": True})
+        return True
+
+    if path == "/api/admin/revisions" and method == "GET":
+        h.send_json({"revisions": content_repo.list_revisions(conn, limit=30)})
+        return True
+
+    match = re.fullmatch(r"/api/admin/revisions/([\w-]+)/([\w-]+)", path)
+    if match and method == "GET":
+        h.send_json({"revisions": content_repo.list_revisions(conn, match.group(1), match.group(2), 30)})
         return True
 
     if path == "/api/admin/questions" and method == "GET":
@@ -114,10 +226,15 @@ def handle(h, conn, method, path, user):
         item = validate_question(body)
         position = conn.execute("SELECT COALESCE(MAX(position), 0) + 1 FROM questions").fetchone()[0]
         qid = "q-" + secrets.token_hex(5)
+        module_id = conn.execute(
+            "SELECT id FROM modules WHERE component = ? ORDER BY status = 'published' DESC, position LIMIT 1",
+            (item["component"],),
+        ).fetchone()
+        module_id = module_id["id"] if module_id and item["kind"] in ("quiz", "scenario") else None
         conn.execute(
-            "INSERT INTO questions (id, component, kind, topic, prompt, options, correct, explanation, active, position)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?)",
-            (qid, item["component"], item["kind"], item["topic"], item["prompt"],
+            "INSERT INTO questions (id, component, module_id, kind, topic, prompt, options, correct,"
+            " explanation, active, position) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            (qid, item["component"], module_id, item["kind"], item["topic"], item["prompt"],
              json.dumps(item["options"]), item["correct"], item["explanation"], item["active"], position),
         )
         conn.commit()
@@ -133,10 +250,15 @@ def handle(h, conn, method, path, user):
         if method == "PUT":
             body = h.read_json()
             item = validate_question(body)
+            module_row = conn.execute(
+                "SELECT id FROM modules WHERE component = ? ORDER BY status = 'published' DESC, position LIMIT 1",
+                (item["component"],),
+            ).fetchone()
+            module_id = module_row["id"] if module_row and item["kind"] in ("quiz", "scenario") else None
             conn.execute(
-                "UPDATE questions SET component=?, kind=?, topic=?, prompt=?, options=?, correct=?,"
+                "UPDATE questions SET component=?, module_id=?, kind=?, topic=?, prompt=?, options=?, correct=?,"
                 " explanation=?, active=? WHERE id=?",
-                (item["component"], item["kind"], item["topic"], item["prompt"], json.dumps(item["options"]),
+                (item["component"], module_id, item["kind"], item["topic"], item["prompt"], json.dumps(item["options"]),
                  item["correct"], item["explanation"], item["active"], qid),
             )
             conn.commit()
@@ -168,14 +290,19 @@ def handle(h, conn, method, path, user):
         for key, val in values.items():
             conn.execute("INSERT INTO settings (key, value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
                          (key, val))
+        content_repo.audit(conn, user["id"], "settings.update", "settings", None, values)
         conn.commit()
         h.send_json({"ok": True, "settings": settings_public(conn)})
         return True
 
     if path == "/api/admin/content" and method == "GET":
-        module = get_module_content(conn)
-        overrides = {r["key"]: r["value"] for r in conn.execute("SELECT * FROM content_overrides").fetchall()}
-        h.send_json({"module": module, "overrides": overrides})
+        modules = content_repo.module_summaries(conn)
+        module = content_repo.get_module(conn, modules[0]["id"]) if modules else None
+        h.send_json({
+            "modules": modules,
+            "module": module,
+            "components": content_repo.components_public(conn),
+        })
         return True
 
     if path == "/api/admin/content" and method == "PUT":
@@ -184,21 +311,148 @@ def handle(h, conn, method, path, user):
         field = body.get("field")
         if field not in ("title", "summary", "explanation"):
             raise ApiError(400, "Editable fields are title, summary and explanation.", "invalid_input")
-        if lesson_id not in [l["id"] for l in content.MODULE["lessons"]]:
+        lesson = content_repo.get_lesson(conn, lesson_id)
+        if not lesson:
             raise ApiError(404, "Lesson not found.", "not_found")
         value = clean_text(body.get("value"), 8000, "Content")
         if not value:
             raise ApiError(400, "Content cannot be empty.", "invalid_input")
-        conn.execute(
-            "INSERT INTO content_overrides (key, value, updated_at) VALUES (?,?,?)"
-            " ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at",
-            (f"lesson:{lesson_id}:{field}", value, iso()),
-        )
+        lesson_body = {
+            key: lesson[key] for key in
+            ("explanation", "example", "do", "dont", "why", "mistakes", "exercise")
+            if key in lesson
+        }
+        if field == "explanation":
+            lesson_body["explanation"] = [p.strip() for p in value.split("\n\n") if p.strip()]
+        data = {
+            "title": value if field == "title" else lesson["title"],
+            "summary": value if field == "summary" else lesson["summary"],
+            "minutes": lesson["minutes"],
+            "body": lesson_body,
+        }
+        updated = _repo(content_repo.update_lesson, conn, lesson_id, data, user["id"])
         conn.commit()
-        h.send_json({"ok": True, "module": get_module_content(conn)})
+        h.send_json({"ok": True, "lesson": updated})
         return True
 
     raise ApiError(404, "Admin route not found.", "not_found")
+
+
+def validate_module_fields(body):
+    out = {}
+    for key, limit in (("title", 120), ("tagline", 300), ("level", 40), ("hours", 40), ("outcome", 400)):
+        if key in body:
+            val = clean_text(body[key], limit, key.title())
+            if key == "title" and len(val) < 3:
+                raise ApiError(400, "Module title is too short.", "invalid_input")
+            out[key] = val
+    if "intro" in body:
+        intro = body["intro"]
+        if not isinstance(intro, list):
+            raise ApiError(400, "Intro must be a list of paragraphs.", "invalid_input")
+        out["intro"] = [
+            clean_text(item, 800, "Intro paragraph")
+            for item in intro if isinstance(item, str) and item.strip()
+        ][:20]
+    if "practical" in body:
+        practical = body["practical"]
+        if not isinstance(practical, dict):
+            raise ApiError(400, "Practical must be an object.", "invalid_input")
+        criteria = []
+        for item in practical.get("criteria") or []:
+            if not isinstance(item, dict):
+                raise ApiError(400, "Each criterion must be an object.", "invalid_input")
+            cid = clean_text(item.get("id", ""), 40, "Criterion id").lower()
+            if not re.match(r"^[a-z0-9_]{2,40}$", cid):
+                raise ApiError(400, "Criterion ids use lowercase letters, numbers and underscores.", "invalid_input")
+            criteria.append({
+                "id": cid,
+                "label": clean_text(item.get("label", ""), 120, "Criterion label"),
+                "hint": clean_text(item.get("hint", ""), 300, "Criterion hint"),
+            })
+        criterion_ids = {c["id"] for c in criteria}
+        prompts = []
+        for item in practical.get("prompts") or []:
+            if not isinstance(item, dict):
+                raise ApiError(400, "Each prompt must be an object.", "invalid_input")
+            pid = clean_text(item.get("id", ""), 20, "Prompt id").lower()
+            if not re.match(r"^p[0-9]{1,3}$", pid):
+                raise ApiError(400, "Prompt ids look like p1, p2, p3.", "invalid_input")
+            criterion = item.get("criterion", "")
+            if criterion not in criterion_ids:
+                raise ApiError(400, "Each prompt must reference a criterion.", "invalid_input")
+            prompts.append({
+                "id": pid,
+                "criterion": criterion,
+                "label": clean_text(item.get("label", ""), 300, "Prompt label"),
+                "placeholder": clean_text(item.get("placeholder", ""), 300, "Prompt placeholder"),
+            })
+        out["practical"] = {
+            "title": clean_text(practical.get("title", ""), 200, "Practical title"),
+            "intro": clean_text(practical.get("intro", ""), 800, "Practical intro"),
+            "criteria": criteria,
+            "prompts": prompts,
+        }
+    return out
+
+
+def _text_list(value, field, max_items=20, max_len=500):
+    if not isinstance(value, list):
+        raise ApiError(400, f"{field} must be a list.", "invalid_input")
+    items = [clean_text(item, max_len, field) for item in value if isinstance(item, str) and item.strip()]
+    return items[:max_items]
+
+
+def validate_lesson_payload(body):
+    title = clean_text(body.get("title", ""), 160, "Lesson title")
+    if len(title) < 3:
+        raise ApiError(400, "Lesson title is too short.", "invalid_input")
+    summary = clean_text(body.get("summary", ""), 500, "Summary")
+    if len(summary) < 10:
+        raise ApiError(400, "Add a one-sentence summary.", "invalid_input")
+    try:
+        minutes = int(body.get("minutes", 10))
+    except (TypeError, ValueError):
+        raise ApiError(400, "Minutes must be a number.", "invalid_input")
+    if minutes < 1 or minutes > 180:
+        raise ApiError(400, "Minutes must be between 1 and 180.", "invalid_input")
+
+    raw = body.get("body") or {}
+    if not isinstance(raw, dict):
+        raise ApiError(400, "Lesson body must be an object.", "invalid_input")
+    explanation = _text_list(raw.get("explanation", []), "Explanation", 20, 2000)
+    if not explanation:
+        raise ApiError(400, "Add at least one explanation paragraph.", "invalid_input")
+    example = raw.get("example") or {}
+    if not isinstance(example, dict):
+        raise ApiError(400, "Example must be an object.", "invalid_input")
+    example = {
+        "title": clean_text(example.get("title", ""), 160, "Example title"),
+        "text": clean_text(example.get("text", ""), 2000, "Example text"),
+    }
+    exercise = raw.get("exercise") or {}
+    if not isinstance(exercise, dict):
+        raise ApiError(400, "Exercise must be an object.", "invalid_input")
+    exercise = {
+        "prompt": clean_text(exercise.get("prompt", ""), 400, "Exercise prompt"),
+        "steps": _text_list(exercise.get("steps", []), "Exercise steps", 20, 400),
+    }
+    if not exercise["prompt"]:
+        raise ApiError(400, "Add the exercise prompt.", "invalid_input")
+    return {
+        "title": title,
+        "minutes": minutes,
+        "summary": summary,
+        "body": {
+            "explanation": explanation,
+            "example": example,
+            "do": _text_list(raw.get("do", []), "What to do", 20, 400),
+            "dont": _text_list(raw.get("dont", []), "What not to do", 20, 400),
+            "why": clean_text(raw.get("why", ""), 800, "Why it matters"),
+            "mistakes": _text_list(raw.get("mistakes", []), "Common mistakes", 20, 400),
+            "exercise": exercise,
+        },
+    }
 
 
 def validate_question(body):

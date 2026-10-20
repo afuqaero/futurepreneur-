@@ -1,29 +1,19 @@
-"""Content reads: the module, its overrides, and active question rows."""
+"""Content reads shared by learner endpoints."""
 
-from copy import deepcopy
-
-import content
+from . import content_repo
 
 
-def get_module_content(conn):
-    module = deepcopy(content.MODULE)
-    overrides = {
-        r["key"]: r["value"]
-        for r in conn.execute("SELECT key, value FROM content_overrides").fetchall()
-    }
-    for lesson in module["lessons"]:
-        for field in ("title", "summary", "explanation"):
-            key = f"lesson:{lesson['id']}:{field}"
-            if key in overrides:
-                lesson[field] = overrides[key].split("\n\n") if field == "explanation" else overrides[key]
-    if "module:tagline" in overrides:
-        module["tagline"] = overrides["module:tagline"]
-    if "module:intro" in overrides:
-        module["intro"] = overrides["module:intro"].split("\n\n")
-    return module
+def get_module_content(conn, module_id=content_repo.DEFAULT_MODULE_ID, published_only=True):
+    return content_repo.get_module(conn, module_id, published_only=published_only)
 
 
-def mcq_rows(conn, kind):
+def mcq_rows(conn, kind, module_id=None):
+    if module_id:
+        return conn.execute(
+            "SELECT * FROM questions WHERE kind = ? AND active = 1 AND (module_id = ? OR module_id IS NULL)"
+            " ORDER BY position, id",
+            (kind, module_id),
+        ).fetchall()
     return conn.execute(
         "SELECT * FROM questions WHERE kind = ? AND active = 1 ORDER BY position, id", (kind,)
     ).fetchall()

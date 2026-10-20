@@ -241,9 +241,12 @@ Split `server.py` into modules without changing behaviour; add `run.py`; add mig
 **Evidence:** 39/39 tests pass (14.5 s); parity check against the old server — 10 of 12 endpoints byte-identical, the 2 differences were learner counts from extra test users only; existing `data/bizready.db` migrated in place with a backup written first; browser smoke test logged in through the form and persisted an action-plan update (97% → 98%) with no JS errors.
 **Bug found and fixed while testing:** the old admin settings endpoint wrote `rubric_floor` as `"2.0"`, which crashed `int()` on every later settings read (500). Now stored as an integer and parsed defensively.
 
-### Phase 2 — Content engine + real admin authoring (≈ 4–5 h)
-Move modules, lessons, templates and questions into the DB, seeded from `content/*.json`; admin CRUD with validation (correct index in range, unique ids, required fields), draft/publish, revision history, preview; passing thresholds editable with audit trail.
+### Phase 2 — Content engine + real admin authoring ✅ (20 Oct 2026)
+Move modules, lessons, templates and questions into the DB, seeded from `content/*.json`; admin CRUD with validation, draft/publish, revision history, preview; passing thresholds editable with audit trail.
 **Acceptance:** create a question in admin → it appears in the learner quiz; edit lesson text → learner sees it; invalid question rejected with a clear message; change quiz pass mark to 75 → a 74 fails and a 75 passes on new attempts; revisions listed.
+
+**Delivered:** `modules`, `lessons`, `templates`, `content_revisions` and `audit_log` tables (migration `002_content.sql`); seeding from the prototype; DB-backed module reads with published-only enforcement; admin module CRUD, publish gate (≥1 lesson, 5 quiz, 3 scenario, practical), lesson editor, template editor, practical editor, preview pane, revision history, audit rows for settings and reviews.
+**Evidence:** 47/47 tests pass, including draft-hidden-until-published, publish gate, lesson edit reaching the learner, revision snapshot, template download/delete, settings audit, and module-slug/lesson validation. Live server verified: module list, module save (v2), revision list, short-title rejection.
 
 ### Phase 3 — Business Check-Up v2 (≈ 2–3 h)
 Expanded profile (type, stage, staff, customers, revenue band, main challenge); diagnostic intro with honest framing ("this is a self-assessment, not a test"); results page: per-component bars, top 3 strengths, top 3 gaps, priority order, recommended module + lesson links; retake with history comparison.

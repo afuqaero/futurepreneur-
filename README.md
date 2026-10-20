@@ -28,7 +28,7 @@ The database lives at `data/bizready.db`. A timestamped backup is written to `da
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-39 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, rubric floor, settings changes, headers, static traversal.
+47 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, rubric floor, settings changes, headers, static traversal, draft/publish gates, admin content authoring, revisions and audit.
 
 ## Configuration
 
@@ -91,5 +91,6 @@ docs/PLAN.md               phase plan and current status
 ## Status
 
 - **Phase 1 — complete:** modular server, migrations, backups, CSRF, throttling, security headers, 39-test suite, behaviour parity with the prototype.
-- **Phase 2 — next:** content and questions move into the database with real admin authoring.
-- Phases 3–10: see `docs/PLAN.md`.
+- **Phase 2 — complete:** modules, lessons, templates and practicals live in SQLite, with admin authoring, draft/publish, preview, revisions and an audit trail (47 tests total).
+- **Phase 3 — next:** Business Check-Up v2 — expanded profile, clearer results, retake comparison.
+- Phases 4–10: see `docs/PLAN.md`.

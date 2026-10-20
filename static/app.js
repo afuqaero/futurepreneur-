@@ -21,7 +21,7 @@ const state = {
   practicalForm: false,
   moduleData: null,
   coach: { mode: 'teach', messages: [], busy: false },
-  admin: { tab: 'learners', qkind: 'all', editing: null, showForm: false, lesson: 'l1', content: null },
+  admin: { tab: 'learners', qkind: 'all', editing: null, showForm: false, lesson: 'l1', content: null, moduleId: null, template: null, newModule: false, newTemplate: false, preview: false },
 };
 let seq = 0;
 let lastRoute = '';
@@ -428,7 +428,7 @@ async function router() {
   try {
     if (root === 'dashboard') await viewDashboard(my);
     else if (root === 'checkup') await viewCheckup(my);
-    else if (root === 'learn' && sub === 'strategy') await viewModule(my);
+    else if (root === 'learn' && sub) await viewModule(my, sub);
     else if (root === 'learn') await viewLearn(my);
     else if (root === 'coach') renderCoach(my);
     else if (root === 'test') await viewTest(my, sub);
@@ -458,7 +458,7 @@ async function viewDashboard(my) {
 
   const steps = [
     { id: 'checkup', label: 'Check-Up', sub: p.diagnostic ? 'Completed' : 'Start here', href: '#/checkup', done: !!p.diagnostic },
-    { id: 'learn', label: 'Learn', sub: `${mod.lessons_done}/${mod.lessons_total} lessons`, href: '#/learn/strategy', done: mod.lessons_done === mod.lessons_total },
+    { id: 'learn', label: 'Learn', sub: `${mod.lessons_done}/${mod.lessons_total} lessons`, href: `#/learn/${mod.id}`, done: mod.lessons_done === mod.lessons_total },
     { id: 'coach', label: 'Coach', sub: 'Ask anything', href: '#/coach', done: false },
     { id: 'test', label: 'Test', sub: `${[mod.quiz_passed, mod.scenario_passed, mod.practical_passed].filter(Boolean).length}/3 passed`, href: '#/test', done: mod.passed },
     { id: 'progress', label: 'Progress', sub: p.mastery.level, href: '#/progress', done: mod.passed },
@@ -487,7 +487,7 @@ async function viewDashboard(my) {
       <h1>${greeting()}, ${esc(state.user.name.split(' ')[0])}.</h1>
       <p>${p.diagnostic ? 'Your check-up is complete. ' : 'Start with a quick diagnostic across eight business areas. '}${esc(next.detail)}</p>
       <div class="hero-actions">
-        <a class="btn btn-teal btn-lg" href="#/${next.route}">${nextLabel} ${icon('right', 15)}</a>
+        <a class="btn btn-teal btn-lg" href="${next.route === 'module' ? `#/learn/${mod.id}` : `#/${next.route}`}">${nextLabel} ${icon('right', 15)}</a>
         <a class="ghost-link" href="#/coach">${icon('coach', 14)} Ask the business coach</a>
       </div>
     </div>
@@ -865,20 +865,21 @@ async function viewLearn(my) {
     </div>
     <div class="roadmap-note" style="margin-bottom:20px">
       ${icon('info', 16)}
-      <div><b>Version 1 scope.</b> Business Strategy &amp; Model is fully built and assessed. The other seven components show their planned topics and are being built on the same structure — their diagnostic questions are already live. Nothing here is a fake “coming soon” button: unavailable modules are marked clearly.</div>
+      <div><b>${state.components.filter(c => c.available).length} of ${state.components.length} modules live.</b> Published modules follow the same format: explanation, examples, do and don't, why it matters, exercises, templates and a scored quiz. Unavailable modules are marked clearly — they are not fake buttons.</div>
     </div>
     <div class="grid auto-300">
       ${state.components.map((c, i) => {
         const comp = p.components.find(x => x.id === c.id);
+        const isCurrent = p.module.id === c.module_id;
         if (c.available) {
           return `<div class="comp-card available">
             <div class="top"><span class="idx">${String(i + 1).padStart(2, '0')}</span><span class="chip chip-teal">Live</span></div>
             <h3>${esc(c.name)}</h3>
             <p>${esc(c.description)}</p>
             <div class="topics">${c.topics.slice(0, 4).map(t => `<span>${esc(t)}</span>`).join('')}</div>
-            <div style="margin-top:4px">${bar(p.module.percent)}<div class="row-between" style="margin-top:6px"><span class="tiny muted">${p.module.percent}% complete</span><span class="tiny muted">${p.module.lessons_done}/${p.module.lessons_total} lessons</span></div></div>
-            <div class="foot"><span class="meta">${p.module.passed ? 'Module passed' : 'Foundation · 45–60 min'}</span>
-              <a class="btn btn-primary btn-sm" href="#/learn/strategy">${p.module.lessons_done ? 'Continue' : 'Start'} ${icon('right', 12)}</a></div>
+            ${isCurrent ? `<div style="margin-top:4px">${bar(p.module.percent)}<div class="row-between" style="margin-top:6px"><span class="tiny muted">${p.module.percent}% complete</span><span class="tiny muted">${p.module.lessons_done}/${p.module.lessons_total} lessons</span></div></div>` : ''}
+            <div class="foot"><span class="meta">${isCurrent && p.module.passed ? 'Module passed' : (isCurrent ? 'In progress' : 'Module available')}</span>
+              <a class="btn btn-primary btn-sm" href="#/learn/${esc(c.module_id)}">${isCurrent && p.module.lessons_done ? 'Continue' : 'Start'} ${icon('right', 12)}</a></div>
           </div>`;
         }
         return `<div class="comp-card">
@@ -906,12 +907,13 @@ async function viewLearn(my) {
     </div>`, my);
 }
 
-async function viewModule(my) {
-  const data = await api('/api/module/strategy');
+async function viewModule(my, moduleId = 'strategy') {
+  const data = await api('/api/module/' + encodeURIComponent(moduleId));
   if (my !== seq) return;
   state.moduleData = data;
   const m = data.module;
   const st = data.state;
+  const moduleIndex = Math.max(0, state.components.findIndex(c => c.id === m.component));
   const done = new Set(data.lessons_done);
   const practical = st.practical;
   const lessonCheck = st.lessons_done === st.lessons_total ? `${st.lessons_done}/${st.lessons_total} complete` : `${st.lessons_done}/${st.lessons_total} lessons`;
@@ -925,17 +927,17 @@ async function viewModule(my) {
   mount(`
     <div class="row" style="gap:8px;margin-bottom:14px">
       <a class="link-arrow" href="#/learn">${icon('left', 13)} All components</a>
-      <span class="chip chip-grey">Module 1 of 8</span>
+      <span class="chip chip-grey">Module ${moduleIndex + 1} of ${state.components.length || 8}</span>
     </div>
     <section class="module-hero">
-      <div class="eyebrow" style="color:#6FE9DD">Foundation module · Business Strategy &amp; Model</div>
+      <div class="eyebrow" style="color:#6FE9DD">${esc(m.level)} module · ${esc(compName(m.component))}</div>
       <h1>${esc(m.title)}</h1>
       <p>${esc(m.tagline)}</p>
       <div class="meta">
         <span class="chip">${icon('clock', 12)} ${esc(m.hours)}</span>
         <span class="chip">${icon('learn', 12)} ${m.lessons.length} lessons</span>
         <span class="chip">${icon('test', 12)} Quiz · scenario · practical</span>
-        <span class="chip">${icon('download', 12)} 4 templates</span>
+        <span class="chip">${icon('download', 12)} ${m.templates.length} templates</span>
       </div>
     </section>
 
@@ -1526,12 +1528,17 @@ async function viewAdmin(my, sub) {
       <a class="btn btn-outline btn-sm" href="#/dashboard">Back to dashboard</a></div></div>`, my);
     return;
   }
-  const tab = ['learners', 'reviews', 'questions', 'settings'].includes(sub) ? sub : state.admin.tab;
+  const tab = ['learners', 'reviews', 'questions', 'content', 'settings'].includes(sub) ? sub : state.admin.tab;
   state.admin.tab = tab;
   const tabs = `<div class="tabs">
-    ${[['learners', 'Learners'], ['reviews', 'Practical reviews'], ['questions', 'Questions'], ['settings', 'Standards & content']].map(t =>
+    ${[['learners', 'Learners'], ['reviews', 'Practical reviews'], ['questions', 'Questions'], ['content', 'Content'], ['settings', 'Standards']].map(t =>
       `<button type="button" class="tab ${tab === t[0] ? 'on' : ''}" data-action="admin-tab" data-tab="${t[0]}">${t[1]}</button>`).join('')}
     </div>`;
+
+  if (tab === 'content') {
+    await viewAdminContent(my, tabs);
+    return;
+  }
 
   if (tab === 'learners') {
     const data = await api('/api/admin/overview');
@@ -1637,10 +1644,7 @@ async function viewAdmin(my, sub) {
     return;
   }
 
-  const content = await api('/api/admin/content');
-  if (my !== seq) return;
-  const lesson = content.module.lessons.find(l => l.id === state.admin.lesson) || content.module.lessons[0];
-  mount(`${headAdmin('Standards & content')}${tabs}
+  mount(`${headAdmin('Standards')}${tabs}
     <div class="split">
       <div class="card card-pad">
         <div class="card-head"><div><h2>Passing criteria</h2><p>Applied immediately to new submissions and reviews.</p></div></div>
@@ -1670,24 +1674,166 @@ async function viewAdmin(my, sub) {
           <span class="small">${state.ai.configured ? 'Live API configured on the server.' : 'Demo mode — no API key configured.'}</span></div>
         <p class="tiny muted" style="margin-top:7px">Set <code>BIZREADY_AI_KEY</code> in the server environment, or add <code>ai.api_key</code> to <code>config.json</code>. Keys never reach the browser.</p>
       </div>
+    </div>`, my);
+}
+
+function moduleEditorHTML(module, lesson, template, revisions) {
+  const statusChip = module.status === 'published'
+    ? '<span class="chip chip-teal">Published</span>'
+    : '<span class="chip chip-yellow">Draft</span>';
+  return `
+    <div class="card card-pad">
+      <div class="row-between wrap" style="gap:10px">
+        <div><h2 style="margin-bottom:4px">${esc(module.title)}</h2>
+          <div class="tiny muted">${esc(module.component)} · v${module.version} · updated ${fmtDate(module.updated_at)}</div></div>
+        <div class="row wrap" style="gap:8px">
+          ${statusChip}
+          <button class="btn btn-ghost btn-sm" type="button" data-action="admin-preview">${state.admin.preview ? 'Hide preview' : 'Preview'}</button>
+          <button class="btn ${module.status === 'published' ? 'btn-outline' : 'btn-primary'} btn-sm" type="button" data-action="admin-module-status" data-status="${module.status === 'published' ? 'draft' : 'published'}">
+            ${module.status === 'published' ? 'Unpublish' : 'Publish'}</button>
+        </div>
+      </div>
+      ${state.admin.preview ? `<div class="preview-pane">
+        <div class="eyebrow">Learner preview · draft-safe</div>
+        <h3 style="margin:6px 0">${esc(module.title)}</h3>
+        <p class="small muted">${esc(module.tagline)}</p>
+        <p class="small"><b>Outcome:</b> ${esc(module.outcome)}</p>
+        <ol class="tiny" style="margin:10px 0 0 18px">${module.lessons.map(l => `<li><b>${esc(l.title)}</b> — ${esc(l.summary)}</li>`).join('')}</ol>
+      </div>` : ''}
     </div>
 
-    <div class="section card card-pad">
-      <div class="card-head"><div><h2>Learning content</h2><p>Edit the lesson text learners see. Changes are stored as overrides and applied immediately.</p></div></div>
-      <div class="content-editor">
-        <div class="lesson-list">
-          ${content.module.lessons.map(l => `<button type="button" class="${l.id === lesson.id ? 'on' : ''}" data-action="admin-lesson" data-id="${l.id}">${esc(l.title)}<span>Lesson ${l.number} · ${l.minutes} min</span></button>`).join('')}
+    <div class="card card-pad" style="margin-top:16px">
+      <div class="card-head"><div><h2>Module details</h2><p>Shown at the top of the learner module page.</p></div></div>
+      <form data-form="module-meta">
+        <div class="field-row">
+          <div class="field"><label>Title</label><input class="input" name="title" value="${esc(module.title)}" required maxlength="120"></div>
+          <div class="field"><label>Level</label><select class="select" name="level">
+            ${['Foundation', 'Practical', 'Advanced'].map(l => `<option ${module.level === l ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         </div>
-        <form data-form="admin-content">
-          <input type="hidden" name="lesson_id" value="${lesson.id}">
-          <div class="field"><label>Lesson title</label><input class="input" name="title" value="${esc(lesson.title)}" required></div>
-          <div class="field"><label>Summary</label><input class="input" name="summary" value="${esc(lesson.summary)}" required></div>
-          <div class="field"><label>Explanation (separate paragraphs with a blank line)</label>
-            <textarea class="textarea" name="explanation" rows="8" required>${esc(lesson.explanation.join('\n\n'))}</textarea></div>
-          <button class="btn btn-primary btn-sm" type="submit">${icon('check', 13)} Save lesson content</button>
-          <span class="tiny muted" style="margin-left:10px">Lesson ${lesson.number} of ${content.module.lessons.length}</span>
-        </form>
+        <div class="field"><label>Tagline</label><input class="input" name="tagline" value="${esc(module.tagline)}" maxlength="300"></div>
+        <div class="field-row">
+          <div class="field"><label>Typical time</label><input class="input" name="hours" value="${esc(module.hours)}" placeholder="45–60 min"></div>
+          <div class="field"><label>Outcome</label><input class="input" name="outcome" value="${esc(module.outcome)}"></div>
+        </div>
+        <div class="field"><label>Intro paragraphs (blank line between)</label>
+          <textarea class="textarea" name="intro" rows="4">${esc((module.intro || []).join('\n\n'))}</textarea></div>
+        <button class="btn btn-primary btn-sm" type="submit">Save module details</button>
+      </form>
+    </div>
+
+    <div class="card card-pad" style="margin-top:16px">
+      <div class="card-head"><div><h2>Practical assignment</h2><p>Reviewed by an admin against the rubric. Required before publishing.</p></div></div>
+      <form data-form="practical-save">
+        <div class="field"><label>Title</label><input class="input" name="practical_title" value="${esc((module.practical || {}).title || '')}" required></div>
+        <div class="field"><label>Intro</label><textarea class="textarea" name="practical_intro" rows="2">${esc((module.practical || {}).intro || '')}</textarea></div>
+        <div class="field"><label>Criteria — one per line: <code>id | Label | Hint</code></label>
+          <textarea class="textarea" name="criteria" rows="4" placeholder="customer_clarity | Customer clarity | One primary customer group">${esc(((module.practical || {}).criteria || []).map(c => `${c.id} | ${c.label} | ${c.hint}`).join('\n'))}</textarea></div>
+        <div class="field"><label>Prompts — one per line: <code>id | criterion | Question | Placeholder</code></label>
+          <textarea class="textarea" name="prompts" rows="4" placeholder="p1 | customer_clarity | Who is your customer? | Be specific">${esc(((module.practical || {}).prompts || []).map(p => `${p.id} | ${p.criterion} | ${p.label} | ${p.placeholder || ''}`).join('\n'))}</textarea></div>
+        <button class="btn btn-primary btn-sm" type="submit">Save practical</button>
+      </form>
+    </div>
+
+    <div class="card card-pad" style="margin-top:16px">
+      <div class="card-head"><div><h2>Lessons</h2><p>${module.lessons.length} lesson${module.lessons.length === 1 ? '' : 's'} · edit the text learners read.</p></div>
+        <button class="btn btn-ghost btn-sm" type="button" data-action="admin-lesson-new">+ Add lesson</button></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+        ${module.lessons.map(l => `<button type="button" class="chip ${lesson && l.id === lesson.id ? 'chip-navy' : 'chip-grey'}" data-action="admin-lesson-select" data-id="${esc(l.id)}">${l.number}. ${esc(l.title)}</button>`).join('')}
       </div>
+      ${lesson ? `<form data-form="lesson-save">
+        <input type="hidden" name="lesson_id" value="${esc(lesson.id)}">
+        <div class="field-row">
+          <div class="field"><label>Lesson title</label><input class="input" name="title" value="${esc(lesson.title)}" required maxlength="160"></div>
+          <div class="field"><label>Minutes</label><input class="input" name="minutes" type="number" min="1" max="180" value="${lesson.minutes}" required></div>
+        </div>
+        <div class="field"><label>Summary</label><input class="input" name="summary" value="${esc(lesson.summary)}" required maxlength="500"></div>
+        <div class="field"><label>Explanation (blank line between paragraphs)</label>
+          <textarea class="textarea" name="explanation" rows="7" required>${esc((lesson.explanation || []).join('\n\n'))}</textarea></div>
+        <div class="field-row">
+          <div class="field"><label>Example title</label><input class="input" name="example_title" value="${esc((lesson.example || {}).title || '')}"></div>
+          <div class="field"><label>Example text</label><textarea class="textarea" name="example_text" rows="3">${esc((lesson.example || {}).text || '')}</textarea></div>
+        </div>
+        <div class="field"><label>What to do (one per line)</label><textarea class="textarea" name="do" rows="4">${esc((lesson.do || []).join('\n'))}</textarea></div>
+        <div class="field"><label>What not to do (one per line)</label><textarea class="textarea" name="dont" rows="4">${esc((lesson.dont || []).join('\n'))}</textarea></div>
+        <div class="field"><label>Why it matters</label><textarea class="textarea" name="why" rows="3">${esc(lesson.why || '')}</textarea></div>
+        <div class="field"><label>Common mistakes (one per line)</label><textarea class="textarea" name="mistakes" rows="4">${esc((lesson.mistakes || []).join('\n'))}</textarea></div>
+        <div class="field-row">
+          <div class="field"><label>Exercise prompt</label><textarea class="textarea" name="exercise_prompt" rows="2">${esc((lesson.exercise || {}).prompt || '')}</textarea></div>
+          <div class="field"><label>Exercise steps (one per line)</label><textarea class="textarea" name="exercise_steps" rows="4">${esc(((lesson.exercise || {}).steps || []).join('\n'))}</textarea></div>
+        </div>
+        <div class="row" style="gap:8px">
+          <button class="btn btn-primary btn-sm" type="submit">Save lesson</button>
+          <button class="btn btn-ghost btn-sm" type="button" data-action="admin-lesson-delete" data-id="${esc(lesson.id)}">Delete lesson</button>
+          <span class="tiny muted">Revision history keeps every save.</span>
+        </div>
+      </form>` : '<div class="empty">Add a lesson to start authoring this module.</div>'}
+    </div>
+
+    <div class="card card-pad" style="margin-top:16px">
+      <div class="card-head"><div><h2>Templates</h2><p>Downloadable files attached to this module.</p></div>
+        <button class="btn btn-ghost btn-sm" type="button" data-action="admin-template-new">+ New template</button></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+        ${module.templates.map(t => `<button type="button" class="chip ${template && t.slug === template.slug ? 'chip-navy' : 'chip-grey'}" data-action="admin-template-select" data-slug="${esc(t.slug)}">${esc(t.title)}</button>`).join('')}
+      </div>
+      ${state.admin.newTemplate || template ? `<form data-form="template-save">
+        <div class="field-row">
+          <div class="field"><label>Slug (lowercase, dashes)</label><input class="input" name="slug" value="${esc(template ? template.slug : '')}" ${template ? 'readonly' : ''} required></div>
+          <div class="field"><label>File name</label><input class="input" name="filename" value="${esc(template ? template.filename : '')}" placeholder="bizready-template.md" required></div>
+        </div>
+        <div class="field"><label>Title</label><input class="input" name="title" value="${esc(template ? template.title : '')}" required></div>
+        <div class="field"><label>Description</label><input class="input" name="description" value="${esc(template ? template.description : '')}"></div>
+        <div class="field"><label>Body (plain text, Markdown or CSV)</label><textarea class="textarea" name="body" rows="8">${esc(template ? template.body : '')}</textarea></div>
+        <div class="row" style="gap:8px"><button class="btn btn-primary btn-sm" type="submit">Save template</button>
+          ${template ? `<button class="btn btn-ghost btn-sm" type="button" data-action="admin-template-delete" data-slug="${esc(template.slug)}">Delete</button>` : ''}</div>
+      </form>` : '<div class="tiny muted">Select a template to edit, or create one.</div>'}
+    </div>
+
+    <div class="card card-pad" style="margin-top:16px">
+      <div class="card-head"><div><h2>Revision history</h2><p>Last edits to this module, newest first.</p></div></div>
+      ${revisions.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>When</th><th>Action</th><th>Editor</th><th>Snapshot</th></tr></thead><tbody>
+        ${revisions.map(r => `<tr><td class="tiny">${fmtDateTime(r.created_at)}</td><td><span class="chip chip-grey">${esc(r.action)}</span></td>
+          <td class="tiny">${esc(r.editor || 'system')}</td><td class="tiny muted">v${r.snapshot.version || '—'} · ${esc(r.snapshot.status || '')}</td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="empty">No edits yet. Saving a module or lesson records a revision.</div>'}
+    </div>`;
+}
+
+async function viewAdminContent(my, tabs) {
+  const list = await api('/api/admin/modules');
+  if (my !== seq) return;
+  if (!state.admin.moduleId || !list.modules.some(m => m.id === state.admin.moduleId)) {
+    state.admin.moduleId = list.modules.length ? list.modules[0].id : null;
+  }
+  let detail = null;
+  if (state.admin.moduleId) {
+    detail = await api('/api/admin/modules/' + encodeURIComponent(state.admin.moduleId));
+    if (my !== seq) return;
+  }
+  const module = detail ? detail.module : null;
+  const lesson = module ? (module.lessons.find(l => l.id === state.admin.lesson) || module.lessons[0]) : null;
+  const template = module && state.admin.template ? module.templates.find(t => t.slug === state.admin.template) : null;
+
+  mount(`${headAdmin('Content')}${tabs}
+    <div class="split" style="grid-template-columns:290px minmax(0,1fr)">
+      <div class="card card-pad">
+        <div class="card-head"><div><h2>Modules</h2><p>${list.modules.length} total</p></div></div>
+        <div style="display:grid;gap:8px">
+          ${list.modules.map(m => `<button type="button" class="module-pick ${m.id === state.admin.moduleId ? 'on' : ''}" data-action="admin-module-select" data-id="${esc(m.id)}">
+            <b>${esc(m.title)}</b><span>${m.lessons} lessons · ${m.quiz} quiz · ${m.scenario} scenario</span>
+            <em class="chip ${m.status === 'published' ? 'chip-teal' : 'chip-yellow'}">${m.status}</em>
+          </button>`).join('')}
+        </div>
+        <hr class="hr">
+        ${state.admin.newModule ? `<form data-form="module-new">
+          <div class="field"><label>Module id</label><input class="input" name="id" placeholder="marketing-basics" required></div>
+          <div class="field"><label>Component</label><select class="select" name="component">
+            ${list.components.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div>
+          <div class="field"><label>Title</label><input class="input" name="title" placeholder="Marketing Foundations" required></div>
+          <div class="row" style="gap:6px"><button class="btn btn-primary btn-sm" type="submit">Create draft</button>
+            <button class="btn btn-ghost btn-sm" type="button" data-action="admin-module-new">Cancel</button></div>
+        </form>` : `<button class="btn btn-outline btn-sm" type="button" data-action="admin-module-new">+ New module</button>`}
+        <p class="tiny muted" style="margin-top:12px">New modules start as drafts. Publish requires at least one lesson, 5 quiz questions, 3 scenario questions and a practical.</p>
+      </div>
+      <div>${module ? moduleEditorHTML(module, lesson, template, detail.revisions || []) : `<div class="card card-pad"><div class="empty">No modules yet.</div></div>`}</div>
     </div>`, my);
 }
 
@@ -1800,7 +1946,70 @@ document.addEventListener('click', async (e) => {
     catch (err) { toast(err.message, 'err'); }
     return;
   }
-  if (action === 'admin-lesson') { state.admin.lesson = el.dataset.id; viewAdmin(begin(), 'settings'); return; }
+  if (action === 'admin-module-select') {
+    state.admin.moduleId = el.dataset.id; state.admin.lesson = null;
+    state.admin.template = null; state.admin.newTemplate = false; state.admin.preview = false;
+    viewAdmin(begin(), 'content'); return;
+  }
+  if (action === 'admin-module-new') {
+    state.admin.newModule = !state.admin.newModule;
+    viewAdmin(begin(), 'content'); return;
+  }
+  if (action === 'admin-module-status') {
+    try {
+      await api('/api/admin/modules/' + encodeURIComponent(state.admin.moduleId) + '/status', {
+        method: 'POST', body: JSON.stringify({ status: el.dataset.status }),
+      });
+      toast(el.dataset.status === 'published' ? 'Module published.' : 'Module moved to draft.', 'ok');
+      viewAdmin(begin(), 'content');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
+  if (action === 'admin-preview') {
+    state.admin.preview = !state.admin.preview;
+    viewAdmin(begin(), 'content'); return;
+  }
+  if (action === 'admin-lesson-select') {
+    state.admin.lesson = el.dataset.id;
+    viewAdmin(begin(), 'content'); return;
+  }
+  if (action === 'admin-lesson-new') {
+    try {
+      const data = await api('/api/admin/modules/' + encodeURIComponent(state.admin.moduleId) + '/lessons', { method: 'POST' });
+      state.admin.lesson = data.lesson.id;
+      toast('Lesson added. Fill in the content and save.', 'ok');
+      viewAdmin(begin(), 'content');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
+  if (action === 'admin-lesson-delete') {
+    if (!confirm('Delete this lesson? The revision history keeps a snapshot, but learners will lose it.')) return;
+    try {
+      await api('/api/admin/lessons/' + encodeURIComponent(el.dataset.id), { method: 'DELETE' });
+      state.admin.lesson = null;
+      toast('Lesson deleted.', 'ok');
+      viewAdmin(begin(), 'content');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
+  if (action === 'admin-template-select') {
+    state.admin.template = el.dataset.slug; state.admin.newTemplate = false;
+    viewAdmin(begin(), 'content'); return;
+  }
+  if (action === 'admin-template-new') {
+    state.admin.template = null; state.admin.newTemplate = true;
+    viewAdmin(begin(), 'content'); return;
+  }
+  if (action === 'admin-template-delete') {
+    if (!confirm('Delete this template?')) return;
+    try {
+      await api('/api/admin/templates/' + encodeURIComponent(el.dataset.slug), { method: 'DELETE' });
+      state.admin.template = null;
+      toast('Template deleted.', 'ok');
+      viewAdmin(begin(), 'content');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
   if (action === 'admin-review') {
     const card = el.closest('.review-card');
     const scores = {};
@@ -1890,6 +2099,114 @@ document.addEventListener('submit', async (e) => {
       state.admin.editing = null; state.admin.showForm = false;
       toast(editing ? 'Question updated.' : 'Question created.', 'ok');
       viewAdmin(begin(), 'questions');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
+  if (kind === 'module-new') {
+    const el = form.elements;
+    try {
+      const data = await api('/api/admin/modules', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: el.id.value.trim().toLowerCase(), component: el.component.value,
+          title: el.title.value.trim(),
+        }),
+      });
+      state.admin.moduleId = data.module.id;
+      state.admin.newModule = false; state.admin.lesson = null;
+      toast('Draft module created. Add lessons, questions and a practical before publishing.', 'ok');
+      viewAdmin(begin(), 'content');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
+  if (kind === 'practical-save') {
+    const el = form.elements;
+    const splitRows = (value) => value.split('\n').map(line => line.split('|').map(s => s.trim())).filter(row => row[0]);
+    const criteria = splitRows(el.criteria.value).map(row => ({
+      id: row[0].toLowerCase(), label: row[1] || row[0], hint: row[2] || '',
+    }));
+    const prompts = splitRows(el.prompts.value).map(row => ({
+      id: row[0].toLowerCase(), criterion: row[1] || '', label: row[2] || row[0], placeholder: row[3] || '',
+    }));
+    try {
+      await api('/api/admin/modules/' + encodeURIComponent(state.admin.moduleId), {
+        method: 'PUT',
+        body: JSON.stringify({
+          practical: {
+            title: el.practical_title.value.trim(),
+            intro: el.practical_intro.value.trim(),
+            criteria,
+            prompts,
+          },
+        }),
+      });
+      toast('Practical assignment saved.', 'ok');
+      viewAdmin(begin(), 'content');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
+  if (kind === 'module-meta') {
+    const el = form.elements;
+    const paragraphs = (value) => value.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+    try {
+      await api('/api/admin/modules/' + encodeURIComponent(state.admin.moduleId), {
+        method: 'PUT',
+        body: JSON.stringify({
+          title: el.title.value.trim(), tagline: el.tagline.value.trim(), level: el.level.value,
+          hours: el.hours.value.trim(), outcome: el.outcome.value.trim(),
+          intro: paragraphs(el.intro.value),
+        }),
+      });
+      toast('Module details saved.', 'ok');
+      viewAdmin(begin(), 'content');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
+  if (kind === 'lesson-save') {
+    const el = form.elements;
+    const lines = (value) => value.split('\n').map(s => s.trim()).filter(Boolean);
+    const paragraphs = (value) => value.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+    const lessonId = el.lesson_id.value;
+    try {
+      await api('/api/admin/lessons/' + encodeURIComponent(lessonId), {
+        method: 'PUT',
+        body: JSON.stringify({
+          title: el.title.value.trim(),
+          minutes: Number(el.minutes.value),
+          summary: el.summary.value.trim(),
+          body: {
+            explanation: paragraphs(el.explanation.value),
+            example: { title: el.example_title.value.trim(), text: el.example_text.value.trim() },
+            do: lines(el['do'].value),
+            dont: lines(el['dont'].value),
+            why: el.why.value.trim(),
+            mistakes: lines(el.mistakes.value),
+            exercise: { prompt: el.exercise_prompt.value.trim(), steps: lines(el.exercise_steps.value) },
+          },
+        }),
+      });
+      toast('Lesson saved. Learners see this immediately when the module is published.', 'ok');
+      viewAdmin(begin(), 'content');
+    } catch (err) { toast(err.message, 'err'); }
+    return;
+  }
+  if (kind === 'template-save') {
+    const el = form.elements;
+    try {
+      await api('/api/admin/modules/' + encodeURIComponent(state.admin.moduleId) + '/templates', {
+        method: 'PUT',
+        body: JSON.stringify({
+          slug: el.slug.value.trim().toLowerCase(),
+          title: el.title.value.trim(),
+          description: el.description.value.trim(),
+          filename: el.filename.value.trim(),
+          body: el.body.value,
+        }),
+      });
+      state.admin.template = el.slug.value.trim().toLowerCase();
+      state.admin.newTemplate = false;
+      toast('Template saved.', 'ok');
+      viewAdmin(begin(), 'content');
     } catch (err) { toast(err.message, 'err'); }
     return;
   }

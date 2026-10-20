@@ -2,12 +2,19 @@
 
 import json
 
-import content
+from .. import content_repo
 from ..clock import iso
 from ..content_service import mcq_rows
 from ..errors import ApiError, clean_text
 from ..models import settings_public
-from ..scoring import build_progress, is_pass, pass_mark, score_answers
+from ..scoring import build_progress, is_pass, pass_mark, practical_latest, score_answers
+
+
+def _published_module(conn):
+    module = content_repo.get_module(conn, content_repo.DEFAULT_MODULE_ID, published_only=True)
+    if not module:
+        raise ApiError(404, "Module not available.", "not_found")
+    return module
 
 
 def handle(h, conn, method, path, user):
@@ -15,7 +22,8 @@ def handle(h, conn, method, path, user):
         kind = path[len("/api/assessment/"):-len("/questions")].strip("/")
         if kind not in ("quiz", "scenario"):
             raise ApiError(404, "Assessment not found.", "not_found")
-        rows = mcq_rows(conn, kind)
+        module = _published_module(conn)
+        rows = mcq_rows(conn, kind, module["id"])
         s = settings_public(conn)
         history = [dict(r) for r in conn.execute(
             "SELECT score, passed, created_at FROM attempts WHERE user_id = ? AND kind = ? ORDER BY id DESC LIMIT 10",
@@ -39,7 +47,8 @@ def handle(h, conn, method, path, user):
         answers = body.get("answers")
         if not isinstance(answers, dict):
             raise ApiError(400, "Answers must be an object.", "invalid_input")
-        rows = mcq_rows(conn, kind)
+        module = _published_module(conn)
+        rows = mcq_rows(conn, kind, module["id"])
         if not rows:
             raise ApiError(400, "No questions are available.", "no_questions")
         score, detail, correct, total = score_answers(rows, answers)
@@ -48,7 +57,7 @@ def handle(h, conn, method, path, user):
         passed = is_pass(score, mark)
         conn.execute(
             "INSERT INTO attempts (user_id, kind, component, score, passed, detail, created_at) VALUES (?,?,?,?,?,?,?)",
-            (user["id"], kind, "strategy", score, 1 if passed else 0,
+            (user["id"], kind, module["component"], score, 1 if passed else 0,
              json.dumps({"detail": detail, "correct": correct, "total": total}), iso()),
         )
         conn.commit()
@@ -62,24 +71,22 @@ def handle(h, conn, method, path, user):
         return True
 
     if path == "/api/practical" and method == "GET":
-        from ..scoring import practical_latest
-
+        module = _published_module(conn)
         h.send_json({
-            "practical": content.MODULE["practical"],
+            "practical": module["practical"],
             "submission": practical_latest(conn, user["id"]),
             "standards": settings_public(conn),
         })
         return True
 
     if path == "/api/practical/submit" and method == "POST":
-        from ..scoring import practical_latest
-
+        module = _published_module(conn)
         body = h.read_json()
         responses = body.get("responses")
         if not isinstance(responses, dict):
             raise ApiError(400, "Responses must be an object.", "invalid_input")
         cleaned = {}
-        for prompt in content.MODULE["practical"]["prompts"]:
+        for prompt in (module["practical"].get("prompts") or []):
             val = clean_text(responses.get(prompt["id"], ""), 4000, prompt["label"])
             if len(val) < 30:
                 raise ApiError(400, "Please give a fuller answer for every question (at least 30 characters).", "invalid_input")
@@ -98,14 +105,16 @@ def handle(h, conn, method, path, user):
 
     if path.startswith("/api/templates/") and method == "GET":
         slug = path[len("/api/templates/"):].strip("/")
-        if slug not in content.TEMPLATE_FILES:
+        template = content_repo.get_template(conn, slug)
+        if not template:
             raise ApiError(404, "Template not found.", "not_found")
-        meta = next((t for t in content.MODULE["templates"] if t["slug"] == slug), None)
-        filename = meta["filename"] if meta else f"{slug}.txt"
-        data = content.TEMPLATE_FILES[slug].encode("utf-8")
+        module = content_repo.get_module(conn, template["module_id"], published_only=True)
+        if not module:
+            raise ApiError(404, "Template not found.", "not_found")
+        data = template["body"].encode("utf-8")
         h.send_bytes(
             data, "text/plain; charset=utf-8",
-            extra={"Content-Disposition": f'attachment; filename="{filename}"', "Cache-Control": "no-store"},
+            extra={"Content-Disposition": f'attachment; filename="{template["filename"]}"', "Cache-Control": "no-store"},
         )
         return True
 
