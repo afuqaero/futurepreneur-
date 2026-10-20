@@ -1,0 +1,234 @@
+{
+  "id": "people",
+  "component": "people",
+  "title": "People & Leadership",
+  "tagline": "Build a team that runs the work without you standing in the middle.",
+  "level": "Foundation",
+  "hours": "50–65 min",
+  "outcome": "By the end, you will have a role scorecard, a delegation plan with clear authority, a weekly 1:1 rhythm, and a retention plan for your key person.",
+  "intro": [
+    "Most small businesses do not have a people problem; they have a clarity problem. People cannot own outcomes that were never defined, and owners stay in the middle because handing over a task is not the same as handing over a decision.",
+    "This module gives you four tools: a role scorecard, a delegation agreement, a short feedback rhythm, and a retention plan. They work with two staff or twenty."
+  ],
+  "practical": {
+    "title": "Practical assignment: make one role ownable",
+    "intro": "Pick one role — including your own — and make it clear enough that someone else could run it. A reviewer scores each criterion from 0 to 4; the module passes at an average of 3 or more, with no criterion below 2.",
+    "criteria": [
+      { "id": "role_clarity", "label": "Role clarity", "hint": "Outcomes, measures and authority are written, not assumed." },
+      { "id": "delegation", "label": "Delegation", "hint": "A real decision is handed over with limits and a check-in point." },
+      { "id": "feedback_rhythm", "label": "Feedback rhythm", "hint": "A repeatable 1:1 or feedback routine with a specific example." },
+      { "id": "retention", "label": "Retention", "hint": "A concrete plan for keeping the person who would hurt most to lose." }
+    ],
+    "prompts": [
+      { "id": "p1", "criterion": "role_clarity", "label": "Write the role scorecard: outcomes, measures, authority and must-have skills.", "placeholder": "Three to five outcomes, one measure each, what they can decide alone, what needs you." },
+      { "id": "p2", "criterion": "delegation", "label": "What decision will you hand over, with what limits?", "placeholder": "Decision, authority limit, definition of done, check-in date." },
+      { "id": "p3", "criterion": "feedback_rhythm", "label": "Describe your feedback routine and one real example.", "placeholder": "When it happens, how long, what gets discussed, what changed." },
+      { "id": "p4", "criterion": "retention", "label": "How will you keep your most important person?", "placeholder": "Pay position, schedule, growth path, recognition, risk you are fixing." }
+    ]
+  },
+  "lessons": [
+    {
+      "id": "pp1",
+      "title": "Hire for the gap, not for a job title",
+      "minutes": 11,
+      "summary": "Define the outcomes you need before you write an advertisement.",
+      "explanation": [
+        "A hire should close a specific gap: too much work, a skill you do not have, or a role the owner should stop doing. If you cannot name the gap in one sentence, you are not ready to hire — you are hoping a new person will make the chaos feel better.",
+        "Write a role scorecard before a job description. It lists three to five outcomes the person owns, how each is measured, what they can decide alone, and the few skills that genuinely must exist on day one. A title like 'assistant' tells nobody what good looks like.",
+        "Hire for the outcomes you can supervise, not the CV you find impressive. In a five-person business, reliability and willingness to follow a standard usually beat a long list of experience. Test the actual work: a short paid trial shift or a small real task tells you more than an interview."
+      ],
+      "example": {
+        "title": "Aina's Kitchen — three hours a day packing",
+        "text": "Aina spent three hours every morning packing lunch sets, then rushed her own cooking. She wrote the gap in one sentence: 'I need 60 sets packed by 11am at fewer than two errors a day.' The scorecard had three outcomes — packs per hour, error rate, and packaging stock counted — plus authority to reject a bad batch. She hired a part-time packer and tested the role with two paid trial mornings. Within two weeks, Aina stopped packing entirely and used the time to fix supplier pricing, which saved more than the wage."
+      },
+      "do": [
+        "Name the gap in one sentence: capacity, skill or owner time.",
+        "Write three to five outcomes with a measure for each.",
+        "State what the person can decide alone and what needs approval.",
+        "Use a paid trial task or shift before a permanent offer."
+      ],
+      "dont": [
+        "Do not hire from a generic job title with no outcomes.",
+        "Do not hire to fix a process you have not defined.",
+        "Do not skip reference checks because the trial went well."
+      ],
+      "why": "A clear role attracts the right person and gives you a fair way to judge performance. Without it, every mistake becomes an argument about attitude.",
+      "mistakes": [
+        "Writing a long list of duties instead of a short list of outcomes.",
+        "Hiring a friend or relative without a scorecard, then avoiding the performance conversation.",
+        "Testing only conversation, never the real work."
+      ],
+      "exercise": {
+        "prompt": "Write a one-page scorecard for the role you need most.",
+        "steps": [
+          "Name the gap in one sentence.",
+          "List three to five outcomes, each with a measure.",
+          "Mark what the role can decide alone and the spending limit.",
+          "List the two must-have skills and one trainable skill.",
+          "Design a 60-minute paid trial task that tests the main outcome."
+        ]
+      }
+    },
+    {
+      "id": "pp2",
+      "title": "Delegate outcomes, not tasks",
+      "minutes": 12,
+      "summary": "Hand over the result, the limits and the check-in point — then stay out.",
+      "explanation": [
+        "Delegating a task sounds like 'pack the orders'. Delegating an outcome sounds like 'all orders packed by 3pm, under two errors a week, and you decide how to sequence the work'. The second version creates ownership. The first creates a person waiting for instructions.",
+        "Every delegation needs four parts: the result, the definition of done, the authority limit, and the check-in. The definition of done removes ambiguity. The authority limit tells the person what they can decide without asking — for example, replace a damaged item up to RM50. The check-in is a fixed time, not constant supervision.",
+        "Owners often delegate work but keep the decisions, then complain that nobody takes responsibility. If every small choice still comes back to you, you have added a messenger, not capacity. Hand over one real decision this week and review the result at the agreed check-in."
+      ],
+      "example": {
+        "title": "Cleaning company — the owner was the scheduling bottleneck",
+        "text": "A cleaning company owner approved every job schedule, even though the supervisor knew the sites and staff better. Jobs were confirmed late and clients complained. The owner handed over scheduling with three rules: keep travel under 30 minutes between sites, do not exceed 42 hours per cleaner, and flag any job above RM1,500. The supervisor got authority to move staff and rebook within those limits, with a Monday 15-minute review. Late confirmations fell from nine a week to one, and the owner stopped working evenings."
+      },
+      "do": [
+        "State the outcome and the definition of done in writing.",
+        "Set a clear authority limit, including a spending cap.",
+        "Agree a fixed check-in time and what will be reviewed.",
+        "Let the person choose the method unless a method is safety-critical."
+      ],
+      "dont": [
+        "Do not delegate responsibility without the authority to act.",
+        "Do not check in every hour and call it support.",
+        "Do not take the task back at the first mistake without a conversation."
+      ],
+      "why": "Outcome delegation increases capacity and builds judgment. Task delegation only moves instructions from your head to someone else's inbox.",
+      "mistakes": [
+        "Giving a deadline but no definition of done, then rejecting the result.",
+        "Delegating to the fastest person instead of the person who should learn it.",
+        "Keeping a hidden veto, so staff learn that decisions are not really theirs."
+      ],
+      "exercise": {
+        "prompt": "Hand over one real decision this week.",
+        "steps": [
+          "Choose a decision you currently make at least three times a week.",
+          "Write the outcome, definition of done and authority limit.",
+          "Name the one thing that must still come to you.",
+          "Set the check-in date and what you will review.",
+          "After one week, note what you had to clarify — that is your missing standard."
+        ]
+      }
+    },
+    {
+      "id": "pp3",
+      "title": "Feedback that changes behaviour",
+      "minutes": 12,
+      "summary": "Short, specific and close to the event beats an annual review nobody remembers.",
+      "explanation": [
+        "Feedback works when it is specific, timely and about behaviour rather than character. 'You are careless' cannot be acted on. 'Yesterday two orders went out without a drink; the customer called back' can. Use situation, behaviour, impact — then ask what happened before you prescribe a fix.",
+        "A weekly 20-minute 1:1 is the cheapest management system available. The person brings wins, blockers and one thing they need from you. You bring one piece of specific feedback and one question. Keep a running log so commitments do not disappear between busy weeks.",
+        "When performance does not improve, move to a clear process: restate the standard, show the evidence, agree support, state the consequence, and set a review date. Document it. This is fair to the person and protects the business. Avoiding the conversation is not kindness; it is a decision to let the problem grow."
+      ],
+      "example": {
+        "title": "Café barista — late three times a week",
+        "text": "A café owner kept covering for a barista who arrived 15 minutes late three times a week. The owner mentioned it casually, then felt resentful. In a 1:1, she used the facts: three late arrivals, the queue reaching the door, and one customer complaint. She asked what was happening. The barista had a childcare handover that clashed with the opening shift. They moved her start to 9am and gave the opening task to another staff member. Lateness stopped, and the owner stopped arriving early to cover."
+      },
+      "do": [
+        "Give feedback within a day or two, in private.",
+        "Describe the situation, behaviour and impact, then ask a question.",
+        "Hold a weekly 20-minute 1:1 with a written log.",
+        "For repeated issues, set a standard, evidence, support, consequence and review date."
+      ],
+      "dont": [
+        "Do not save feedback for an annual review.",
+        "Do not label the person; describe the behaviour.",
+        "Do not promise a consequence you are not prepared to enforce."
+      ],
+      "why": "Clear feedback protects standards and reduces resentment. People rarely improve from hints, and owners rarely feel better after swallowing a problem for months.",
+      "mistakes": [
+        "Giving feedback in front of customers or other staff.",
+        "Only giving feedback when something goes wrong, never when it goes right.",
+        "Treating a schedule problem as an attitude problem."
+      ],
+      "exercise": {
+        "prompt": "Start a weekly 1:1 and use it once.",
+        "steps": [
+          "Pick a fixed 20-minute slot for the next four weeks.",
+          "Create a simple log: wins, blockers, commitments.",
+          "Prepare one specific piece of feedback using situation-behaviour-impact.",
+          "Ask 'what would make this easier?' before suggesting a fix.",
+          "Record one commitment and review it next week."
+        ]
+      }
+    },
+    {
+      "id": "pp4",
+      "title": "Keep the people who carry the business",
+      "minutes": 11,
+      "summary": "Retention is cheaper than recruiting, and it is built from predictable basics.",
+      "explanation": [
+        "Replacing one experienced person usually costs one to three months of their wage in recruiting, training and lost productivity, before counting the mistakes and customer relationships that leave with them. Retention is not a perk programme; it is a set of basics done consistently.",
+        "The basics are pay at or near the local market for the role, a schedule people can plan around, fair treatment, a clear path to learn something new, and recognition that is specific. Different people weight these differently, so ask instead of guessing.",
+        "Run a short stay conversation every six months with your key person: what keeps you here, what would make you leave, what do you want to learn next, and what is frustrating you now. Then fix one thing. A business that only asks these questions during an exit interview is collecting information too late."
+      ],
+      "example": {
+        "title": "Tuition centre — three teachers in six months",
+        "text": "A tuition centre lost three teachers in six months. Exit conversations pointed to the same issues: schedules sent on Sunday night, no pay band, and no path beyond assistant. The owner introduced four-week published schedules, a three-step pay band tied to class quality and retention, and a paid assistant role for teachers who wanted to lead. Turnover stopped for the next year, and recruiting costs fell by more than the pay increase."
+      },
+      "do": [
+        "Check pay against the local market at least once a year.",
+        "Publish schedules far enough ahead for people to plan their lives.",
+        "Offer one visible way to learn and earn more.",
+        "Ask stay questions every six months and fix one answer."
+      ],
+      "dont": [
+        "Do not rely on loyalty while paying below market.",
+        "Do not promise a promotion with no role or budget behind it.",
+        "Do not wait for an exit interview to learn what is wrong."
+      ],
+      "why": "Stable people protect quality, customer relationships and your own time. Constant hiring quietly consumes the owner's attention and the business's margin.",
+      "mistakes": [
+        "Giving a small raise to everyone instead of fixing the specific reason people leave.",
+        "Treating flexibility as a favour rather than a scheduled commitment.",
+        "Promoting the best technician into a supervisor role without training."
+      ],
+      "exercise": {
+        "prompt": "Build a one-page retention plan for your key person.",
+        "steps": [
+          "Name the person whose exit would hurt most, and why.",
+          "Check their pay against the local market for the role.",
+          "List what they have asked for in the last six months.",
+          "Choose one fix you can afford this quarter.",
+          "Book a 20-minute stay conversation and ask four questions."
+        ]
+      }
+    }
+  ],
+  "templates": [
+    {
+      "slug": "people-role-scorecard",
+      "title": "Role scorecard",
+      "description": "Outcomes, measures, authority and must-have skills for one role.",
+      "format": "Markdown",
+      "filename": "futurepreneur-people-role-scorecard.md",
+      "body": "# Role scorecard\n\nRole:\nReports to:\nGap this role closes (one sentence):\n\n## Outcomes\n| # | Outcome | Measure | Checked how often |\n|---|---------|---------|-------------------|\n| 1 | | | |\n| 2 | | | |\n| 3 | | | |\n\n## Authority\n- Can decide alone:\n- Spending limit without approval:\n- Must escalate:\n\n## Skills\n- Must have on day one:\n- Can train:\n\n## Trial task\n- Task:\n- What good looks like:\n"
+    },
+    {
+      "slug": "people-one-to-one-log",
+      "title": "Weekly 1:1 log",
+      "description": "CSV log for wins, blockers, feedback and commitments.",
+      "format": "CSV",
+      "filename": "futurepreneur-people-one-to-one-log.csv",
+      "body": "date,person,wins,blockers,feedback,commitment,review_date\n2026-11-06,Packer,Packed 62 sets with 1 error,Stock ran out Thursday,Packaging count missed at 10am,Add 9am stock count,2026-11-13\n"
+    }
+  ],
+  "questions": [
+    { "id": "pp-q1", "kind": "quiz", "topic": "Hiring", "prompt": "What should come before a job advertisement?", "options": ["A long list of duties", "A role scorecard with outcomes and measures", "A salary survey", "A new uniform"], "correct": 1, "explanation": "Outcomes define what good looks like; duties alone do not." },
+    { "id": "pp-q2", "kind": "quiz", "topic": "Gap", "prompt": "Which is a real hiring gap?", "options": ["We need more people", "Packing takes 3 hours a day and causes late deliveries", "Our competitor hired someone", "We have a spare desk"], "correct": 1, "explanation": "A gap should name capacity, skill or owner time in measurable terms." },
+    { "id": "pp-q3", "kind": "quiz", "topic": "Delegation", "prompt": "What makes delegation complete?", "options": ["A task and a deadline", "Outcome, definition of done, authority and a check-in", "A WhatsApp message", "A promise to help"], "correct": 1, "explanation": "All four parts prevent the task bouncing back." },
+    { "id": "pp-q4", "kind": "quiz", "topic": "Authority", "prompt": "Why set a spending limit when delegating?", "options": ["To test loyalty", "So the person can act without asking for every small decision", "To reduce wages", "To create paperwork"], "correct": 1, "explanation": "Clear limits create speed and safety at the same time." },
+    { "id": "pp-q5", "kind": "quiz", "topic": "Feedback", "prompt": "Which is specific feedback?", "options": ["You are careless", "Two orders went out without drinks yesterday; the customer called back", "Be more professional", "Everyone needs to improve"], "correct": 1, "explanation": "Specific behaviour and impact can be acted on; labels cannot." },
+    { "id": "pp-q6", "kind": "quiz", "topic": "1:1", "prompt": "What belongs in a weekly 1:1?", "options": ["Only sales numbers", "Wins, blockers, one specific feedback point and commitments", "A full performance review", "Only praise"], "correct": 1, "explanation": "Short, regular and two-way beats an annual event." },
+    { "id": "pp-q7", "kind": "quiz", "topic": "Performance", "prompt": "A repeated performance issue has not improved. What comes next?", "options": ["Ignore it", "Restate standard, show evidence, agree support, state consequence, set review date", "Cut their hours silently", "Give a vague warning"], "correct": 1, "explanation": "A documented, fair process protects both sides." },
+    { "id": "pp-q8", "kind": "quiz", "topic": "Retention", "prompt": "What is the cheapest retention improvement?", "options": ["A new office", "Fixing the specific reason people leave, starting with schedule and pay fairness", "A yearly dinner", "More rules"], "correct": 1, "explanation": "Basics beat perks; ask why people leave and fix that." },
+    { "id": "pp-q9", "kind": "quiz", "topic": "Turnover", "prompt": "What does replacing an experienced person usually cost?", "options": ["Nothing", "One to three months of their wage in recruiting, training and lost output", "Only the recruitment fee", "A week of wages"], "correct": 1, "explanation": "The hidden cost is training time, mistakes and lost customer knowledge." },
+    { "id": "pp-q10", "kind": "quiz", "topic": "Stay interview", "prompt": "When should you ask what would make someone leave?", "options": ["During the exit interview", "Every six months, while they still work for you", "Only when they resign", "Never"], "correct": 1, "explanation": "Stay conversations surface fixable issues before resignation." },
+    { "id": "pp-s1", "kind": "scenario", "topic": "Owner bottleneck", "prompt": "A cleaning owner approves every schedule and works evenings. What is the soundest first move?", "options": ["Hire an assistant for the owner", "Hand scheduling to the supervisor with clear limits and a weekly review", "Tell clients to wait", "Work later"], "correct": 1, "explanation": "Delegate the decision, not just the task, with limits and a check-in." },
+    { "id": "pp-s2", "kind": "scenario", "topic": "Lateness", "prompt": "A barista is late three times a week. What should the owner do first?", "options": ["Cut her pay", "Have a private conversation using specific facts and ask what is happening", "Ignore it", "Post a warning in the group chat"], "correct": 1, "explanation": "Specific facts plus a question often reveal a fixable scheduling issue." },
+    { "id": "pp-s3", "kind": "scenario", "topic": "Hiring test", "prompt": "Two candidates interview well. What gives the best evidence?", "options": ["The longer CV", "A short paid trial of the main outcome", "A personality quiz", "Whoever accepts the lowest pay"], "correct": 1, "explanation": "A trial tests the real work; interviews test conversation." },
+    { "id": "pp-s4", "kind": "scenario", "topic": "Retention", "prompt": "Three teachers left in six months, all citing schedules and no growth. What should the owner fix first?", "options": ["Buy new furniture", "Publish schedules four weeks ahead and create a visible pay/growth path", "Hire cheaper teachers", "Add more classes"], "correct": 1, "explanation": "Fix the repeated exit reason before adding perks." },
+    { "id": "pp-s5", "kind": "scenario", "topic": "Delegation failure", "prompt": "A delegated task keeps coming back for approval. What is the likely cause?", "options": ["The person is lazy", "The authority limit was never defined", "The task is impossible", "The owner is too kind"], "correct": 1, "explanation": "Without explicit authority, people default to asking." }
+  ]
+}

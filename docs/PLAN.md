@@ -256,10 +256,10 @@ Expanded profile (type, stage, staff, customers, revenue band, main challenge); 
 **Evidence:** 51/51 tests pass, including customer-type round-trip, history ordering (83/67/50), +16 delta, old results retained, and priorities ordered weakest-first. Headless Chrome: 2 real gaps (0%, 67%), two history rows, +16 chip, customer type shown and editable, zero JS errors, 390px with no horizontal scroll.
 **Bug found and fixed:** the first cut listed the three lowest scores even when many were 100%, producing a "priority" card at 100% while also calling it a strength. Gap ranking now uses a threshold and excludes overlaps.
 
-### Phase 4 — Learn & Improve, modules 2–8 🔄 (in progress, 3 of 7 done)
+### Phase 4 — Learn & Improve, modules 2–8 🔄 (in progress, 4 of 7 done)
 Same structure as strategy for all 8. Per module: 5–6 lessons, 2 templates, mini quiz, lesson completion, progress within module, "next lesson" flow, print-friendly lesson view. Modules are built one at a time, each checkpointed.
-**Delivered so far:** Marketing & Sales, Operations & Quality, Financial Management — 4 lessons and 2 templates each, plus 10 quiz + 5 scenario questions and a practical rubric per module; JSON seeding pipeline; per-module assessment scoping.
-**Remaining:** People & Leadership, Systems & SOP, Legal & Risk, Digitalisation & Growth. Assessment wiring for new modules lands in Phase 5; the module UI labels this clearly and does not link to the wrong quiz.
+**Delivered so far:** Marketing & Sales, Operations & Quality, Financial Management, People & Leadership — 4 lessons and 2 templates each, plus 10 quiz + 5 scenario questions and a practical rubric per module; JSON seeding pipeline; per-module assessment scoping.
+**Remaining:** Systems & SOP, Legal & Risk, Digitalisation & Growth. Assessment wiring for new modules lands in Phase 5; the module UI labels this clearly and does not link to the wrong quiz.
 **Acceptance:** all 8 open and render; lesson completion persists across logout; templates download with correct filename/type; quiz unlocks only after lessons; no placeholder lorem anywhere.
 
 ### Phase 5 — Assessment centre (≈ 4–5 h)
