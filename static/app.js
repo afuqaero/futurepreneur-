@@ -918,7 +918,12 @@ async function viewModule(my, moduleId = 'strategy') {
     { b: 'Knowledge quiz', s: st.quiz ? `Best ${st.quiz.score}%` : `Pass ${st.standards.quiz_pass}%`, done: st.quiz_passed },
     { b: 'Scenario test', s: st.scenario ? `Best ${st.scenario.score}%` : `Pass ${st.standards.scenario_pass}%`, done: st.scenario_passed },
     { b: 'Practical', s: practical ? (practical.status === 'reviewed' ? `Scored ${practical.average}/4` : 'Awaiting review') : `Rubric ${st.standards.rubric_min}/4`, done: st.practical_passed },
-  ] : [{ b: 'Lessons', s: lessonCheck, done: st.lessons_done === st.lessons_total }];
+  ] : [
+    { b: 'Lessons', s: lessonCheck, done: st.lessons_done === st.lessons_total },
+    { b: 'Templates', s: `${m.templates.length} ready to download`, done: true },
+    { b: 'Exercises', s: `${m.lessons.length} practical steps`, done: false },
+    { b: 'Assessment', s: 'Arrives in Phase 5', done: false },
+  ];
   const LESSON_ART = ['/static/img/lesson-map.svg', '/static/img/lesson-lens.svg', '/static/img/lesson-check.svg', '/static/img/lesson-boost.svg'];
   const LESSON_EMOJI = ['🧠', '🔍', '✅', '🚀'];
 
