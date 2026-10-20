@@ -30,6 +30,10 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 54 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, rubric floor, settings changes, headers, static traversal, draft/publish gates, admin content authoring, revisions, audit, check-up history and deltas, and drop-in template file overrides.
 
+## Design system
+
+Blue `#1B4DFF`, yellow `#FFD23F`, ink `#0A1733` on cloud `#F6F7FB`. Display type is Bricolage Grotesque, body is DM Sans. The Gen-Z layer lives in `static/theme.css` (loaded after `styles.css`) with illustrations in `static/img/`. Keep card copy to one line; depth belongs inside the lessons.
+
 ## Your own template files
 
 You do not need to edit code to replace a template. Drop a file into `content/templates/` and it is served immediately.

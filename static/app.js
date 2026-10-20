@@ -260,7 +260,7 @@ function renderAuth() {
           <li><span class="num">04</span> Scored assessments and a verified progress record</li>
         </ul>
       </div>
-      <div class="auth-foot">Version 1 · Business Strategy &amp; Model module complete. Seven modules in development.</div>
+      <div class="auth-foot">4 of 8 modules live · built for micro-business owners.</div>
     </section>
     <section class="auth-panel">
       <div class="auth-card">
@@ -349,6 +349,19 @@ const NAV = [
   { id: 'test', label: 'Test Your Skills', href: '#/test', icon: 'test' },
   { id: 'progress', label: 'My Business Progress', href: '#/progress', icon: 'progress' },
 ];
+
+const COMP_STYLE = {
+  strategy: { emoji: '🧭', short: 'Know what you sell, to whom, and why it wins.' },
+  marketing: { emoji: '📣', short: 'Get found, get chosen, get paid.' },
+  operations: { emoji: '⚙️', short: 'Same good result every time — without you hovering.' },
+  finance: { emoji: '💸', short: 'Know your numbers. Keep more of what you earn.' },
+  people: { emoji: '🫶', short: 'Hire right, delegate well, keep good people.' },
+  systems: { emoji: '🧩', short: 'Write it down once. Stop repeating yourself.' },
+  legal: { emoji: '🛡️', short: 'Cover the basics before they bite.' },
+  digital: { emoji: '🚀', short: 'Tools that save hours, not more apps.' },
+};
+const compStyle = (id) => COMP_STYLE[id] || { emoji: '✨', short: 'Practical skills for your business.' };
+
 
 function renderShell(active) {
   const p = state.progress;
@@ -453,11 +466,12 @@ async function viewDashboard(my) {
   state.progress = progress;
   const p = progress;
   const mod = p.module;
-  const next = p.next_steps[0] || { title: 'You are on track', detail: 'Keep your weekly review going and complete one action from your plan.', route: 'progress' };
-  const nextLabel = { checkup: 'Continue check-up', module: 'Open the module', test: 'Open assessments', progress: 'Review progress' }[next.route] || 'Continue';
+  const next = p.next_steps[0] || { title: 'Keep your weekly review going', detail: 'One action this week is enough.', route: 'progress' };
+  const nextLabel = { checkup: 'Start check-up', module: 'Open module', test: 'Take a test', progress: 'See my plan' }[next.route] || 'Continue';
+  const firstName = state.user.name.split(' ')[0];
 
   const steps = [
-    { id: 'checkup', label: 'Check-Up', sub: p.diagnostic ? 'Completed' : 'Start here', href: '#/checkup', done: !!p.diagnostic },
+    { id: 'checkup', label: 'Check-Up', sub: p.diagnostic ? 'Done' : 'Start here', href: '#/checkup', done: !!p.diagnostic },
     { id: 'learn', label: 'Learn', sub: `${mod.lessons_done}/${mod.lessons_total} lessons`, href: `#/learn/${mod.id}`, done: mod.lessons_done === mod.lessons_total },
     { id: 'coach', label: 'Coach', sub: 'Ask anything', href: '#/coach', done: false },
     { id: 'test', label: 'Test', sub: `${[mod.quiz_passed, mod.scenario_passed, mod.practical_passed].filter(Boolean).length}/3 passed`, href: '#/test', done: mod.passed },
@@ -466,69 +480,53 @@ async function viewDashboard(my) {
   let currentAssigned = false;
   const journey = steps.map(s => {
     let cls = s.done ? 'done' : '';
-    if (!s.done && !currentAssigned) { cls = 'current'; currentAssigned = true; }
+    if (!s.done && !currentAssigned && !mod.passed) { cls = 'current'; currentAssigned = true; }
     return `<a class="jstep ${cls}" href="${s.href}">
       <span class="jdot">${s.done ? icon('check', 13) : ''}</span>
       <span class="jt"><b>${s.label}</b><span>${s.sub}</span></span>
     </a>`;
   }).join('');
 
-  const history = [];
-  if (p.diagnostic) history.push({ name: 'Business Check-Up', score: p.diagnostic.overall, passed: null, at: p.diagnostic.created_at });
-  p.attempts.slice(0, 3).forEach(a => history.push({
-    name: a.kind === 'quiz' ? 'Knowledge quiz' : 'Scenario test', score: a.score, passed: a.passed, at: a.created_at,
-  }));
-  history.sort((a, b) => new Date(b.at) - new Date(a.at));
-
   mount(`
   <section class="hero">
-    <div>
-      <div class="eyebrow">${esc(p.profile ? p.profile.business_name : 'Your workspace')} · ${new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
-      <h1>${greeting()}, ${esc(state.user.name.split(' ')[0])}.</h1>
-      <p>${p.diagnostic ? 'Your check-up is complete. ' : 'Start with a quick diagnostic across eight business areas. '}${esc(next.detail)}</p>
+    <div class="hero-copy">
+      <span class="hero-pill">👋 Hey ${esc(firstName)}</span>
+      <h1>Your business.<br><em>Levelled up.</em></h1>
+      <p>${p.diagnostic ? 'One small step today beats a perfect plan next month.' : 'Take the 5-minute check-up. We\'ll show you what to fix first.'}</p>
       <div class="hero-actions">
-        <a class="btn btn-teal btn-lg" href="${next.route === 'module' ? `#/learn/${mod.id}` : `#/${next.route}`}">${nextLabel} ${icon('right', 15)}</a>
-        <a class="ghost-link" href="#/coach">${icon('coach', 14)} Ask the business coach</a>
+        <a class="btn btn-primary btn-lg" href="${next.route === 'module' ? `#/learn/${mod.id}` : `#/${next.route}`}">${nextLabel} ${icon('right', 15)}</a>
+        <a class="hero-link" href="#/coach">${icon('coach', 14)} Ask the coach</a>
       </div>
     </div>
-    <div class="hero-ring">
-      ${ring(p.overall_percent, 124, 9, 'overall')}
-      <span class="ring-label">${esc(p.mastery.level)}</span>
+    <div class="hero-art">
+      <img src="/static/img/hero-collage.svg" alt="Business progress illustration" width="390" height="337">
+      <div class="hero-sticker"><b>${p.overall_percent}%</b><span>${esc(p.mastery.level)} · ready</span></div>
     </div>
   </section>
 
-  <div class="section">
-    <div class="journey">${journey}</div>
-  </div>
+  <div class="section"><div class="journey">${journey}</div></div>
 
-  <div class="section grid auto-220">
-    <div class="stat"><div class="k">${icon('progress', 13)} Overall progress</div><div class="v">${p.overall_percent}<small>%</small></div><div class="s">Across profile, learning and verified assessments</div></div>
-    <div class="stat"><div class="k">${icon('shield', 13)} Mastery level</div><div class="v" style="font-size:22px;margin-top:9px">${esc(p.mastery.level)}</div><div class="s">${esc(p.mastery.basis)}</div></div>
-    <div class="stat"><div class="k">${icon('learn', 13)} Modules passed</div><div class="v">${mod.passed ? 1 : 0}<small> / 1 available</small></div><div class="s">${mod.passed ? 'Strategy module verified' : 'Complete quiz, scenario and practical'}</div></div>
-    <div class="stat"><div class="k">${icon('target', 13)} Action plan</div><div class="v">${p.plan_done}<small> / ${p.plan.length} done</small></div><div class="s">Practical steps you committed to</div></div>
+  <div class="section grid grid-3">
+    <div class="stat"><div class="k">🔥 Readiness</div><div class="v">${p.overall_percent}<small>%</small></div><div class="s">Across 8 business areas</div></div>
+    <div class="stat"><div class="k">🎯 Mastery</div><div class="v" style="font-size:23px;margin-top:10px">${esc(p.mastery.level)}</div><div class="s">Verified results only</div></div>
+    <div class="stat"><div class="k">✅ Action plan</div><div class="v">${p.plan_done}<small> / ${p.plan.length}</small></div><div class="s">Steps completed</div></div>
   </div>
 
   <div class="section split">
+    <div class="card card-pad">
+      <div class="card-head"><div><h2>Next up</h2><p>Small moves, in order.</p></div><a class="link-arrow" href="#/progress">Full plan ${icon('right', 13)}</a></div>
+      ${p.next_steps.slice(0, 3).map((s, i) => `
+        <a class="action-item" href="#/${s.route}">
+          <span class="num">${String(i + 1).padStart(2, '0')}</span>
+          <span class="txt"><b>${esc(s.title)}</b><span>${esc(s.detail)}</span></span>
+          <span class="go">${icon('right', 15)}</span>
+        </a>`).join('')}
+      ${p.next_steps.length === 0 ? `<div class="empty">All required steps are complete. Keep your weekly review going.</div>` : ''}
+    </div>
+
     <div>
       <div class="card card-pad">
-        <div class="card-head">
-          <div><h2>Next best actions</h2><p>Ordered by what will move your progress most.</p></div>
-          <a class="link-arrow" href="#/progress">Full plan ${icon('right', 13)}</a>
-        </div>
-        ${p.next_steps.slice(0, 3).map((s, i) => `
-          <a class="action-item" href="#/${s.route}">
-            <span class="num">${String(i + 1).padStart(2, '0')}</span>
-            <span class="txt"><b>${esc(s.title)}</b><span>${esc(s.detail)}</span></span>
-            <span class="go">${icon('right', 15)}</span>
-          </a>`).join('')}
-        ${p.next_steps.length === 0 ? `<div class="empty">All required steps are complete. Keep your weekly review going.</div>` : ''}
-      </div>
-
-      <div class="card card-pad" style="margin-top:16px">
-        <div class="card-head">
-          <div><h2>Business snapshot</h2><p>Diagnostic scores across the eight components.</p></div>
-          <a class="link-arrow" href="#/checkup">View check-up ${icon('right', 13)}</a>
-        </div>
+        <div class="card-head" style="margin-bottom:4px"><div><h2>Your 8 areas</h2></div><a class="link-arrow" href="#/checkup">Check-up ${icon('right', 13)}</a></div>
         ${p.components.map((c, i) => `
           <div class="comp-row">
             <span class="swatch">${String(i + 1).padStart(2, '0')}</span>
@@ -537,43 +535,13 @@ async function viewDashboard(my) {
             <span class="sc">${c.score != null ? c.score + '%' : '—'}</span>
           </div>`).join('')}
       </div>
-    </div>
 
-    <div>
-      <div class="card card-pad">
-        <div class="row-between" style="margin-bottom:10px">
-          <h2 style="font-size:16px">Mastery</h2>
-          ${pill(p.mastery.level)}
-        </div>
-        <div class="level-scale">
-          ${['Beginner', 'Developing', 'Structured', 'Optimising'].map((l, i) => `<span class="${i <= ['Beginner', 'Developing', 'Structured', 'Optimising'].indexOf(p.mastery.level) ? 'on' : ''}"></span>`).join('')}
-        </div>
-        <div class="level-labels"><span>Beginner</span><span>Developing</span><span>Structured</span><span>Optimising</span></div>
-        <p class="small muted" style="margin-top:14px">${esc(p.mastery.basis)}. Levels use scored assessments and verified module results only — not self-reported confidence.</p>
-        <a class="btn btn-outline btn-sm btn-block" href="#/progress" style="margin-top:12px">See how levels are calculated</a>
-      </div>
-
-      <div class="card card-pad" style="margin-top:14px">
-        <div class="card-head" style="margin-bottom:6px"><div><h2 style="font-size:16px">Assessment history</h2></div></div>
-        ${history.length ? history.slice(0, 4).map(h => `
-          <div class="row-between" style="padding:9px 0;border-bottom:1px solid var(--line)">
-            <div><div class="small strong">${esc(h.name)}</div><div class="tiny muted">${fmtDate(h.at)}</div></div>
-            <div class="row" style="gap:7px">
-              <span class="small strong">${h.score}%</span>
-              ${h.passed === null ? `<span class="chip chip-grey">Baseline</span>` : h.passed ? `<span class="chip chip-teal">Passed</span>` : `<span class="chip chip-red">Retry</span>`}
-            </div>
-          </div>`).join('') : `<div class="empty" style="padding:18px 0">No assessments yet. Start with the check-up.</div>`}
-      </div>
-
-      <div class="card card-pad ai-teaser" style="margin-top:14px">
-        <div class="row" style="gap:8px;margin-bottom:8px">
-          ${icon('spark', 15)}
-          <span class="tiny" style="letter-spacing:.1em;text-transform:uppercase;color:#7CE3D8;font-weight:700">AI Business Coach</span>
-          ${state.ai.configured ? `<span class="chip chip-teal" style="margin-left:auto">Live</span>` : `<span class="chip chip-yellow" style="margin-left:auto">Demo mode</span>`}
-        </div>
-        <h3>Stuck on a real decision?</h3>
-        <p>Describe what is happening and get a structured way to think it through.</p>
-        <a class="btn btn-teal btn-sm" href="#/coach" style="margin-top:12px">Open coach ${icon('right', 13)}</a>
+      <div class="coach-mini" style="margin-top:14px">
+        <img src="/static/img/coach-bubbles.svg" alt="">
+        <h3>Stuck on something?</h3>
+        <p>Tell the coach what's happening. Get a plan, not a lecture.</p>
+        <a class="btn btn-teal btn-sm" href="#/coach">Ask now ${icon('right', 12)}</a>
+        ${state.ai.configured ? '' : `<div class="tiny" style="color:#C9D4FF;margin-top:9px">Demo mode · add an API key for live answers</div>`}
       </div>
     </div>
   </div>`, my);
@@ -904,51 +872,33 @@ async function viewLearn(my) {
   const liveModules = state.components.filter(c => c.available).length;
   mount(`
     <div class="section-head" style="margin-top:0">
-      <div><div class="eyebrow">Learn &amp; Improve</div><h1>Build the structure behind the work.</h1>
-      <p>${liveModules} of ${state.components.length} modules live now. Each published module follows the same format: explanation, examples, do and don't, why it matters, exercises, templates and a scored quiz.</p></div>
-      <span class="chip chip-teal">${p.module.lessons_done}/${p.module.lessons_total} lessons complete</span>
-    </div>
-    <div class="roadmap-note" style="margin-bottom:20px">
-      ${icon('info', 16)}
-      <div><b>${state.components.filter(c => c.available).length} of ${state.components.length} modules live.</b> Published modules follow the same format: explanation, examples, do and don't, why it matters, exercises, templates and a scored quiz. Unavailable modules are marked clearly — they are not fake buttons.</div>
+      <div><div class="eyebrow">Learn &amp; Improve</div><h1>Pick a skill. Use it this week.</h1>
+      <p>${liveModules} of ${state.components.length} modules live. Short lessons, real numbers, templates you can actually use.</p></div>
+      <span class="chip chip-yellow">🔥 ${p.module.lessons_done} lessons done</span>
     </div>
     <div class="grid auto-300">
       ${state.components.map((c, i) => {
+        const style = compStyle(c.id);
         const comp = p.components.find(x => x.id === c.id);
         const isCurrent = p.module.id === c.module_id;
         if (c.available) {
           return `<div class="comp-card available">
-            <div class="top"><span class="idx">${String(i + 1).padStart(2, '0')}</span><span class="chip chip-teal">Live</span></div>
+            <div class="top"><span class="comp-emoji" aria-hidden="true">${style.emoji}</span><span class="chip chip-teal">Live</span></div>
             <h3>${esc(c.name)}</h3>
-            <p>${esc(c.description)}</p>
-            <div class="topics">${c.topics.slice(0, 4).map(t => `<span>${esc(t)}</span>`).join('')}</div>
-            ${isCurrent ? `<div style="margin-top:4px">${bar(p.module.percent)}<div class="row-between" style="margin-top:6px"><span class="tiny muted">${p.module.percent}% complete</span><span class="tiny muted">${p.module.lessons_done}/${p.module.lessons_total} lessons</span></div></div>` : ''}
-            <div class="foot"><span class="meta">${isCurrent && p.module.passed ? 'Module passed' : (isCurrent ? 'In progress' : 'Module available')}</span>
+            <p>${esc(style.short)}</p>
+            ${isCurrent ? `<div style="margin-top:2px">${bar(p.module.percent)}<div class="row-between" style="margin-top:6px"><span class="tiny muted">${p.module.percent}% complete</span><span class="tiny muted">${p.module.lessons_done}/${p.module.lessons_total} lessons</span></div></div>` : ''}
+            <div class="foot"><span class="meta">${isCurrent && p.module.passed ? 'Passed ✓' : (isCurrent ? 'In progress' : 'Ready when you are')}</span>
               <a class="btn btn-primary btn-sm" href="#/learn/${esc(c.module_id)}">${isCurrent && p.module.lessons_done ? 'Continue' : 'Start'} ${icon('right', 12)}</a></div>
           </div>`;
         }
-        return `<div class="comp-card">
-          <div class="top"><span class="idx">${String(i + 1).padStart(2, '0')}</span><span class="ribbon">Next release</span></div>
+        return `<div class="comp-card locked">
+          <div class="top"><span class="comp-emoji" aria-hidden="true">${style.emoji}</span><span class="ribbon">Soon</span></div>
           <h3>${esc(c.name)}</h3>
-          <p>${esc(c.description)}</p>
-          <div class="topics">${c.topics.slice(0, 4).map(t => `<span>${esc(t)}</span>`).join('')}</div>
-          <div class="foot"><span class="meta">${comp && comp.score != null ? 'Diagnostic ' + comp.score + '%' : 'Not yet assessed'}</span>
-            <span class="chip chip-grey">${icon('lock', 11)} Planned</span></div>
+          <p>${esc(style.short)}</p>
+          <div class="foot"><span class="meta">${comp && comp.score != null ? 'Check-up ' + comp.score + '%' : 'Not assessed yet'}</span>
+            <span class="chip chip-grey">${icon('lock', 11)} Locked</span></div>
         </div>`;
       }).join('')}
-    </div>
-    <div class="section card card-pad">
-      <div class="card-head"><div><h2>What every module will include</h2><p>The same structure, applied to each of the eight components.</p></div></div>
-      <div class="grid auto-220">
-        ${[
-          ['Simple explanations', 'Plain language, with food, online-selling and service examples.'],
-          ['What to do / not do', 'Specific behaviours, not vague principles.'],
-          ['Why it matters', 'The commercial consequence in your context.'],
-          ['Common mistakes', 'What typically goes wrong in small businesses.'],
-          ['Practical exercises', 'Use your own business as the case study.'],
-          ['Templates', 'Downloadable canvases, worksheets and checklists.'],
-        ].map(x => `<div><div class="row" style="gap:7px;margin-bottom:4px">${icon('check', 14)}<b class="small">${x[0]}</b></div><p class="tiny muted">${x[1]}</p></div>`).join('')}
-      </div>
     </div>`, my);
 }
 
@@ -976,7 +926,7 @@ async function viewModule(my, moduleId = 'strategy') {
       <span class="chip chip-grey">Module ${moduleIndex + 1} of ${state.components.length || 8}</span>
     </div>
     <section class="module-hero">
-      <div class="eyebrow" style="color:#6FE9DD">${esc(m.level)} module · ${esc(compName(m.component))}</div>
+      <div class="eyebrow" style="color:var(--sun)">${esc(m.level)} module · ${esc(compName(m.component))}</div>
       <h1>${esc(m.title)}</h1>
       <p>${esc(m.tagline)}</p>
       <div class="meta">
@@ -996,13 +946,13 @@ async function viewModule(my, moduleId = 'strategy') {
           ${cp.map(c => `<div class="checkpoint ${c.done ? 'done' : ''}"><span class="tick">${c.done ? icon('check', 11) : ''}</span><div><b>${c.b}</b><span>${esc(c.s)}</span></div></div>`).join('')}
         </div>
       </div>
-      ${assessmentsLive ? `<div class="card card-pad" style="background:${st.passed ? 'linear-gradient(150deg,#0B3B34,#0C4A41)' : '#F8FAFC'};color:${st.passed ? '#fff' : 'inherit'}">
-        <div class="eyebrow" style="color:${st.passed ? '#6FE9DD' : 'var(--teal-600)'}">${st.passed ? 'Module verified' : 'Pass standard'}</div>
-        <h3 style="color:${st.passed ? '#fff' : 'var(--navy-900)'};font-size:18px;margin-bottom:8px">${st.passed ? 'Module complete' : 'All three criteria required'}</h3>
-        <p class="small" style="color:${st.passed ? '#C8E7E1' : 'var(--muted)'}">${st.passed ? 'Your quiz, scenario and reviewed practical are all verified. This result counts toward your mastery level.' : `Knowledge quiz ${st.standards.quiz_pass}% · scenario test ${st.standards.scenario_pass}% · practical rubric ${st.standards.rubric_min}/4 with no criterion below 2. Retries are unlimited.`}</p>
+      ${assessmentsLive ? `<div class="card card-pad" style="background:${st.passed ? 'linear-gradient(150deg,#FFF7D6,#FFF0B0)' : '#F8FAFC'};border-color:${st.passed ? '#F3DC8A' : 'var(--line)'}">
+        <div class="eyebrow" style="color:${st.passed ? '#6A4B00' : 'var(--teal-600)'}">${st.passed ? '✓ Module verified' : 'Pass standard'}</div>
+        <h3 style="color:var(--ink);font-size:18px;margin-bottom:8px">${st.passed ? 'Module complete' : 'All three criteria required'}</h3>
+        <p class="small" style="color:${st.passed ? '#5C511F' : 'var(--muted)'}">${st.passed ? 'Your quiz, scenario and reviewed practical are all verified. This result counts toward your mastery level.' : `Knowledge quiz ${st.standards.quiz_pass}% · scenario test ${st.standards.scenario_pass}% · practical rubric ${st.standards.rubric_min}/4 with no criterion below 2. Retries are unlimited.`}</p>
         <div style="margin-top:14px">
           ${practical && practical.status === 'pending' ? `<span class="chip chip-yellow">${icon('clock', 11)} Practical awaiting review</span>` : ''}
-          ${st.passed ? `<a class="btn btn-teal btn-sm" href="#/progress">See verified progress ${icon('right', 12)}</a>` : `<a class="btn btn-primary btn-sm" href="#/test">Go to assessments ${icon('right', 12)}</a>`}
+          ${st.passed ? `<a class="btn btn-primary btn-sm" href="#/progress">See verified progress ${icon('right', 12)}</a>` : `<a class="btn btn-primary btn-sm" href="#/test">Go to assessments ${icon('right', 12)}</a>`}
         </div>
       </div>` : `<div class="card card-pad" style="background:#F8FAFC">
         <div class="eyebrow" style="color:var(--teal-600)">Content module</div>
@@ -1368,7 +1318,7 @@ async function viewProgress(my) {
       </div>
 
       <div class="level-card">
-        <div class="eyebrow" style="color:#6FE9DD">Mastery rules</div>
+        <div class="eyebrow" style="color:var(--sun)">Mastery rules</div>
         <h3 style="font-size:18px;margin-bottom:8px">No level without evidence</h3>
         <p style="margin-bottom:12px">Levels are never assigned from confidence, logins or unfinished work.</p>
         <div class="small" style="color:#D3E4F1;line-height:1.75">

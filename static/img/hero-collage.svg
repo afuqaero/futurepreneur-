@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 380" fill="none" role="img" aria-label="Illustration of a business dashboard with rising results">
+  <path d="M64 312C18 250 34 150 96 96s178-66 248-8 66 176 6 240-240 48-286-16Z" fill="#EEF2FF"/>
+  <circle cx="352" cy="78" r="50" fill="#FFD23F"/>
+  <path d="M352 52v52M326 78h52" stroke="#0A1733" stroke-width="5" stroke-linecap="round" opacity=".14"/>
+
+  <g transform="translate(126 46) rotate(-4)">
+    <rect x="0" y="0" width="200" height="272" rx="28" fill="#fff" stroke="#0A1733" stroke-width="4"/>
+    <rect x="16" y="16" width="168" height="44" rx="13" fill="#1B4DFF"/>
+    <circle cx="38" cy="38" r="8" fill="#FFD23F"/>
+    <rect x="56" y="31" width="74" height="9" rx="4.5" fill="#fff" opacity=".95"/>
+    <rect x="56" y="44" width="46" height="6" rx="3" fill="#fff" opacity=".55"/>
+
+    <rect x="16" y="72" width="168" height="92" rx="16" fill="#F6F7FB" stroke="#E6E9F5" stroke-width="2"/>
+    <rect x="32" y="128" width="20" height="22" rx="6" fill="#D9E1FF"/>
+    <rect x="60" y="112" width="20" height="38" rx="6" fill="#D9E1FF"/>
+    <rect x="88" y="120" width="20" height="30" rx="6" fill="#FFD23F"/>
+    <rect x="116" y="96" width="20" height="54" rx="6" fill="#1B4DFF"/>
+    <rect x="144" y="106" width="20" height="44" rx="6" fill="#1B4DFF"/>
+    <path d="M34 96l26 10 26-16 26 8 34-24" stroke="#1B4DFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <rect x="16" y="176" width="86" height="10" rx="5" fill="#0A1733" opacity=".82"/>
+    <rect x="16" y="194" width="132" height="9" rx="4.5" fill="#D5DAEB"/>
+
+    <rect x="16" y="214" width="168" height="44" rx="14" fill="#FFF7D6"/>
+    <circle cx="40" cy="236" r="11" fill="#0E9F6E"/>
+    <path d="M35 236l4 4 7-8" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="58" y="228" width="92" height="7" rx="3.5" fill="#0A1733" opacity=".75"/>
+    <rect x="58" y="241" width="60" height="6" rx="3" fill="#0A1733" opacity=".3"/>
+  </g>
+
+  <g transform="translate(58 250)">
+    <rect width="118" height="58" rx="16" fill="#fff" stroke="#0A1733" stroke-width="3.5"/>
+    <rect x="12" y="12" width="34" height="34" rx="10" fill="#FFD23F"/>
+    <path d="M23 29l5 5 9-11" stroke="#0A1733" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="56" y="18" width="48" height="8" rx="4" fill="#0A1733" opacity=".8"/>
+    <rect x="56" y="32" width="32" height="7" rx="3.5" fill="#0A1733" opacity=".28"/>
+  </g>
+
+  <g transform="translate(322 232)">
+    <rect width="86" height="86" rx="24" fill="#1B4DFF" stroke="#0A1733" stroke-width="3.5"/>
+    <path d="M24 50l13 13 25-30" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <path d="M96 120c-16 8-26 22-30 40" stroke="#0A1733" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 9" opacity=".35"/>
+  <path d="M330 176l6 14 14 6-14 6-6 14-6-14-14-6 14-6 6-14Z" fill="#FFD23F" stroke="#0A1733" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="76" cy="96" r="7" fill="#1B4DFF"/>
+  <circle cx="392" cy="318" r="9" fill="#FFD23F"/>
+</svg>
