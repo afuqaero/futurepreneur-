@@ -239,7 +239,8 @@ def init_db(seed=True):
             seed_questions(conn)
             seed_demo(conn)
             seed_content(conn)
-            seed_json_modules(conn)
+            if config.SEED_MODULES:
+                seed_json_modules(conn)
         conn.commit()
     finally:
         conn.close()

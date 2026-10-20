@@ -106,6 +106,7 @@ class ServerCase(unittest.TestCase):
             "BIZREADY_SKIP_BACKUP": "1",
             "BIZREADY_QUIET": "1",
             "BIZREADY_SECURE_COOKIES": "0",
+            "BIZREADY_SEED_MODULES": "0",
         })
         env.pop("BIZREADY_AI_KEY", None)
         cls.proc = subprocess.Popen(

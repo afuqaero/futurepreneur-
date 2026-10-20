@@ -28,6 +28,9 @@ TRUST_PROXY = os.environ.get("BIZREADY_TRUST_PROXY") == "1"
 LOGIN_MAX_FAILURES = 5
 LOGIN_WINDOW_SECONDS = 15 * 60
 
+# JSON module seeding can be disabled for deterministic tests.
+SEED_MODULES = os.environ.get("BIZREADY_SEED_MODULES", "1") == "1"
+
 DEFAULT_SETTINGS = {
     "quiz_pass": "80",
     "scenario_pass": "70",

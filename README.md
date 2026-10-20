@@ -94,5 +94,5 @@ docs/PLAN.md               phase plan and current status
 - **Phase 1 — complete:** modular server, migrations, backups, CSRF, throttling, security headers, 39-test suite, behaviour parity with the prototype.
 - **Phase 2 — complete:** modules, lessons, templates and practicals live in SQLite, with admin authoring, draft/publish, preview, revisions and an audit trail (47 tests total).
 - **Phase 3 — complete:** Check-Up v2 — customer type, clearer results, gap threshold, retake history and deltas (51 tests total).
-- **Phase 4 — in progress:** Marketing & Sales module live (4 lessons, 2 templates, 10 quiz + 5 scenario questions, practical). Six modules remain: Operations, Finance, People, Systems, Legal, Digitalisation.
+- **Phase 4 — in progress:** Marketing & Sales and Operations & Quality live (4 lessons + 2 templates each). Five modules remain: Finance, People, Systems, Legal, Digitalisation.
 - Phases 5–10: see `docs/PLAN.md`.

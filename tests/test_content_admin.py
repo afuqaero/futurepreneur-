@@ -142,8 +142,8 @@ class ContentAdminTests(ServerCase):
         self.assertEqual(len(data["module"]["lessons"]), 1)
 
         status, boot, _ = learner.get("/api/bootstrap")
-        marketing = next(c for c in boot["components"] if c["id"] == "marketing")
-        self.assertTrue(marketing["available"])
+        operations = next(c for c in boot["components"] if c["id"] == "operations")
+        self.assertTrue(operations["available"])
 
     def test_unpublish_hides_module_from_learners(self):
         admin = self.admin()
