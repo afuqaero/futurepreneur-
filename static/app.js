@@ -353,7 +353,7 @@ const NAV = [
 function renderShell(active) {
   const p = state.progress;
   const business = p && p.profile ? p.profile.business_name : 'Your business';
-  const level = p && p.mastery ? p.mastery.level : 'Not assessed';
+  const level = state.user && state.user.role === 'admin' ? 'Admin' : (p && p.mastery ? p.mastery.level : 'Not assessed');
   const adminLink = state.user.role === 'admin'
     ? `<div class="nav-label">Administration</div><div class="nav"><a href="#/admin" data-nav="admin" class="${active === 'admin' ? 'active' : ''}">${icon('admin')}<span>Manage platform</span></a></div>` : '';
   $('#app').innerHTML = `
@@ -616,22 +616,36 @@ function profileForm(profile) {
   </form>`;
 }
 
-function checkupResults(data, profile) {
+function deltaChip(value) {
+  if (value == null || value === 0) return '';
+  const up = value > 0;
+  return `<span class="chip ${up ? 'chip-teal' : 'chip-red'}" title="Change since your previous check-up">${up ? '+' : ''}${value}</span>`;
+}
+
+function checkupResults(data, profile, history = []) {
   const result = data.result || data;
   const scores = result.components || {};
+  const change = data.change || null;
+  const previous = data.previous || null;
   const ranked = Object.keys(scores).sort((a, b) => scores[a] - scores[b]);
   const priorities = data.priorities || ranked.slice(0, 3).map(id => ({
-    component: id, name: compName(id), score: scores[id], recommendation: DIAG_RECS[id], available: compMeta(id).available,
+    component: id, name: compName(id), score: scores[id], recommendation: DIAG_RECS[id],
+    available: compMeta(id).available, module_id: compMeta(id).module_id || null, lessons: [],
   }));
   const strengths = data.strengths || ranked.slice(-2).reverse().map(id => ({ component: id, name: compName(id), score: scores[id] }));
+  const firstModule = priorities.find(pr => pr.available && pr.module_id);
   return `
   <div class="card result-hero">
     <div class="copy">
       <div class="eyebrow">Business Check-Up · ${fmtDate(result.created_at)}</div>
       <h2>${result.overall >= 70 ? 'A solid base — now make it systematic.' : result.overall >= 50 ? 'Practical experience, uneven structure.' : 'You have room to build strong foundations.'}</h2>
       <p>You answered the diagnostic for <b>${esc(profile ? profile.business_name : 'your business')}</b>. Strongest areas: ${strengths.map(s => `${esc(s.name)} (${s.score}%)`).join(', ')}. The priorities below are ordered by the lowest scores.</p>
+      ${change ? `<div class="row wrap" style="gap:7px;margin-top:10px">
+        <span class="chip ${change.overall >= 0 ? 'chip-teal' : 'chip-red'}">${change.overall >= 0 ? '+' : ''}${change.overall} points since ${fmtDate(previous.created_at)}</span>
+        <span class="chip chip-grey">Self-assessment, not a pass</span>
+      </div>` : ''}
       <div class="row wrap" style="gap:8px;margin-top:14px">
-        <a class="btn btn-primary btn-sm" href="#/learn/strategy">Start Business Strategy &amp; Model ${icon('right', 13)}</a>
+        <a class="btn btn-primary btn-sm" href="#/learn/${firstModule ? esc(firstModule.module_id) : 'strategy'}">${firstModule ? `Start ${esc(firstModule.name)}` : 'Start Business Strategy & Model'} ${icon('right', 13)}</a>
         <button class="btn btn-outline btn-sm" type="button" data-action="retake-checkup">${icon('refresh', 13)} Retake check-up</button>
       </div>
     </div>
@@ -645,7 +659,9 @@ function checkupResults(data, profile) {
         <div class="row-between"><span class="rank">Priority ${i + 1}</span><span class="chip ${i === 0 ? 'chip-yellow' : 'chip-grey'}">${pr.score}%</span></div>
         <h4>${esc(pr.name)}</h4>
         <p>${esc(pr.recommendation)}</p>
-        ${pr.available ? `<a class="link-arrow" href="#/learn/strategy">Start the module ${icon('right', 12)}</a>` : `<span class="chip chip-grey">Module in development</span>`}
+        ${pr.available && pr.module_id ? `<a class="link-arrow" href="#/learn/${esc(pr.module_id)}">Start the module ${icon('right', 12)}</a>
+          ${pr.lessons && pr.lessons.length ? `<div class="tiny muted" style="margin-top:6px">Starts with: ${pr.lessons.map(esc).join(' · ')}</div>` : ''}`
+          : `<span class="chip chip-grey">Module in development</span>`}
       </div>`).join('')}
     </div>
   </div>
@@ -658,6 +674,7 @@ function checkupResults(data, profile) {
           <span class="nm">${esc(compName(id))}</span>
           ${bar(scores[id], scores[id] >= 70 ? '' : scores[id] >= 50 ? 'yellow' : 'navy')}
           <span class="vl">${scores[id]}%</span>
+          ${change && change.components[id] != null ? deltaChip(change.components[id]) : ''}
         </div>`).join('')}
       </div>
     </div>
@@ -670,7 +687,22 @@ function checkupResults(data, profile) {
       <hr class="hr">
       <a class="btn btn-soft btn-block btn-sm" href="#/progress">View full progress record ${icon('right', 13)}</a>
     </div>
-  </div>`;
+  </div>
+
+  ${history.length > 1 ? `<div class="section card card-pad">
+    <div class="card-head"><div><h2>Check-up history</h2><p>Every diagnostic is stored. Compare what actually moved.</p></div></div>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>Date</th><th>Overall</th><th>Change</th><th>Weakest area</th></tr></thead>
+      <tbody>${history.map((h, i) => {
+        const prev = history[i + 1];
+        const delta = prev ? h.overall - prev.overall : null;
+        const weakest = Object.entries(h.components || {}).sort((a, b) => a[1] - b[1])[0];
+        return `<tr><td class="tiny">${fmtDate(h.created_at)}</td><td><b>${h.overall}%</b></td>
+          <td>${delta == null ? '<span class="tiny muted">first</span>' : deltaChip(delta)}</td>
+          <td class="tiny muted">${weakest ? `${esc(compName(weakest[0]))} (${weakest[1]}%)` : '—'}</td></tr>`;
+      }).join('')}</tbody>
+    </table></div>
+  </div>` : ''}`;
 }
 
 async function viewCheckup(my) {
@@ -710,7 +742,7 @@ async function viewCheckup(my) {
         <div><div class="k">Stage</div><div class="v">${esc(profile.stage)} · ${esc(profile.team_size)} people</div></div>
         <div><div class="k">Main challenge</div><div class="v" style="font-weight:500;font-size:12px">${esc(profile.main_challenge)}</div></div>
       </div>
-      ${checkupResults(state.checkupResult || data, profile)}`, my);
+      ${checkupResults(state.checkupResult || data, profile, data.history || [])}`, my);
     return;
   }
 
@@ -1810,16 +1842,18 @@ async function viewAdminContent(my, tabs) {
   }
   const module = detail ? detail.module : null;
   const lesson = module ? (module.lessons.find(l => l.id === state.admin.lesson) || module.lessons[0]) : null;
-  const template = module && state.admin.template ? module.templates.find(t => t.slug === state.admin.template) : null;
+  const template = module && !state.admin.newTemplate
+    ? (module.templates.find(t => t.slug === state.admin.template) || module.templates[0] || null)
+    : null;
 
   mount(`${headAdmin('Content')}${tabs}
-    <div class="split" style="grid-template-columns:290px minmax(0,1fr)">
+    <div class="admin-split">
       <div class="card card-pad">
         <div class="card-head"><div><h2>Modules</h2><p>${list.modules.length} total</p></div></div>
         <div style="display:grid;gap:8px">
           ${list.modules.map(m => `<button type="button" class="module-pick ${m.id === state.admin.moduleId ? 'on' : ''}" data-action="admin-module-select" data-id="${esc(m.id)}">
-            <b>${esc(m.title)}</b><span>${m.lessons} lessons · ${m.quiz} quiz · ${m.scenario} scenario</span>
-            <em class="chip ${m.status === 'published' ? 'chip-teal' : 'chip-yellow'}">${m.status}</em>
+            <span class="row-between" style="gap:6px;align-items:flex-start"><b>${esc(m.title)}</b><em class="chip ${m.status === 'published' ? 'chip-teal' : 'chip-yellow'}">${m.status}</em></span>
+            <span>${m.lessons} lessons · ${m.quiz} quiz · ${m.scenario} scenario</span>
           </button>`).join('')}
         </div>
         <hr class="hr">
