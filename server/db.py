@@ -10,6 +10,7 @@ from pathlib import Path
 import content
 from . import config
 from .clock import iso, utcnow
+from .content_seed import seed_json_modules
 from .security import hash_password
 
 
@@ -238,6 +239,7 @@ def init_db(seed=True):
             seed_questions(conn)
             seed_demo(conn)
             seed_content(conn)
+            seed_json_modules(conn)
         conn.commit()
     finally:
         conn.close()

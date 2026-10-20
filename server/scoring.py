@@ -70,9 +70,10 @@ def diagnostic_summary(conn, user_id):
     }
 
 
-def practical_latest(conn, user_id):
+def practical_latest(conn, user_id, module_id=content_repo.DEFAULT_MODULE_ID):
     row = conn.execute(
-        "SELECT * FROM practical_submissions WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,)
+        "SELECT * FROM practical_submissions WHERE user_id = ? AND module_id = ? ORDER BY id DESC LIMIT 1",
+        (user_id, module_id),
     ).fetchone()
     if not row:
         return None
@@ -89,9 +90,11 @@ def practical_latest(conn, user_id):
     }
 
 
-def best_attempt(conn, user_id, kind):
+def best_attempt(conn, user_id, kind, module_id=content_repo.DEFAULT_MODULE_ID):
     rows = conn.execute(
-        "SELECT * FROM attempts WHERE user_id = ? AND kind = ? ORDER BY score DESC, id DESC", (user_id, kind)
+        "SELECT * FROM attempts WHERE user_id = ? AND kind = ? AND module_id = ?"
+        " ORDER BY score DESC, id DESC",
+        (user_id, kind, module_id),
     ).fetchall()
     if not rows:
         return None
@@ -113,9 +116,9 @@ def module_state(conn, user_id, module_id=content_repo.DEFAULT_MODULE_ID):
     ).fetchall()
     done = {r["lesson_id"] for r in done_rows}
     lessons_done = len([l for l in lessons if l["id"] in done])
-    quiz = best_attempt(conn, user_id, "quiz")
-    scenario = best_attempt(conn, user_id, "scenario")
-    practical = practical_latest(conn, user_id)
+    quiz = best_attempt(conn, user_id, "quiz", module_id)
+    scenario = best_attempt(conn, user_id, "scenario", module_id)
+    practical = practical_latest(conn, user_id, module_id)
 
     quiz_passed = bool(quiz and quiz["passed"])
     scenario_passed = bool(scenario and scenario["passed"])

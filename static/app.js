@@ -901,10 +901,11 @@ async function viewLearn(my) {
   const p = state.progress || await api('/api/progress');
   if (my !== seq) return;
   state.progress = p;
+  const liveModules = state.components.filter(c => c.available).length;
   mount(`
     <div class="section-head" style="margin-top:0">
       <div><div class="eyebrow">Learn &amp; Improve</div><h1>Build the structure behind the work.</h1>
-      <p>Eight components, one practical module live now. Each module follows the same format: explanation, examples, do and don't, why it matters, exercises, templates and a scored quiz.</p></div>
+      <p>${liveModules} of ${state.components.length} modules live now. Each published module follows the same format: explanation, examples, do and don't, why it matters, exercises, templates and a scored quiz.</p></div>
       <span class="chip chip-teal">${p.module.lessons_done}/${p.module.lessons_total} lessons complete</span>
     </div>
     <div class="roadmap-note" style="margin-bottom:20px">
@@ -958,15 +959,16 @@ async function viewModule(my, moduleId = 'strategy') {
   const m = data.module;
   const st = data.state;
   const moduleIndex = Math.max(0, state.components.findIndex(c => c.id === m.component));
+  const assessmentsLive = m.id === 'strategy';
   const done = new Set(data.lessons_done);
   const practical = st.practical;
   const lessonCheck = st.lessons_done === st.lessons_total ? `${st.lessons_done}/${st.lessons_total} complete` : `${st.lessons_done}/${st.lessons_total} lessons`;
-  const cp = [
+  const cp = assessmentsLive ? [
     { b: 'Lessons', s: lessonCheck, done: st.lessons_done === st.lessons_total },
     { b: 'Knowledge quiz', s: st.quiz ? `Best ${st.quiz.score}%` : `Pass ${st.standards.quiz_pass}%`, done: st.quiz_passed },
     { b: 'Scenario test', s: st.scenario ? `Best ${st.scenario.score}%` : `Pass ${st.standards.scenario_pass}%`, done: st.scenario_passed },
     { b: 'Practical', s: practical ? (practical.status === 'reviewed' ? `Scored ${practical.average}/4` : 'Awaiting review') : `Rubric ${st.standards.rubric_min}/4`, done: st.practical_passed },
-  ];
+  ] : [{ b: 'Lessons', s: lessonCheck, done: st.lessons_done === st.lessons_total }];
 
   mount(`
     <div class="row" style="gap:8px;margin-bottom:14px">
@@ -980,7 +982,7 @@ async function viewModule(my, moduleId = 'strategy') {
       <div class="meta">
         <span class="chip">${icon('clock', 12)} ${esc(m.hours)}</span>
         <span class="chip">${icon('learn', 12)} ${m.lessons.length} lessons</span>
-        <span class="chip">${icon('test', 12)} Quiz · scenario · practical</span>
+        ${assessmentsLive ? `<span class="chip">${icon('test', 12)} Quiz · scenario · practical</span>` : `<span class="chip">${icon('download', 12)} Content module</span>`}
         <span class="chip">${icon('download', 12)} ${m.templates.length} templates</span>
       </div>
     </section>
@@ -994,7 +996,7 @@ async function viewModule(my, moduleId = 'strategy') {
           ${cp.map(c => `<div class="checkpoint ${c.done ? 'done' : ''}"><span class="tick">${c.done ? icon('check', 11) : ''}</span><div><b>${c.b}</b><span>${esc(c.s)}</span></div></div>`).join('')}
         </div>
       </div>
-      <div class="card card-pad" style="background:${st.passed ? 'linear-gradient(150deg,#0B3B34,#0C4A41)' : '#F8FAFC'};color:${st.passed ? '#fff' : 'inherit'}">
+      ${assessmentsLive ? `<div class="card card-pad" style="background:${st.passed ? 'linear-gradient(150deg,#0B3B34,#0C4A41)' : '#F8FAFC'};color:${st.passed ? '#fff' : 'inherit'}">
         <div class="eyebrow" style="color:${st.passed ? '#6FE9DD' : 'var(--teal-600)'}">${st.passed ? 'Module verified' : 'Pass standard'}</div>
         <h3 style="color:${st.passed ? '#fff' : 'var(--navy-900)'};font-size:18px;margin-bottom:8px">${st.passed ? 'Module complete' : 'All three criteria required'}</h3>
         <p class="small" style="color:${st.passed ? '#C8E7E1' : 'var(--muted)'}">${st.passed ? 'Your quiz, scenario and reviewed practical are all verified. This result counts toward your mastery level.' : `Knowledge quiz ${st.standards.quiz_pass}% · scenario test ${st.standards.scenario_pass}% · practical rubric ${st.standards.rubric_min}/4 with no criterion below 2. Retries are unlimited.`}</p>
@@ -1002,7 +1004,12 @@ async function viewModule(my, moduleId = 'strategy') {
           ${practical && practical.status === 'pending' ? `<span class="chip chip-yellow">${icon('clock', 11)} Practical awaiting review</span>` : ''}
           ${st.passed ? `<a class="btn btn-teal btn-sm" href="#/progress">See verified progress ${icon('right', 12)}</a>` : `<a class="btn btn-primary btn-sm" href="#/test">Go to assessments ${icon('right', 12)}</a>`}
         </div>
-      </div>
+      </div>` : `<div class="card card-pad" style="background:#F8FAFC">
+        <div class="eyebrow" style="color:var(--teal-600)">Content module</div>
+        <h3 style="font-size:18px;margin-bottom:8px">Lessons and templates are live</h3>
+        <p class="small muted">The scored assessments for this module are being wired in Phase 5. You can read every lesson, complete them, and download the templates now — no assessment result is recorded yet.</p>
+        <div style="margin-top:14px"><a class="btn btn-outline btn-sm" href="#/learn">Back to modules ${icon('right', 12)}</a></div>
+      </div>`}
     </div>
 
     <div class="section">
@@ -1050,7 +1057,7 @@ async function viewModule(my, moduleId = 'strategy') {
           <a class="btn btn-outline btn-sm dl" href="/api/templates/${esc(t.slug)}" download>${icon('download', 13)} Download</a>
         </div>`).join('')}
       </div>
-      <div class="card card-pad">
+      ${assessmentsLive ? `<div class="card card-pad">
         <h2 style="font-size:16px;margin-bottom:6px">Ready to test it?</h2>
         <p class="small muted" style="margin-bottom:14px">Each assessment is scored on the server. Your best verified results stay on your record.</p>
         ${[
@@ -1062,7 +1069,10 @@ async function viewModule(my, moduleId = 'strategy') {
           <div><div class="small strong">${x.t}</div><div class="tiny muted">${esc(x.s)}</div></div></div>
           ${icon('right', 14)}
         </a>`).join('')}
-      </div>
+      </div>` : `<div class="card card-pad">
+        <h2 style="font-size:16px;margin-bottom:6px">Assessments</h2>
+        <p class="small muted" style="margin:0">Quiz, scenario and practical for this module arrive in Phase 5. Lesson progress and template downloads are recorded now.</p>
+      </div>`}
     </div>`, my);
 }
 

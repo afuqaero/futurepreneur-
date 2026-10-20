@@ -56,8 +56,8 @@ def handle(h, conn, method, path, user):
         mark = pass_mark(kind, s)
         passed = is_pass(score, mark)
         conn.execute(
-            "INSERT INTO attempts (user_id, kind, component, score, passed, detail, created_at) VALUES (?,?,?,?,?,?,?)",
-            (user["id"], kind, module["component"], score, 1 if passed else 0,
+            "INSERT INTO attempts (user_id, module_id, kind, component, score, passed, detail, created_at) VALUES (?,?,?,?,?,?,?,?)",
+            (user["id"], module["id"], kind, module["component"], score, 1 if passed else 0,
              json.dumps({"detail": detail, "correct": correct, "total": total}), iso()),
         )
         conn.commit()
@@ -92,8 +92,8 @@ def handle(h, conn, method, path, user):
                 raise ApiError(400, "Please give a fuller answer for every question (at least 30 characters).", "invalid_input")
             cleaned[prompt["id"]] = val
         conn.execute(
-            "INSERT INTO practical_submissions (user_id, responses, status, created_at) VALUES (?,?,?,?)",
-            (user["id"], json.dumps(cleaned), "pending", iso()),
+            "INSERT INTO practical_submissions (user_id, module_id, responses, status, created_at) VALUES (?,?,?,?,?)",
+            (user["id"], module["id"], json.dumps(cleaned), "pending", iso()),
         )
         conn.commit()
         h.send_json({

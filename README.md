@@ -71,7 +71,8 @@ server/
   migrations/001_init.sql
 static/                    index.html, app.js, styles.css
 tests/                     unittest suite + live-server harness
-content.py                 seed content (module 1; moves to DB in Phase 2)
+content.py                 legacy seed for the Strategy module
+content/seed/*.json        authoring seed for new modules (Marketing live)
 data/                      SQLite database + backups (gitignored)
 docs/PLAN.md               phase plan and current status
 ```
@@ -93,5 +94,5 @@ docs/PLAN.md               phase plan and current status
 - **Phase 1 — complete:** modular server, migrations, backups, CSRF, throttling, security headers, 39-test suite, behaviour parity with the prototype.
 - **Phase 2 — complete:** modules, lessons, templates and practicals live in SQLite, with admin authoring, draft/publish, preview, revisions and an audit trail (47 tests total).
 - **Phase 3 — complete:** Check-Up v2 — customer type, clearer results, gap threshold, retake history and deltas (51 tests total).
-- **Phase 4 — next:** Learn & Improve content for the remaining seven components.
+- **Phase 4 — in progress:** Marketing & Sales module live (4 lessons, 2 templates, 10 quiz + 5 scenario questions, practical). Six modules remain: Operations, Finance, People, Systems, Legal, Digitalisation.
 - Phases 5–10: see `docs/PLAN.md`.

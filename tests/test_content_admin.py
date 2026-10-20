@@ -74,10 +74,10 @@ class ContentAdminTests(ServerCase):
     def test_create_draft_module_is_hidden_until_published(self):
         admin = self.admin()
         learner = self.login_demo()
-        module_id = "test-marketing"
+        module_id = "test-operations"
 
         status, out, _ = admin.post("/api/admin/modules", {
-            "id": module_id, "component": "marketing", "title": "Marketing Foundations",
+            "id": module_id, "component": "operations", "title": "Operations Foundations",
         })
         if status == 409:
             admin.post(f"/api/admin/modules/{module_id}/status", {"status": "draft"})
@@ -115,7 +115,7 @@ class ContentAdminTests(ServerCase):
         # Add 5 quiz and 3 scenario questions.
         for i in range(5):
             status, out, _ = admin.post("/api/admin/questions", {
-                "component": "marketing", "kind": "quiz", "topic": "Customers",
+                "component": "operations", "kind": "quiz", "topic": "Customers",
                 "prompt": f"Marketing quiz question {i} with enough detail?",
                 "options": ["A", "B", "C"], "correct": 1,
                 "explanation": "Because B is the practical answer.",
@@ -123,7 +123,7 @@ class ContentAdminTests(ServerCase):
             self.assertEqual(status, 201, out)
         for i in range(3):
             status, out, _ = admin.post("/api/admin/questions", {
-                "component": "marketing", "kind": "scenario", "topic": "Offer",
+                "component": "operations", "kind": "scenario", "topic": "Offer",
                 "prompt": f"Marketing scenario question {i} with enough detail?",
                 "options": ["A", "B", "C"], "correct": 0,
                 "explanation": "Because A fits the scenario.",
@@ -150,13 +150,13 @@ class ContentAdminTests(ServerCase):
         learner = self.login_demo()
         status, out, _ = admin.get("/api/admin/modules")
         ids = [m["id"] for m in out["modules"]]
-        if "test-marketing" not in ids:
+        if "test-operations" not in ids:
             self.skipTest("depends on the published draft test")
-        status, _, _ = admin.post("/api/admin/modules/test-marketing/status", {"status": "draft"})
+        status, _, _ = admin.post("/api/admin/modules/test-operations/status", {"status": "draft"})
         self.assertEqual(status, 200)
-        status, _, _ = learner.get("/api/module/test-marketing")
+        status, _, _ = learner.get("/api/module/test-operations")
         self.assertEqual(status, 404)
-        admin.post("/api/admin/modules/test-marketing/status", {"status": "published"})
+        admin.post("/api/admin/modules/test-operations/status", {"status": "published"})
 
     def test_template_crud_and_download(self):
         admin = self.admin()
@@ -202,7 +202,7 @@ class ContentAdminTests(ServerCase):
     def test_module_slug_validation(self):
         admin = self.admin()
         status, out, _ = admin.post("/api/admin/modules", {
-            "id": "Bad ID!", "component": "marketing", "title": "Nope",
+            "id": "Bad ID!", "component": "operations", "title": "Nope",
         })
         self.assertEqual(status, 400)
 

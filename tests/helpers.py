@@ -171,17 +171,20 @@ class ServerCase(unittest.TestCase):
         self.assertEqual(status, 201, body)
         return client, body
 
-    def answers_from_db(self, kind, correct_count):
+    def answers_from_db(self, kind, correct_count, module_id=None):
         """Return {question_id: chosen_index} with exactly correct_count right."""
         import sqlite3
 
         db = os.path.join(self.tmpdir, "bizready.db")
         conn = sqlite3.connect(db)
         conn.row_factory = sqlite3.Row
-        rows = conn.execute(
-            "SELECT id, correct, options FROM questions WHERE kind = ? AND active = 1 ORDER BY position, id",
-            (kind,),
-        ).fetchall()
+        sql = "SELECT id, correct, options FROM questions WHERE kind = ? AND active = 1"
+        args = [kind]
+        if kind in ("quiz", "scenario"):
+            sql += " AND (module_id = ? OR module_id IS NULL)"
+            args.append(module_id or "strategy")
+        sql += " ORDER BY position, id"
+        rows = conn.execute(sql, args).fetchall()
         conn.close()
         answers = {}
         for i, row in enumerate(rows):
