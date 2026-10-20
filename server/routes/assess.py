@@ -2,7 +2,7 @@
 
 import json
 
-from .. import content_repo
+from .. import content_repo, template_files
 from ..clock import iso
 from ..content_service import mcq_rows
 from ..errors import ApiError, clean_text
@@ -106,10 +106,23 @@ def handle(h, conn, method, path, user):
     if path.startswith("/api/templates/") and method == "GET":
         slug = path[len("/api/templates/"):].strip("/")
         template = content_repo.get_template(conn, slug)
-        if not template:
-            raise ApiError(404, "Template not found.", "not_found")
-        module = content_repo.get_module(conn, template["module_id"], published_only=True)
+        module_id = template["module_id"] if template else None
+        local_path = None
+        if template:
+            local_path = template_files.override_for(slug)
+        else:
+            hit = template_files.find_custom(slug)
+            if not hit:
+                raise ApiError(404, "Template not found.", "not_found")
+            local_path, module_id = hit
+        module = content_repo.get_module(conn, module_id, published_only=True)
         if not module:
+            raise ApiError(404, "Template not found.", "not_found")
+        if local_path:
+            if not template_files.send(h, local_path):
+                raise ApiError(404, "Template file is too large to serve.", "not_found")
+            return True
+        if not template:
             raise ApiError(404, "Template not found.", "not_found")
         data = template["body"].encode("utf-8")
         h.send_bytes(

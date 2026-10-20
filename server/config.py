@@ -14,6 +14,9 @@ CONFIG_PATH = Path(os.environ.get("BIZREADY_CONFIG") or (ROOT / "config.json"))
 BACKUP_DIR = DATA_DIR / "backups"
 CSRF_SECRET_PATH = DATA_DIR / "csrf.key"
 
+# Drop-in template files: replace built-ins or add new learner downloads.
+TEMPLATES_DIR = Path(os.environ.get("BIZREADY_TEMPLATES_DIR") or (ROOT / "content" / "templates"))
+
 HOST = os.environ.get("BIZREADY_HOST", "127.0.0.1")
 PORT = int(os.environ.get("BIZREADY_PORT", "8000"))
 QUIET = os.environ.get("BIZREADY_QUIET") == "1"

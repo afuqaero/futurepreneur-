@@ -69,6 +69,15 @@ class Client:
     def get(self, path):
         return self.request("GET", path)
 
+    def get_raw(self, path):
+        """GET returning raw bytes, for downloads."""
+        req = urllib.request.Request(self.base + path, method="GET")
+        try:
+            with self.opener.open(req, timeout=15) as res:
+                return res.status, res.read(), dict(res.headers)
+        except urllib.error.HTTPError as exc:
+            return exc.code, exc.read(), dict(exc.headers)
+
     def post(self, path, payload=None, **kwargs):
         return self.request("POST", path, payload, **kwargs)
 
@@ -107,6 +116,7 @@ class ServerCase(unittest.TestCase):
             "BIZREADY_QUIET": "1",
             "BIZREADY_SECURE_COOKIES": "0",
             "BIZREADY_SEED_MODULES": "0",
+            "BIZREADY_TEMPLATES_DIR": str(Path(cls.tmpdir) / "templates"),
         })
         env.pop("BIZREADY_AI_KEY", None)
         cls.proc = subprocess.Popen(

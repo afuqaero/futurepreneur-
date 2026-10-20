@@ -28,7 +28,25 @@ The database lives at `data/bizready.db`. A timestamped backup is written to `da
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-51 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, rubric floor, settings changes, headers, static traversal, draft/publish gates, admin content authoring, revisions, audit, check-up history and deltas.
+54 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, rubric floor, settings changes, headers, static traversal, draft/publish gates, admin content authoring, revisions, audit, check-up history and deltas, and drop-in template file overrides.
+
+## Your own template files
+
+You do not need to edit code to replace a template. Drop a file into `content/templates/` and it is served immediately.
+
+```
+content/templates/
+  finance-13-week-cashflow.xlsx     # replaces the built-in template with that slug
+  finance/Stock-count.csv           # adds an extra download to the Finance module
+  operations/Opening-checklist.pdf  # adds an extra download to Operations
+```
+
+- **Replace:** the filename must match the template slug shown in Admin → Content → Templates. Supported: `pdf, docx, xlsx, pptx, csv, md, txt, zip, png, jpg`.
+- **Add:** any supported file inside `content/templates/<module-id>/` appears as an extra learner download, titled from the filename.
+- Only published modules serve files; max 10 MB per file; one file per slug for replacements.
+- The learner row shows “Your file” so you can tell a real file from a built-in one.
+
+See `content/templates/README.md` for the full rules.
 
 ## Configuration
 
@@ -72,7 +90,8 @@ server/
 static/                    index.html, app.js, styles.css
 tests/                     unittest suite + live-server harness
 content.py                 legacy seed for the Strategy module
-content/seed/*.json        authoring seed for new modules (Marketing live)
+content/seed/*.json        authoring seed for new modules (Marketing, Operations, Finance)
+content/templates/         drop-in files: replace a template or add a download
 data/                      SQLite database + backups (gitignored)
 docs/PLAN.md               phase plan and current status
 ```

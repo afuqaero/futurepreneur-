@@ -2,7 +2,7 @@
 
 import re
 
-from .. import content_repo
+from .. import content_repo, template_files
 from ..clock import iso
 from ..content_service import get_module_content
 from ..errors import ApiError
@@ -15,6 +15,7 @@ def handle(h, conn, method, path, user):
         module = get_module_content(conn, match.group(1), published_only=True)
         if not module:
             raise ApiError(404, "Module not available.", "not_found")
+        module = template_files.decorate(module)
         rows = conn.execute("SELECT lesson_id FROM lesson_progress WHERE user_id = ?", (user["id"],)).fetchall()
         h.send_json({
             "module": module,
