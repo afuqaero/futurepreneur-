@@ -255,6 +255,15 @@ def build_progress(conn, user):
     for item in attempts:
         item["passed"] = bool(item["passed"])
 
+    trend = [
+        {
+            "kind": a["kind"], "score": a["score"], "passed": a["passed"],
+            "module_title": a.get("module_title") or a.get("component"),
+            "created_at": a["created_at"],
+        }
+        for a in reversed(attempts[:12])
+    ]
+
     next_steps = []
     if not profile:
         next_steps.append({"title": "Create your business profile", "detail": "A few questions so the check-up and coaching fit your business.", "route": "checkup"})
@@ -314,6 +323,7 @@ def build_progress(conn, user):
         "mastery": {"level": level, "basis": basis},
         "components": components,
         "attempts": attempts,
+        "trend": trend,
         "plan": plan,
         "plan_done": plan_done,
         "next_steps": next_steps,

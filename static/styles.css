@@ -738,3 +738,52 @@ svg { flex: none; }
   #toast { left: 14px; right: 14px; align-items: stretch; }
   .toast-item { max-width: none; }
 }
+
+/* Progress: score trend */
+.trend-svg { display: block; width: 100%; height: auto; margin-top: 10px; }
+.trend-grid { stroke: var(--line); stroke-width: 1; }
+.trend-high, .trend-mid { stroke-width: 1; stroke-dasharray: 4 4; }
+.trend-high { stroke: rgba(15, 42, 102, .32); }
+.trend-mid { stroke: rgba(255, 201, 60, .85); }
+.trend-label { font-size: 8.5px; font-weight: 650; fill: var(--muted-2); }
+.trend-label.end { text-anchor: end; }
+.trend-line { fill: none; stroke: var(--blue-600); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.trend-dot { stroke: #fff; stroke-width: 2; }
+.trend-dot.pass { fill: var(--green); }
+.trend-dot.fail { fill: var(--red); }
+.trend-legend { margin-top: 6px; font-size: 10.5px; color: var(--muted); align-items: center; }
+.trend-legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+.trend-legend .dot.pass { background: var(--green); }
+.trend-legend .dot.fail { background: var(--red); }
+
+/* Printable one-page business improvement plan */
+.print-only { display: none; }
+@media print {
+  @page { size: A4; margin: 14mm; }
+  html, body { background: #fff !important; }
+  body { color: #0A1733; font-family: Inter, "Segoe UI", sans-serif; }
+  .app { display: block; min-height: 0; }
+  .sidebar, .topbar, #toast, .menu-btn, .backdrop { display: none !important; }
+  .main { margin-left: 0; }
+  .view { padding: 0; max-width: none; }
+  .view > *:not(#print-plan) { display: none !important; }
+  #print-plan { display: block !important; position: static; width: 100%; padding: 0; margin: 0; font-size: 10pt; }
+  .print-head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0F2A66; padding-bottom: 7px; margin-bottom: 12px; font-size: 9pt; }
+  .print-brand { font-weight: 800; font-size: 13pt; color: #0F2A66; letter-spacing: -.02em; }
+  .print-brand span { display: block; font-size: 6.8pt; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #5B6683; margin-top: 1px; }
+  #print-plan h1 { font-size: 22pt; margin: 0 0 3px; color: #0A1733; letter-spacing: -.03em; }
+  .print-meta { margin: 0 0 10px; font-size: 10pt; color: #23325F; }
+  .print-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; border: 1px solid #D3D9EC; border-radius: 6px; padding: 7px 10px; margin: 10px 0 14px; }
+  .print-summary div { border-left: 2px solid #FFC93C; padding-left: 8px; }
+  .print-summary b { display: block; font-size: 15pt; color: #0F2A66; line-height: 1.1; }
+  .print-summary span { font-size: 8pt; color: #5B6683; }
+  #print-plan h2 { font-size: 11pt; margin: 12px 0 4px; color: #0F2A66; }
+  .print-table { width: 100%; border-collapse: collapse; font-size: 8.6pt; }
+  .print-table th { text-align: left; border-bottom: 1.5px solid #0F2A66; padding: 3px 4px; color: #0F2A66; }
+  .print-table td { border-bottom: 1px solid #E6E9F5; padding: 3px 4px; }
+  .print-list, .print-plan-list { margin: 3px 0 8px 17px; padding: 0; font-size: 9pt; line-height: 1.45; }
+  .print-plan-list { list-style: none; margin-left: 0; }
+  .print-note { font-size: 8pt; color: #5B6683; margin: 2px 0 8px; }
+  .print-foot { font-size: 7.4pt; color: #5B6683; border-top: 1px solid #E6E9F5; padding-top: 6px; margin-top: 12px; }
+  .card, .section, .split { break-inside: avoid; }
+}

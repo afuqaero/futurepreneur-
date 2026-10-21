@@ -213,6 +213,28 @@ function bar(pct, cls = '') {
   return `<div class="bar ${cls}"><span style="width:${Math.max(0, Math.min(100, Number(pct) || 0))}%"></span></div>`;
 }
 
+function sparkline(points) {
+  if (!points || !points.length) return '';
+  const width = 620, height = 140, padX = 26, padY = 18;
+  const innerW = width - padX * 2, innerH = height - padY * 2;
+  const step = points.length > 1 ? innerW / (points.length - 1) : 0;
+  const x = i => padX + (points.length > 1 ? i * step : innerW / 2);
+  const y = value => padY + innerH * (1 - Math.max(0, Math.min(100, value)) / 100);
+  const coords = points.map((p, i) => `${x(i).toFixed(1)},${y(p.score).toFixed(1)}`).join(' ');
+  return `<svg class="trend-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Assessment score trend">
+    <line class="trend-grid" x1="${padX}" y1="${y(100)}" x2="${width - padX}" y2="${y(100)}"/>
+    <line class="trend-grid" x1="${padX}" y1="${y(0)}" x2="${width - padX}" y2="${y(0)}"/>
+    <line class="trend-high" x1="${padX}" y1="${y(80)}" x2="${width - padX}" y2="${y(80)}"/>
+    <line class="trend-mid" x1="${padX}" y1="${y(70)}" x2="${width - padX}" y2="${y(70)}"/>
+    <text class="trend-label" x="${padX}" y="${y(100) - 5}">100</text>
+    <text class="trend-label" x="${padX}" y="${y(0) + 12}">0</text>
+    <polyline class="trend-line" points="${coords}"/>
+    ${points.map((p, i) => `<circle class="trend-dot ${p.passed ? 'pass' : 'fail'}" cx="${x(i)}" cy="${y(p.score)}" r="4.5">
+      <title>${esc(p.module_title || '')} · ${esc(p.kind)} · ${p.score}% · ${fmtDate(p.created_at)}</title>
+    </circle>`).join('')}
+  </svg>`;
+}
+
 function pill(level) {
   return `<span class="mastery-pill ${masteryClass(level)}">${esc(level)}</span>`;
 }
@@ -1365,6 +1387,9 @@ async function viewProgress(my) {
     });
   });
   history.sort((a, b) => new Date(b.at) - new Date(a.at));
+  const trend = p.trend || [];
+  const trendBest = trend.length ? Math.max(...trend.map(t => t.score)) : null;
+  const trendPassed = trend.filter(t => t.passed).length;
   const focusCriteria = [
     { t: `Lessons (${st.lessons_done}/${st.lessons_total})`, s: 'Mark each lesson complete as you work through it', ok: st.lessons_done === st.lessons_total },
     { t: `Knowledge quiz (${st.quiz ? st.quiz.score + '%' : 'not passed'})`, s: `Pass mark ${st.standards.quiz_pass}%`, ok: st.quiz_passed },
@@ -1376,7 +1401,10 @@ async function viewProgress(my) {
     <div class="section-head" style="margin-top:0">
       <div><div class="eyebrow">My Business Progress</div><h1>Your record, honestly kept.</h1>
       <p>Every score below comes from a stored assessment attempt or a reviewed practical. Unassessed areas are labelled, not guessed.</p></div>
-      <a class="btn btn-outline btn-sm" href="#/test">${icon('test', 13)} Go to assessments</a>
+      <div class="row wrap" style="gap:8px">
+        <button class="btn btn-outline btn-sm" type="button" data-action="print-progress">${icon('download', 13)} Print / save PDF</button>
+        <a class="btn btn-outline btn-sm" href="#/test">${icon('test', 13)} Go to assessments</a>
+      </div>
     </div>
 
     <div class="section">
@@ -1463,6 +1491,59 @@ async function viewProgress(my) {
       </table></div></div>
     </div>
 
+    <div class="section card card-pad">
+      <div class="card-head"><div><h2>Module results</h2><p>Completion, the three verified requirements and the current status for every module.</p></div>
+        <span class="chip ${p.modules_passed ? 'chip-teal' : 'chip-grey'}">${p.modules_passed} of ${p.modules_total} passed</span></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>Module</th><th class="num">Lessons</th><th class="num">Quiz</th><th class="num">Scenario</th><th>Practical</th><th>Completion</th><th>Status</th></tr></thead>
+        <tbody>
+          ${p.modules.map(m => {
+            const practical = m.practical
+              ? (m.practical.status === 'pending' ? '<span class="chip chip-yellow">Awaiting review</span>' : `<b>${m.practical.average != null ? m.practical.average : '—'}/4</b> ${m.practical_passed ? '<span class="chip chip-teal">Pass</span>' : '<span class="chip chip-red">Retry</span>'}`)
+              : '<span class="tiny muted">Not submitted</span>';
+            const failed = (m.quiz && !m.quiz_passed) || (m.scenario && !m.scenario_passed) || (m.practical && m.practical.status === 'reviewed' && !m.practical_passed);
+            const started = m.quiz || m.scenario || m.practical || m.lessons_done;
+            const status = m.passed
+              ? '<span class="chip chip-teal">Passed</span>'
+              : (m.practical && m.practical.status === 'pending') ? '<span class="chip chip-yellow">Awaiting review</span>'
+                : failed ? '<span class="chip chip-red">Needs improvement</span>'
+                  : started ? '<span class="chip chip-yellow">In progress</span>' : '<span class="chip chip-grey">Not started</span>';
+            return `<tr>
+              <td><a href="#/learn/${esc(m.id)}" class="strong">${esc(m.title)}</a></td>
+              <td class="num">${m.lessons_done}/${m.lessons_total}</td>
+              <td class="num">${m.quiz ? `<b>${m.quiz.score}%</b> <span class="tiny" style="color:${m.quiz_passed ? 'var(--green)' : 'var(--red)'}">${m.quiz_passed ? 'pass' : 'retry'}</span>` : '—'}</td>
+              <td class="num">${m.scenario ? `<b>${m.scenario.score}%</b> <span class="tiny" style="color:${m.scenario_passed ? 'var(--green)' : 'var(--red)'}">${m.scenario_passed ? 'pass' : 'retry'}</span>` : '—'}</td>
+              <td>${practical}</td>
+              <td style="min-width:120px"><div class="row" style="gap:8px">${bar(m.percent)}<span class="small strong">${m.percent}%</span></div></td>
+              <td>${status}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="section split">
+      <div class="card card-pad">
+        <div class="card-head"><div><h2>Score trend</h2><p>Your last ${trend.length} quiz and scenario attempts, oldest to newest.</p></div>
+          <span class="chip chip-grey">${trendPassed}/${trend.length} passed</span></div>
+        ${trend.length ? sparkline(trend) : `<div class="empty" style="padding:18px 0">No scored attempts yet. The trend starts after your first quiz or scenario test.</div>`}
+        <div class="row wrap trend-legend" style="gap:14px">
+          <span><i class="dot pass"></i> Passed</span>
+          <span><i class="dot fail"></i> Not passed</span>
+          <span class="muted">Dashed lines: quiz 80% · scenario 70%</span>
+        </div>
+      </div>
+      <div class="card card-pad">
+        <h3>Reading the trend</h3>
+        <div class="grid auto-160" style="margin-top:10px">
+          <div class="stat"><div class="k">Best attempt</div><div class="v">${trendBest != null ? trendBest : '—'}<small>${trendBest != null ? '%' : ''}</small></div><div class="s">Across both test types</div></div>
+          <div class="stat"><div class="k">Latest attempt</div><div class="v">${trend.length ? trend[trend.length - 1].score : '—'}<small>${trend.length ? '%' : ''}</small></div><div class="s">${trend.length ? esc(trend[trend.length - 1].kind) : 'No attempts yet'}</div></div>
+        </div>
+        <p class="small muted" style="margin-top:12px">Quiz and scenario scores use different pass marks, so compare each attempt with its dashed line. The trend is a record of attempts, not an average grade.</p>
+        <p class="tiny muted" style="margin-top:8px">Best passed quiz and scenario results count toward module completion; failed attempts remain visible here.</p>
+      </div>
+    </div>
+
     <div class="section split">
       <div class="card card-pad">
         <div class="card-head"><div><h2>Next module to finish</h2><p>${esc(st.title)} · the four requirements for this module.</p></div><span class="chip ${st.passed ? 'chip-teal' : 'chip-yellow'}">${st.passed ? 'Complete' : 'In progress'}</span></div>
@@ -1515,7 +1596,35 @@ async function viewProgress(my) {
           <td>${h.pending ? '<span class="chip chip-yellow">Awaiting review</span>' : h.passed === null ? '<span class="chip chip-grey">Baseline</span>' : h.passed ? '<span class="chip chip-teal">Passed</span>' : '<span class="chip chip-red">Not passed</span>'}</td>
         </tr>`).join('')}</tbody>
       </table></div>` : `<div class="empty">No attempts yet.</div>`}
-    </div>`, my);
+    </div>
+
+    <section id="print-plan" class="print-only" aria-hidden="true">
+      <div class="print-head"><div class="print-brand">futurePreneur<span>Business readiness</span></div><span>${fmtDate(new Date().toISOString())}</span></div>
+      <h1>Business improvement plan</h1>
+      <p class="print-meta"><b>${esc((p.profile && p.profile.business_name) || state.user.name)}</b>${p.profile && p.profile.sector ? ' · ' + esc(p.profile.sector) : ''} · Mastery: <b>${esc(p.mastery.level)}</b></p>
+      <div class="print-summary">
+        <div><b>${p.overall_percent}%</b><span>Overall completion</span></div>
+        <div><b>${p.modules_passed}/${p.modules_total}</b><span>Modules verified</span></div>
+        <div><b>${p.plan_done}/${p.plan.length}</b><span>Actions complete</span></div>
+      </div>
+      <h2>Module results</h2>
+      <table class="print-table">
+        <thead><tr><th>Module</th><th>Quiz</th><th>Scenario</th><th>Practical</th><th>Status</th></tr></thead>
+        <tbody>${p.modules.map(m => `<tr>
+          <td>${esc(m.title)}</td>
+          <td>${m.quiz ? m.quiz.score + '%' : '—'}</td>
+          <td>${m.scenario ? m.scenario.score + '%' : '—'}</td>
+          <td>${m.practical ? (m.practical.average != null ? m.practical.average + '/4' : 'Pending review') : '—'}</td>
+          <td>${m.passed ? 'Passed' : (m.practical && m.practical.status === 'pending') ? 'Awaiting review' : ((m.quiz && !m.quiz_passed) || (m.scenario && !m.scenario_passed) || (m.practical && m.practical.status === 'reviewed' && !m.practical_passed)) ? 'Needs improvement' : (m.quiz || m.scenario || m.practical || m.lessons_done) ? 'In progress' : 'Not started'}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+      <h2>Recommended next steps</h2>
+      <ol class="print-list">${p.next_steps.map(s => `<li><b>${esc(s.title)}</b> — ${esc(s.detail)}</li>`).join('') || '<li>All current steps complete.</li>'}</ol>
+      <h2>Action plan</h2>
+      <ul class="print-plan-list">${p.plan.slice(0, 8).map(it => `<li>${it.done ? '☑' : '☐'} ${esc(it.title)}${it.due ? ' — target ' + fmtDate(it.due) : ''}</li>`).join('') || '<li>No actions added yet.</li>'}</ul>
+      ${p.plan.length > 8 ? `<p class="print-note">Plus ${p.plan.length - 8} more action(s) in the app.</p>` : ''}
+      <p class="print-foot">Generated from stored attempts and reviewed practicals. Unassessed modules are not shown as passed. This plan is not a certificate.</p>
+    </section>`, my);
 }
 
 /* ------------------------------------------------------------------ coach */
@@ -2103,6 +2212,10 @@ document.addEventListener('click', async (e) => {
   if (action === 'revise-practical') {
     state.practicalForm = true;
     viewPractical(begin(), el.dataset.module || state.practicalModule);
+    return;
+  }
+  if (action === 'print-progress') {
+    window.print();
     return;
   }
   if (action === 'plan-toggle') {

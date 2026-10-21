@@ -28,7 +28,7 @@ The database lives at `data/bizready.db`. A timestamped backup is written to `da
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-65 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, module-scoped question isolation, per-module remediation, module-aware rubric review, rubric floor, settings changes, headers, static traversal, draft/publish gates, admin content authoring, revisions, audit, check-up history and deltas, coach persistence/privacy/rate limiting, live-provider context injection, key masking, and drop-in template file overrides.
+66 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, module-scoped question isolation, per-module remediation, module-aware rubric review, rubric floor, settings changes, headers, static traversal, draft/publish gates, admin content authoring, revisions, audit, check-up history and deltas, coach persistence/privacy/rate limiting, live-provider context injection, key masking, chronological progress trends, and drop-in template file overrides.
 
 ## Design system
 
@@ -126,5 +126,6 @@ docs/PLAN.md               phase plan and current status
 - **Phase 3 — complete:** Check-Up v2 — customer type, clearer results, gap threshold, retake history and deltas (51 tests total).
 - **Phase 4 — content complete:** all 8 modules live (4 lessons + 2 templates + 10 quiz + 5 scenario questions each).
 - **Phase 5 — complete:** all 8 modules are assessable. Question banks are module-scoped and server-scored, every result includes per-question feedback plus the exact lessons to revisit, practical submissions go to a module-aware admin review queue, and progress/mastery aggregate across the full module set.
-- **Phase 6 — complete:** persisted coach conversations with reopen/clear, per-user rate limiting with `Retry-After`, admin-managed OpenAI-compatible provider settings, key masking, learner context injection and a prompt-injection guard (65 tests total).
-- Phases 7–10: see `docs/PLAN.md`.
+- **Phase 6 — complete:** persisted coach conversations with reopen/clear, per-user rate limiting with `Retry-After`, admin-managed OpenAI-compatible provider settings, key masking, learner context injection and a prompt-injection guard.
+- **Phase 7 — complete:** module-by-module results with honest statuses, a 12-attempt score trend with quiz/scenario reference lines, and a one-page print/PDF business improvement plan (66 tests total).
+- Phases 8–10: see `docs/PLAN.md`.

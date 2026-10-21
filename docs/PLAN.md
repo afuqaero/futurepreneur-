@@ -1,6 +1,6 @@
 # futurePreneur — Build Plan (v1)
 
-**Status:** Phases 1–6 complete (21 October 2026). Phase 6 shipped the persisted, provider-configurable coach.
+**Status:** Phases 1–7 complete (21 October 2026). Phase 7 shipped the verified progress report, trends and one-page print plan.
 **Date:** 19 October 2026
 **Purpose:** Turn the existing working prototype into the complete futurePreneur platform described in the brief — 8 components, verified assessments, real progress tracking, admin-managed content, and a coach that never pretends.
 
@@ -274,9 +274,11 @@ Three modes with distinct system prompts; provider config in admin (OpenAI-compa
 **Evidence:** 65/65 tests pass, including persistence, cross-user 404, 429 + `Retry-After`, masked key in bootstrap/admin responses, a mock OpenAI-compatible provider receiving `Bearer <key>` and the learner context, and a learner blocked from admin AI settings. Headless Chrome: chat survives reload, new chat preserves history, reopen restores messages, clear-all empties it, no key in the DOM, 390px no horizontal scroll, zero JS exceptions.
 **Acceptance:** no key → banner “Demo mode — not a live AI” and no fabricated personalisation; with key → live replies; no key in client files, logs or API responses; rate limit returns 429 with a clear message.
 
-### Phase 7 — My Business Progress (≈ 3 h)
+### Phase 7 — My Business Progress ✅ (21 October 2026)
 Verified-only mastery, per-component score cards, modules passed / needs improvement, assessment timeline, score trends, recommended next steps engine, editable action plan with due dates and completion, print/PDF export of the plan.
 **Shipped early (on request):** five owner-facing aspect cards — Marketing, Finance, Operations, Management (Strategy + Systems), People & Growth (People + Digitalisation) — each showing a labelled self-assessed baseline and a verified badge only where a module is fully passed. The full eight-component table stays underneath, including Legal & Risk.
+**Delivered:** a `Module results` table for all eight modules (lessons, quiz, scenario, practical, completion, and an honest status: Passed / Awaiting review / Needs improvement / In progress / Not started); `trend` in `/api/progress` holds the last 12 quiz/scenario attempts chronologically; an SVG score chart with separate quiz-80 and scenario-70 reference lines and green/red pass dots; best/latest attempt stats; a `Print / save PDF` button that prints a dedicated one-page plan with business profile, mastery, 1/8 module table, next steps and the action plan.
+**Evidence:** `66/66` tests pass, including chronological trend order, attempt scores and pass flags. Headless Chrome: 8 module rows, 2 trend points for the demo learner, print CSS shows only the plan, `Page.printToPDF` produces **1 page** at A4, mobile 390px has no horizontal scroll, and zero JS exceptions.
 **Acceptance:** mastery cannot rise without a verified pass (tested); a learner with only a diagnostic shows Beginner; progress percentages match attempt records; export produces a readable one-page plan.
 
 ### Phase 8 — Admin area (≈ 3 h)
