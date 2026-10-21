@@ -42,16 +42,17 @@ def handle(h, conn, method, path, user):
                 "id": learner["id"], "name": learner["name"], "email": learner["email"],
                 "business_name": learner["business_name"], "sector": learner["sector"],
                 "overall_percent": prog["overall_percent"], "mastery": prog["mastery"]["level"],
-                "module_passed": prog["module"]["passed"],
+                "module_passed": prog["module"]["passed"] if prog["module"] else False,
+                "modules_passed": prog["modules_passed"], "modules_total": prog["modules_total"],
                 "diagnostic": prog["diagnostic"]["overall"] if prog["diagnostic"] else None,
-                "practical_status": (prog["module"]["practical"] or {}).get("status"),
+                "practical_status": (prog["module"]["practical"] or {}).get("status") if prog["module"] else None,
                 "created_at": learner["created_at"],
             })
         stats = {
             "learners": len(out),
             "profiles": conn.execute("SELECT COUNT(*) FROM profiles").fetchone()[0],
             "diagnostics": conn.execute("SELECT COUNT(*) FROM diagnostic_results").fetchone()[0],
-            "passed": len([o for o in out if o["module_passed"]]),
+            "passed": len([o for o in out if o["modules_passed"] > 0]),
             "pending_reviews": conn.execute("SELECT COUNT(*) FROM practical_submissions WHERE status = 'pending'").fetchone()[0],
         }
         h.send_json({"learners": out, "stats": stats})
@@ -59,21 +60,27 @@ def handle(h, conn, method, path, user):
 
     if path == "/api/admin/submissions" and method == "GET":
         rows = conn.execute(
-            "SELECT ps.*, u.name AS learner_name, u.email FROM practical_submissions ps"
-            " JOIN users u ON u.id = ps.user_id ORDER BY ps.status = 'reviewed', ps.id DESC"
+            "SELECT ps.*, u.name AS learner_name, u.email, m.title AS module_title, m.practical_json"
+            " FROM practical_submissions ps"
+            " JOIN users u ON u.id = ps.user_id"
+            " LEFT JOIN modules m ON m.id = ps.module_id"
+            " ORDER BY ps.status = 'reviewed', ps.id DESC"
         ).fetchall()
-        submissions = [{
-            "id": r["id"], "learner": r["learner_name"], "email": r["email"],
-            "responses": json.loads(r["responses"]),
-            "status": r["status"], "rubric": json.loads(r["rubric"]) if r["rubric"] else None,
-            "average": r["average"], "passed": bool(r["passed"]),
-            "reviewer_note": r["reviewer_note"], "created_at": r["created_at"],
-            "reviewed_at": r["reviewed_at"],
-        } for r in rows]
-        h.send_json({"criteria": content.MODULE["practical"]["criteria"],
-                     "prompts": content.MODULE["practical"]["prompts"],
-                     "submissions": submissions,
-                     "standards": settings_public(conn)})
+        submissions = []
+        for r in rows:
+            practical = json.loads(r["practical_json"] or "{}")
+            submissions.append({
+                "id": r["id"], "learner": r["learner_name"], "email": r["email"],
+                "module_id": r["module_id"], "module_title": r["module_title"] or "Unknown module",
+                "responses": json.loads(r["responses"]),
+                "status": r["status"], "rubric": json.loads(r["rubric"]) if r["rubric"] else None,
+                "average": r["average"], "passed": bool(r["passed"]),
+                "reviewer_note": r["reviewer_note"], "created_at": r["created_at"],
+                "reviewed_at": r["reviewed_at"],
+                "criteria": practical.get("criteria") or [],
+                "prompts": practical.get("prompts") or [],
+            })
+        h.send_json({"submissions": submissions, "standards": settings_public(conn)})
         return True
 
     match = re.fullmatch(r"/api/admin/submissions/(\d+)/review", path)
@@ -87,8 +94,13 @@ def handle(h, conn, method, path, user):
         if not isinstance(scores, dict):
             raise ApiError(400, "Scores must be an object.", "invalid_input")
         s = settings_public(conn)
+        module = content_repo.get_module(conn, row["module_id"]) if row["module_id"] else None
+        criteria = (module or {}).get("practical", {}).get("criteria") or content.MODULE["practical"]["criteria"]
+        allowed = {c["id"] for c in criteria}
+        if set(scores) - allowed:
+            raise ApiError(400, "Scores contain a criterion that does not belong to this module.", "invalid_input")
         rubric = {}
-        for crit in content.MODULE["practical"]["criteria"]:
+        for crit in criteria:
             try:
                 val = int(scores.get(crit["id"]))
             except (TypeError, ValueError):
@@ -105,7 +117,7 @@ def handle(h, conn, method, path, user):
             (json.dumps(rubric), avg, 1 if passed else 0, note, iso(), sub_id),
         )
         content_repo.audit(conn, user["id"], "practical.review", "practical", str(sub_id),
-                           {"average": avg, "passed": passed})
+                           {"average": avg, "passed": passed, "module_id": row["module_id"]})
         conn.commit()
         h.send_json({"ok": True, "average": avg, "passed": passed, "standard": s["rubric_min"]})
         return True

@@ -28,7 +28,7 @@ The database lives at `data/bizready.db`. A timestamped backup is written to `da
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-54 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, rubric floor, settings changes, headers, static traversal, draft/publish gates, admin content authoring, revisions, audit, check-up history and deltas, and drop-in template file overrides.
+59 tests: scoring boundaries (79/80/81, 69/70), pass rules, mastery levels, auth, CSRF, login throttling, role checks, full module journey, module-scoped question isolation, per-module remediation, module-aware rubric review, rubric floor, settings changes, headers, static traversal, draft/publish gates, admin content authoring, revisions, audit, check-up history and deltas, and drop-in template file overrides.
 
 ## Design system
 
@@ -87,6 +87,7 @@ server/
   models.py                settings, public user
   content_service.py       module reads + overrides
   scoring.py               scoring, pass rules, progress, mastery
+  remediation.py           missed-question → lesson mapping
   ai.py                    coach proxy + labelled demo fallback
   http.py                  Handler, static files, dispatch
   routes/                  auth, checkup, learn, assess, progress, coach, admin
@@ -94,7 +95,7 @@ server/
 static/                    index.html, app.js, styles.css
 tests/                     unittest suite + live-server harness
 content.py                 legacy seed for the Strategy module
-content/seed/*.json        authoring seed for new modules (Marketing, Operations, Finance)
+content/seed/*.json        authoring seed for all eight modules
 content/templates/         drop-in files: replace a template or add a download
 data/                      SQLite database + backups (gitignored)
 docs/PLAN.md               phase plan and current status
@@ -117,5 +118,6 @@ docs/PLAN.md               phase plan and current status
 - **Phase 1 — complete:** modular server, migrations, backups, CSRF, throttling, security headers, 39-test suite, behaviour parity with the prototype.
 - **Phase 2 — complete:** modules, lessons, templates and practicals live in SQLite, with admin authoring, draft/publish, preview, revisions and an audit trail (47 tests total).
 - **Phase 3 — complete:** Check-Up v2 — customer type, clearer results, gap threshold, retake history and deltas (51 tests total).
-- **Phase 4 — content complete:** all 8 modules live (4 lessons + 2 templates + 10 quiz + 5 scenario questions each). Assessment screens for modules 2–8 are wired in Phase 5.
-- Phases 5–10: see `docs/PLAN.md`.
+- **Phase 4 — content complete:** all 8 modules live (4 lessons + 2 templates + 10 quiz + 5 scenario questions each).
+- **Phase 5 — complete:** all 8 modules are assessable. Question banks are module-scoped and server-scored, every result includes per-question feedback plus the exact lessons to revisit, practical submissions go to a module-aware admin review queue, and progress/mastery aggregate across the full module set (59 tests total).
+- Phases 6–10: see `docs/PLAN.md`.

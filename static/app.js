@@ -19,6 +19,7 @@ const state = {
   runner: null,
   assessmentResult: null,
   practicalForm: false,
+  practicalModule: 'strategy',
   moduleData: null,
   coach: { mode: 'teach', messages: [], busy: false },
   admin: { tab: 'learners', qkind: 'all', editing: null, showForm: false, lesson: 'l1', content: null, moduleId: null, template: null, newModule: false, newTemplate: false, preview: false },
@@ -418,13 +419,14 @@ async function router() {
   const parts = raw.split('/').filter(Boolean);
   const root = parts[0] || 'dashboard';
   const sub = parts[1] || '';
+  const kind = parts[2] || '';
   const navKey = root === 'module' ? 'learn' : root;
   const titles = {
     dashboard: 'Dashboard',
     checkup: 'Business Check-Up',
     learn: sub === 'strategy' ? 'Business Strategy & Model' : 'Learn & Improve',
     coach: 'AI Business Coach',
-    test: sub === 'practical' ? 'Practical assignment' : sub === 'quiz' ? 'Knowledge quiz' : sub === 'scenario' ? 'Scenario test' : 'Test Your Skills',
+    test: kind === 'practical' ? 'Practical assignment' : kind === 'quiz' ? 'Knowledge quiz' : kind === 'scenario' ? 'Scenario test' : 'Test Your Skills',
     progress: 'My Business Progress',
     admin: 'Admin',
   };
@@ -432,7 +434,7 @@ async function router() {
   renderShell(['dashboard', 'checkup', 'learn', 'coach', 'test', 'progress', 'admin'].includes(navKey) ? navKey : 'dashboard');
   const my = begin();
   if (raw !== lastRoute) {
-    state.assessmentResult = (root === 'test' && sub) ? state.assessmentResult : null;
+    state.assessmentResult = (root === 'test' && kind) ? state.assessmentResult : null;
     lastRoute = raw;
   }
   const view = $('#view');
@@ -441,10 +443,10 @@ async function router() {
   try {
     if (root === 'dashboard') await viewDashboard(my);
     else if (root === 'checkup') await viewCheckup(my);
-    else if (root === 'learn' && sub) await viewModule(my, sub);
+    else if (root === 'learn' && sub) await viewModule(my, sub, parts[2] || '');
     else if (root === 'learn') await viewLearn(my);
     else if (root === 'coach') renderCoach(my);
-    else if (root === 'test') await viewTest(my, sub);
+    else if (root === 'test') await viewTest(my, sub, kind);
     else if (root === 'progress') await viewProgress(my);
     else if (root === 'admin') await viewAdmin(my, sub);
     else notFound(my);
@@ -465,22 +467,23 @@ async function viewDashboard(my) {
   if (my !== seq) return;
   state.progress = progress;
   const p = progress;
-  const mod = p.module;
+  const mod = p.focus_module || p.module;
+  const allPassed = p.modules_total > 0 && p.modules_passed === p.modules_total;
   const next = p.next_steps[0] || { title: 'Keep your weekly review going', detail: 'One action this week is enough.', route: 'progress' };
-  const nextLabel = { checkup: 'Start check-up', module: 'Open module', test: 'Take a test', progress: 'See my plan' }[next.route] || 'Continue';
+  const nextLabel = next.route.startsWith('learn/') ? 'Open module' : next.route.startsWith('test/') ? 'Take a test' : { checkup: 'Start check-up', progress: 'See my plan' }[next.route] || 'Continue';
   const firstName = state.user.name.split(' ')[0];
 
   const steps = [
     { id: 'checkup', label: 'Check-Up', sub: p.diagnostic ? 'Done' : 'Start here', href: '#/checkup', done: !!p.diagnostic },
-    { id: 'learn', label: 'Learn', sub: `${mod.lessons_done}/${mod.lessons_total} lessons`, href: `#/learn/${mod.id}`, done: mod.lessons_done === mod.lessons_total },
-    { id: 'coach', label: 'Coach', sub: 'Ask anything', href: '#/coach', done: false },
-    { id: 'test', label: 'Test', sub: `${[mod.quiz_passed, mod.scenario_passed, mod.practical_passed].filter(Boolean).length}/3 passed`, href: '#/test', done: mod.passed },
-    { id: 'progress', label: 'Progress', sub: p.mastery.level, href: '#/progress', done: mod.passed },
+    { id: 'learn', label: 'Learn', sub: `${mod.lessons_done}/${mod.lessons_total} in ${mod.title.split(' ')[0]}`, href: `#/learn/${mod.id}`, done: mod.lessons_done === mod.lessons_total },
+    { id: 'coach', label: 'Coach', sub: 'Ask anything', href: '#/coach', done: false, optional: true },
+    { id: 'test', label: 'Test', sub: `${p.modules_passed}/${p.modules_total} modules passed`, href: '#/test', done: p.modules_passed > 0 },
+    { id: 'progress', label: 'Progress', sub: p.mastery.level, href: '#/progress', done: allPassed },
   ];
   let currentAssigned = false;
   const journey = steps.map(s => {
     let cls = s.done ? 'done' : '';
-    if (!s.done && !currentAssigned && !mod.passed) { cls = 'current'; currentAssigned = true; }
+    if (!s.done && !s.optional && !currentAssigned && !allPassed) { cls = 'current'; currentAssigned = true; }
     return `<a class="jstep ${cls}" href="${s.href}">
       <span class="jdot">${s.done ? icon('check', 13) : ''}</span>
       <span class="jt"><b>${s.label}</b><span>${s.sub}</span></span>
@@ -494,7 +497,7 @@ async function viewDashboard(my) {
       <h1>Your business.<br><em>Levelled up.</em></h1>
       <p>${p.diagnostic ? 'One small step today beats a perfect plan next month.' : 'Take the 5-minute check-up. We\'ll show you what to fix first.'}</p>
       <div class="hero-actions">
-        <a class="btn btn-primary btn-lg" href="${next.route === 'module' ? `#/learn/${mod.id}` : `#/${next.route}`}">${nextLabel} ${icon('right', 15)}</a>
+        <a class="btn btn-primary btn-lg" href="#/${next.route}">${nextLabel} ${icon('right', 15)}</a>
         <a class="hero-link" href="#/coach">${icon('coach', 14)} Ask the coach</a>
       </div>
     </div>
@@ -507,9 +510,9 @@ async function viewDashboard(my) {
   <div class="section"><div class="journey">${journey}</div></div>
 
   <div class="section grid grid-3">
-    <div class="stat"><div class="k">🔥 Readiness</div><div class="v">${p.overall_percent}<small>%</small></div><div class="s">Across 8 business areas</div></div>
+    <div class="stat"><div class="k">🔥 Readiness</div><div class="v">${p.overall_percent}<small>%</small></div><div class="s">Across ${p.modules_total} modules</div></div>
     <div class="stat"><div class="k">🎯 Mastery</div><div class="v" style="font-size:23px;margin-top:10px">${esc(p.mastery.level)}</div><div class="s">Verified results only</div></div>
-    <div class="stat"><div class="k">✅ Action plan</div><div class="v">${p.plan_done}<small> / ${p.plan.length}</small></div><div class="s">Steps completed</div></div>
+    <div class="stat"><div class="k">✅ Modules passed</div><div class="v">${p.modules_passed}<small> / ${p.modules_total}</small></div><div class="s">Quiz + scenario + reviewed practical</div></div>
   </div>
 
   <div class="section split">
@@ -765,7 +768,7 @@ function runnerHTML() {
   const total = r.questions.length;
   const selected = r.answers[q.id];
   const titles = { checkup: 'Business Check-Up', quiz: 'Knowledge quiz', scenario: 'Scenario test' };
-  const subtitle = r.type === 'checkup' ? 'Diagnostic assessment' : r.type === 'quiz' ? 'Business Strategy & Model' : 'Real-world decisions';
+  const subtitle = r.type === 'checkup' ? 'Diagnostic assessment' : (r.module_title || 'Module assessment');
   const dots = r.questions.map((qq, i) => `<span class="answer-dot ${r.answers[qq.id] !== undefined ? 'done' : ''} ${i === r.index ? 'cur' : ''}"></span>`).join('');
   const pct = Math.round((Object.keys(r.answers).length / total) * 100);
   return `<div class="runner">
@@ -818,13 +821,14 @@ async function startCheckup() {
   } catch (err) { toast(err.message, 'err'); }
 }
 
-async function startAssessment(kind) {
+async function startAssessment(kind, moduleId = 'strategy') {
   try {
-    const data = await api('/api/assessment/' + kind + '/questions');
+    const data = await api('/api/module/' + encodeURIComponent(moduleId) + '/assessment/' + kind + '/questions');
     state.assessmentResult = null;
     state.runner = {
       type: kind, questions: data.questions, index: 0, answers: {},
       pass_mark: data.pass_mark, history: data.history,
+      module_id: moduleId, module_title: data.module.title,
     };
     renderRunner();
   } catch (err) { toast(err.message, 'err'); }
@@ -843,7 +847,8 @@ async function submitRunner() {
   const btn = $('[data-action="runner-submit"]');
   if (btn) { btn.disabled = true; btn.textContent = 'Scoring…'; }
   try {
-    const endpoint = r.type === 'checkup' ? '/api/checkup/submit' : '/api/assessment/' + r.type + '/submit';
+    const endpoint = r.type === 'checkup' ? '/api/checkup/submit'
+      : '/api/module/' + encodeURIComponent(r.module_id) + '/assessment/' + r.type + '/submit';
     const data = await api(endpoint, { method: 'POST', body: JSON.stringify({ answers: r.answers }) });
     if (r.type === 'checkup') {
       state.checkupResult = data;
@@ -854,8 +859,10 @@ async function submitRunner() {
     } else {
       state.assessmentResult = data;
       state.progress = data.progress;
+      const moduleId = r.module_id;
+      const kind = r.type;
       state.runner = null;
-      viewTest(begin(), r.type);
+      viewTest(begin(), moduleId, kind);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   } catch (err) {
@@ -870,25 +877,27 @@ async function viewLearn(my) {
   if (my !== seq) return;
   state.progress = p;
   const liveModules = state.components.filter(c => c.available).length;
+  const lessonsDone = p.modules.reduce((n, m) => n + m.lessons_done, 0);
   mount(`
     <div class="section-head" style="margin-top:0">
       <div><div class="eyebrow">Learn &amp; Improve</div><h1>Pick a skill. Use it this week.</h1>
       <p>${liveModules} of ${state.components.length} modules live. Short lessons, real numbers, templates you can actually use.</p></div>
-      <span class="chip chip-yellow">🔥 ${p.module.lessons_done} lessons done</span>
+      <span class="chip chip-yellow">🔥 ${lessonsDone} lessons done</span>
     </div>
     <div class="grid auto-300">
       ${state.components.map((c, i) => {
         const style = compStyle(c.id);
         const comp = p.components.find(x => x.id === c.id);
-        const isCurrent = p.module.id === c.module_id;
-        if (c.available) {
+        const m = p.modules.find(x => x.component === c.id);
+        if (c.available && m) {
+          const criteria = [m.quiz_passed, m.scenario_passed, m.practical_passed].filter(Boolean).length;
           return `<div class="comp-card available">
-            <div class="top"><span class="comp-emoji" aria-hidden="true">${style.emoji}</span><span class="chip chip-teal">Live</span></div>
+            <div class="top"><span class="comp-emoji" aria-hidden="true">${style.emoji}</span><span class="chip ${m.passed ? 'chip-teal' : 'chip-grey'}">${m.passed ? 'Passed' : 'Live'}</span></div>
             <h3>${esc(c.name)}</h3>
             <p>${esc(style.short)}</p>
-            ${isCurrent ? `<div style="margin-top:2px">${bar(p.module.percent)}<div class="row-between" style="margin-top:6px"><span class="tiny muted">${p.module.percent}% complete</span><span class="tiny muted">${p.module.lessons_done}/${p.module.lessons_total} lessons</span></div></div>` : ''}
-            <div class="foot"><span class="meta">${isCurrent && p.module.passed ? 'Passed ✓' : (isCurrent ? 'In progress' : 'Ready when you are')}</span>
-              <a class="btn btn-primary btn-sm" href="#/learn/${esc(c.module_id)}">${isCurrent && p.module.lessons_done ? 'Continue' : 'Start'} ${icon('right', 12)}</a></div>
+            <div style="margin-top:2px">${bar(m.percent)}<div class="row-between" style="margin-top:6px"><span class="tiny muted">${m.percent}% complete</span><span class="tiny muted">${m.lessons_done}/${m.lessons_total} lessons</span></div></div>
+            <div class="foot"><span class="meta">${m.lessons_done ? `${criteria}/3 assessments passed` : 'Ready when you are'}</span>
+              <a class="btn btn-primary btn-sm" href="#/learn/${esc(m.id)}">${m.lessons_done ? 'Continue' : 'Start'} ${icon('right', 12)}</a></div>
           </div>`;
         }
         return `<div class="comp-card locked">
@@ -902,27 +911,23 @@ async function viewLearn(my) {
     </div>`, my);
 }
 
-async function viewModule(my, moduleId = 'strategy') {
+async function viewModule(my, moduleId = 'strategy', lessonId = '') {
   const data = await api('/api/module/' + encodeURIComponent(moduleId));
   if (my !== seq) return;
   state.moduleData = data;
   const m = data.module;
   const st = data.state;
   const moduleIndex = Math.max(0, state.components.findIndex(c => c.id === m.component));
-  const assessmentsLive = m.id === 'strategy';
+  const counts = m.question_counts || {};
+  const assessmentsLive = (counts.quiz || 0) > 0 && (counts.scenario || 0) > 0;
   const done = new Set(data.lessons_done);
   const practical = st.practical;
   const lessonCheck = st.lessons_done === st.lessons_total ? `${st.lessons_done}/${st.lessons_total} complete` : `${st.lessons_done}/${st.lessons_total} lessons`;
-  const cp = assessmentsLive ? [
+  const cp = [
     { b: 'Lessons', s: lessonCheck, done: st.lessons_done === st.lessons_total },
     { b: 'Knowledge quiz', s: st.quiz ? `Best ${st.quiz.score}%` : `Pass ${st.standards.quiz_pass}%`, done: st.quiz_passed },
     { b: 'Scenario test', s: st.scenario ? `Best ${st.scenario.score}%` : `Pass ${st.standards.scenario_pass}%`, done: st.scenario_passed },
     { b: 'Practical', s: practical ? (practical.status === 'reviewed' ? `Scored ${practical.average}/4` : 'Awaiting review') : `Rubric ${st.standards.rubric_min}/4`, done: st.practical_passed },
-  ] : [
-    { b: 'Lessons', s: lessonCheck, done: st.lessons_done === st.lessons_total },
-    { b: 'Templates', s: `${m.templates.length} ready to download`, done: true },
-    { b: 'Exercises', s: `${m.lessons.length} practical steps`, done: false },
-    { b: 'Assessment', s: 'Arrives in Phase 5', done: false },
   ];
   const LESSON_ART = ['/static/img/lesson-map.svg', '/static/img/lesson-lens.svg', '/static/img/lesson-check.svg', '/static/img/lesson-boost.svg'];
   const LESSON_EMOJI = ['🧠', '🔍', '✅', '🚀'];
@@ -939,7 +944,7 @@ async function viewModule(my, moduleId = 'strategy') {
       <div class="meta">
         <span class="chip">${icon('clock', 12)} ${esc(m.hours)}</span>
         <span class="chip">${icon('learn', 12)} ${m.lessons.length} lessons</span>
-        ${assessmentsLive ? `<span class="chip">${icon('test', 12)} Quiz · scenario · practical</span>` : `<span class="chip">${icon('download', 12)} Content module</span>`}
+        ${assessmentsLive ? `<span class="chip">${icon('test', 12)} Quiz · scenario · practical</span>` : `<span class="chip">${icon('download', 12)} Content preview</span>`}
         <span class="chip">${icon('download', 12)} ${m.templates.length} templates</span>
       </div>
     </section>
@@ -959,12 +964,12 @@ async function viewModule(my, moduleId = 'strategy') {
         <p class="small" style="color:${st.passed ? '#5C511F' : 'var(--muted)'}">${st.passed ? 'Your quiz, scenario and reviewed practical are all verified. This result counts toward your mastery level.' : `Knowledge quiz ${st.standards.quiz_pass}% · scenario test ${st.standards.scenario_pass}% · practical rubric ${st.standards.rubric_min}/4 with no criterion below 2. Retries are unlimited.`}</p>
         <div style="margin-top:14px">
           ${practical && practical.status === 'pending' ? `<span class="chip chip-yellow">${icon('clock', 11)} Practical awaiting review</span>` : ''}
-          ${st.passed ? `<a class="btn btn-primary btn-sm" href="#/progress">See verified progress ${icon('right', 12)}</a>` : `<a class="btn btn-primary btn-sm" href="#/test">Go to assessments ${icon('right', 12)}</a>`}
+          ${st.passed ? `<a class="btn btn-primary btn-sm" href="#/progress">See verified progress ${icon('right', 12)}</a>` : `<a class="btn btn-primary btn-sm" href="#/test/${esc(m.id)}">Go to assessments ${icon('right', 12)}</a>`}
         </div>
       </div>` : `<div class="card card-pad" style="background:#F8FAFC">
-        <div class="eyebrow" style="color:var(--teal-600)">Content module</div>
-        <h3 style="font-size:18px;margin-bottom:8px">Lessons and templates are live</h3>
-        <p class="small muted">The scored assessments for this module are being wired in Phase 5. You can read every lesson, complete them, and download the templates now — no assessment result is recorded yet.</p>
+        <div class="eyebrow" style="color:var(--teal-600)">Assessment being authored</div>
+        <h3 style="font-size:18px;margin-bottom:8px">Lessons are ready</h3>
+        <p class="small muted">This module's question bank is still being written. Lessons, exercises and templates are live; no assessment result is recorded yet.</p>
         <div style="margin-top:14px"><a class="btn btn-outline btn-sm" href="#/learn">Back to modules ${icon('right', 12)}</a></div>
       </div>`}
     </div>
@@ -972,8 +977,8 @@ async function viewModule(my, moduleId = 'strategy') {
     <div class="section">
       <div class="section-head"><div><h2>Lessons</h2><p>Short reps, not a textbook. Open one, read the story, do the move.</p></div></div>
       ${m.lessons.map((l, i) => {
-        const isOpen = (i === Math.min(st.lessons_done, m.lessons.length - 1) && !done.has(l.id)) || (i === 0 && st.lessons_done === 0);
-        return `<details class="lesson ${done.has(l.id) ? 'done' : ''}" ${isOpen ? 'open' : ''}>
+        const isOpen = l.id === lessonId || (i === Math.min(st.lessons_done, m.lessons.length - 1) && !done.has(l.id)) || (i === 0 && st.lessons_done === 0);
+        return `<details class="lesson ${done.has(l.id) ? 'done' : ''}" id="lesson-${l.id}" ${isOpen ? 'open' : ''}>
         <summary>
           <span class="lesson-emoji" aria-hidden="true">${LESSON_EMOJI[i % 4]}</span>
           <span class="lsum"><span class="lesson-kicker">Lesson ${String(l.number).padStart(2, '0')}</span><b>${esc(l.title)}</b><span>${esc(l.summary)}</span></span>
@@ -1041,66 +1046,136 @@ async function viewModule(my, moduleId = 'strategy') {
           { k: 'quiz', t: 'Knowledge quiz', s: st.quiz ? `Best ${st.quiz.score}%` : `${st.standards.quiz_pass}% to pass`, ok: st.quiz_passed },
           { k: 'scenario', t: 'Scenario test', s: st.scenario ? `Best ${st.scenario.score}%` : `${st.standards.scenario_pass}% to pass`, ok: st.scenario_passed },
           { k: 'practical', t: 'Practical assignment', s: practical ? (practical.status === 'reviewed' ? `Scored ${practical.average}/4` : 'Awaiting review') : `Rubric ${st.standards.rubric_min}/4`, ok: st.practical_passed },
-        ].map(x => `<a href="#/test/${x.k}" class="row-between" style="padding:11px 0;border-bottom:1px solid var(--line);color:inherit">
+        ].map(x => `<a href="#/test/${esc(m.id)}/${x.k}" class="row-between" style="padding:11px 0;border-bottom:1px solid var(--line);color:inherit">
           <div class="row" style="gap:10px"><span class="icon-tile ${x.ok ? 'teal' : ''}" style="width:30px;height:30px;border-radius:8px">${x.ok ? icon('check', 14) : icon('test', 14)}</span>
           <div><div class="small strong">${x.t}</div><div class="tiny muted">${esc(x.s)}</div></div></div>
           ${icon('right', 14)}
         </a>`).join('')}
       </div>` : `<div class="card card-pad">
         <h2 style="font-size:16px;margin-bottom:6px">Assessments</h2>
-        <p class="small muted" style="margin:0">Quiz, scenario and practical for this module arrive in Phase 5. Lesson progress and template downloads are recorded now.</p>
+        <p class="small muted" style="margin:0">The question bank for this module is still being authored. Lesson progress and template downloads are recorded now.</p>
       </div>`}
     </div>`, my);
+  if (lessonId) {
+    requestAnimationFrame(() => {
+      const el = document.getElementById('lesson-' + lessonId);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY - 86;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  }
 }
-
-/* ------------------------------------------------------------------ tests */
-async function viewTest(my, sub) {
+async function viewTest(my, sub, kind) {
+  if (!sub) return viewTestHub(my);
   if (sub === 'quiz' || sub === 'scenario') {
     if (state.assessmentResult && state.assessmentResult.kind === sub) {
       renderAssessmentResult(state.assessmentResult, my);
       return;
     }
-    await startAssessment(sub);
+    await startAssessment(sub, 'strategy');
     return;
   }
-  if (sub === 'practical') {
-    await viewPractical(my);
+  if (sub === 'practical') return viewPractical(my, 'strategy');
+
+  const moduleId = sub;
+  if (!kind) return viewTestModule(my, moduleId);
+  if (kind === 'practical') return viewPractical(my, moduleId);
+  if (kind === 'quiz' || kind === 'scenario') {
+    if (state.assessmentResult && state.assessmentResult.kind === kind
+        && state.assessmentResult.module && state.assessmentResult.module.id === moduleId) {
+      renderAssessmentResult(state.assessmentResult, my);
+      return;
+    }
+    await startAssessment(kind, moduleId);
     return;
   }
+  notFound(my);
+}
+
+async function viewTestHub(my) {
   const p = await api('/api/progress');
   if (my !== seq) return;
   state.progress = p;
-  const st = p.module;
-  const cards = [
-    {
-      cls: '', icon: 'learn', title: 'Knowledge quiz', count: '10 questions',
-      desc: 'Multiple choice on the core ideas: models, contribution, break-even, priorities.',
-      pass: st.standards.quiz_pass + '%', result: st.quiz, key: 'quiz',
-      time: '8 min',
-    },
-    {
-      cls: 'yellow', icon: 'briefcase', title: 'Scenario test', count: '5 scenarios',
-      desc: 'Real decisions from food, online-selling and service businesses. Choose the soundest response.',
-      pass: st.standards.scenario_pass + '%', result: st.scenario, key: 'scenario',
-      time: '10 min',
-    },
-    {
-      cls: 'navy', icon: 'edit', title: 'Practical assignment', count: '4 written answers',
-      desc: 'Apply the module to your own business. Reviewed against a four-part rubric.',
-      pass: st.standards.rubric_min + '/4', result: st.practical ? { score: practicalPct(st.practical), passed: st.practical.passed } : null, key: 'practical',
-      time: '25 min',
-    },
-  ];
+  const totalCriteria = p.modules.reduce((n, m) => n + [m.quiz_passed, m.scenario_passed, m.practical_passed].filter(Boolean).length, 0);
   mount(`
     <div class="section-head" style="margin-top:0">
       <div><div class="eyebrow">Test Your Skills</div><h1>Prove it — with your own business.</h1>
-      <p>Knowledge tells you what the idea is. Scenarios test judgement. The practical assignment proves you can apply it. All three are required to pass the module.</p></div>
-      <a class="btn btn-outline btn-sm" href="#/learn/strategy">${icon('learn', 13)} Back to module</a>
+      <p>Eight modules, each with a knowledge quiz, a scenario test and a reviewed practical. All three are required to pass a module.</p></div>
+      <span class="chip chip-yellow">${p.modules_passed}/${p.modules_total} modules passed</span>
+    </div>
+
+    <div class="grid auto-300">
+      ${p.modules.map(m => {
+        const style = compStyle(m.component);
+        const criteria = [m.quiz_passed, m.scenario_passed, m.practical_passed].
+          map((ok, i) => `<span class="chip ${ok ? 'chip-teal' : 'chip-grey'}">${['Quiz', 'Scenario', 'Practical'][i]} ${ok ? '✓' : '·'}</span>`).join('');
+        const started = m.lessons_done || m.quiz || m.scenario || m.practical;
+        return `<div class="assessment-card ${m.passed ? '' : 'navy'}">
+          <div class="head"><span class="comp-emoji" aria-hidden="true">${style.emoji}</span>
+            ${m.passed ? `<span class="chip chip-green">${icon('check', 11)} Passed</span>` : started ? `<span class="chip chip-yellow">In progress</span>` : `<span class="chip chip-grey">Not started</span>`}</div>
+          <div><h3>${esc(m.title)}</h3><p>${esc(p.components.find(c => c.id === m.component)?.short || '')} · ${m.lessons_done}/${m.lessons_total} lessons</p></div>
+          <div class="row wrap" style="gap:5px">${criteria}</div>
+          <div class="foot"><span class="tiny muted">${m.percent}% complete</span>
+            <a class="btn ${m.passed ? 'btn-outline' : 'btn-primary'} btn-sm" href="#/test/${esc(m.id)}">${m.passed ? 'Review' : started ? 'Continue' : 'Open'} ${icon('right', 12)}</a></div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="section split">
+      <div class="card card-pad">
+        <div class="card-head"><div><h2>Pass standard</h2><p>Set by the administrator and enforced on the server.</p></div></div>
+        <div class="checklist">
+          <div class="checklist-row"><span class="tick">${icon('check', 11)}</span><div class="txt">Knowledge quiz <span>Multiple choice, automatically scored</span></div><b class="small">${p.settings.quiz_pass}%</b></div>
+          <div class="checklist-row"><span class="tick">${icon('check', 11)}</span><div class="txt">Scenario test <span>Applied judgement, automatically scored</span></div><b class="small">${p.settings.scenario_pass}%</b></div>
+          <div class="checklist-row"><span class="tick">${icon('check', 11)}</span><div class="txt">Practical assignment <span>Criteria scored 0–4 by a reviewer</span></div><b class="small">≥ ${p.settings.rubric_min}/4</b></div>
+        </div>
+        <p class="tiny muted" style="margin-top:12px">${totalCriteria} of ${p.modules_total * 3} assessment criteria verified across all modules. Retries are unlimited; the best passed result counts.</p>
+      </div>
+      <div class="card card-pad">
+        <h2 style="font-size:16px;margin-bottom:8px">No fake results</h2>
+        <p class="small muted">Scores are computed on the server from the stored answer key. Practical work is only marked passed after a reviewer scores it against that module's rubric. There are no automatic certificates.</p>
+        <hr class="hr">
+        <div class="row" style="gap:8px;margin-bottom:8px">${icon('alert', 15)}<b class="small">A failed attempt teaches more</b></div>
+        <p class="tiny muted">Each result comes with explanations and the exact lessons to revisit. Use them before retrying.</p>
+      </div>
+    </div>`, my);
+}
+
+async function viewTestModule(my, moduleId) {
+  const p = await api('/api/progress');
+  if (my !== seq) return;
+  state.progress = p;
+  const st = p.modules.find(m => m.id === moduleId);
+  if (!st) { mount(errorHTML('That module is not available.'), my); return; }
+  const cards = [
+    { cls: '', icon: 'learn', title: 'Knowledge quiz', count: '10 questions',
+      desc: 'Core ideas and calculations for this module.',
+      pass: st.standards.quiz_pass + '%', result: st.quiz, key: 'quiz', time: '8 min' },
+    { cls: 'yellow', icon: 'briefcase', title: 'Scenario test', count: '5 scenarios',
+      desc: 'Real decisions from food, online-selling and service businesses.',
+      pass: st.standards.scenario_pass + '%', result: st.scenario, key: 'scenario', time: '10 min' },
+    { cls: 'navy', icon: 'edit', title: 'Practical assignment', count: 'Written answers',
+      desc: 'Apply this module to your own business. Reviewed against its rubric.',
+      pass: st.standards.rubric_min + '/4', result: st.practical, key: 'practical', time: '25 min' },
+  ];
+  mount(`
+    <div class="row" style="gap:8px;margin-bottom:14px">
+      <a class="link-arrow" href="#/test">${icon('left', 13)} Assessment centre</a>
+      <span class="chip chip-grey">${esc(st.title)}</span>
+    </div>
+    <div class="section-head" style="margin-top:0">
+      <div><div class="eyebrow">Test Your Skills · ${esc(compName(st.component))}</div><h1>${esc(st.title)}</h1>
+      <p>Three assessed steps. ${st.passed ? 'This module is fully verified.' : 'Pass all three to complete the module.'}</p></div>
+      <div class="row wrap" style="gap:7px">
+        <a class="btn btn-outline btn-sm" href="#/learn/${esc(st.id)}">${icon('learn', 13)} Lessons</a>
+        ${st.passed ? `<span class="chip chip-teal">${icon('check', 11)} Verified</span>` : ''}
+      </div>
     </div>
     <div class="grid auto-300">
       ${cards.map(c => {
         const r = c.result;
-        const passed = r && r.passed;
+        const passed = c.key === 'practical' ? (r && r.passed) : (r && r.passed);
         const meta = !r ? 'Not attempted' : c.key === 'practical'
           ? (r.status === 'reviewed' ? 'Scored ' + r.average + '/4' : 'Awaiting review')
           : 'Best ' + r.score + '% · ' + (r.attempts || 1) + (r.attempts === 1 ? ' attempt' : ' attempts');
@@ -1110,43 +1185,30 @@ async function viewTest(my, sub) {
           <div><h3>${c.title}</h3><p>${c.desc}</p></div>
           <div class="meta-row"><span>${icon('clock', 11)} ${c.time}</span><span><b>${c.count}</b></span><span>Pass <b>${c.pass}</b></span></div>
           <div class="foot"><span class="tiny muted">${esc(meta)}</span>
-            <a class="btn ${passed ? 'btn-outline' : 'btn-primary'} btn-sm" href="#/test/${c.key}">${passed ? 'Review / retake' : r ? 'Continue' : 'Start'} ${icon('right', 12)}</a></div>
+            <a class="btn ${passed ? 'btn-outline' : 'btn-primary'} btn-sm" data-action="start-assessment" data-module="${esc(st.id)}" data-kind="${c.key}" href="#/test/${esc(st.id)}/${c.key}">${passed ? 'Review / retake' : r ? 'Continue' : 'Start'} ${icon('right', 12)}</a></div>
         </div>`;
       }).join('')}
     </div>
-
-    <div class="section split">
-      <div class="card card-pad">
-        <div class="card-head"><div><h2>Pass standard</h2><p>Set by the platform administrator and enforced on the server.</p></div></div>
-        <div class="checklist">
-          <div class="checklist-row"><span class="tick">${icon('check', 11)}</span><div class="txt">Knowledge quiz <span>Multiple choice, automatically scored</span></div><b class="small">${st.standards.quiz_pass}%</b></div>
-          <div class="checklist-row"><span class="tick">${icon('check', 11)}</span><div class="txt">Scenario test <span>Applied judgement, automatically scored</span></div><b class="small">${st.standards.scenario_pass}%</b></div>
-          <div class="checklist-row"><span class="tick">${icon('check', 11)}</span><div class="txt">Practical assignment <span>Four criteria, scored 0–4 by a reviewer</span></div><b class="small">≥ ${st.standards.rubric_min}/4</b></div>
-        </div>
-        <p class="tiny muted" style="margin-top:12px">Failed attempts are kept in your history. They never remove a previous pass, but they do show what needs revision. The module is marked passed only when all three criteria are verified.</p>
-      </div>
-      <div class="card card-pad">
-        <h2 style="font-size:16px;margin-bottom:8px">Before you start</h2>
-        <p class="small muted">The quiz and scenario give immediate feedback with explanations. Review wrong answers before retrying — retries are unlimited, but guessing your way through teaches you very little.</p>
-        <hr class="hr">
-        <div class="row" style="gap:8px;margin-bottom:8px">${icon('alert', 15)}<b class="small">No fake results</b></div>
-        <p class="tiny muted">Scores are computed on the server from the stored answer key. Practical work is only marked passed after a reviewer scores it. There are no automatic certificates.</p>
+    <div class="section card card-pad">
+      <div class="row-between wrap" style="gap:14px">
+        <div><h3 style="margin-bottom:4px">Module progress</h3>
+          <p class="small muted" style="margin:0">${st.lessons_done}/${st.lessons_total} lessons · ${[st.quiz_passed, st.scenario_passed, st.practical_passed].filter(Boolean).length}/3 assessment criteria verified · ${st.percent}% complete</p></div>
+        <div style="min-width:200px;flex:1;max-width:420px">${bar(st.percent)}</div>
       </div>
     </div>`, my);
-}
-
-function practicalPct(s) {
-  return s && s.average ? Math.round((s.average / 4) * 100) : 0;
 }
 
 function renderAssessmentResult(data, my) {
   const passed = data.passed;
   const title = data.kind === 'quiz' ? 'Knowledge quiz' : 'Scenario test';
-  const nextHref = data.kind === 'quiz' ? '#/test/scenario' : '#/test/practical';
+  const moduleId = data.module ? data.module.id : 'strategy';
+  const moduleTitle = data.module ? data.module.title : 'Module';
+  const st = (data.progress.modules || []).find(m => m.id === moduleId) || data.progress.module;
+  const nextHref = data.kind === 'quiz' ? `#/test/${encodeURIComponent(moduleId)}/scenario` : `#/test/${encodeURIComponent(moduleId)}/practical`;
   const nextLabel = data.kind === 'quiz' ? 'Continue to scenario test' : 'Continue to practical';
   mount(`
     <div class="row" style="gap:8px;margin-bottom:14px"><a class="link-arrow" href="#/test">${icon('left', 13)} Assessment centre</a>
-      <span class="chip chip-grey">${esc(title)}</span></div>
+      <span class="chip chip-grey">${esc(moduleTitle)}</span><span class="chip chip-grey">${esc(title)}</span></div>
     <div class="verdict ${passed ? '' : 'fail'}">
       <div class="vicon">${passed ? icon('check', 22) : icon('refresh', 20)}</div>
       <div style="flex:1"><h3>${passed ? 'Passed — ' + data.score + '%' : 'Not passed — ' + data.score + '%'}</h3>
@@ -1157,8 +1219,17 @@ function renderAssessmentResult(data, my) {
     <div class="section grid auto-260">
       <div class="stat"><div class="k">Your score</div><div class="v">${data.score}<small>%</small></div><div class="s">Pass mark ${data.pass_mark}%</div></div>
       <div class="stat"><div class="k">Correct answers</div><div class="v">${data.correct}<small> / ${data.total}</small></div><div class="s">Scored on the server</div></div>
-      <div class="stat"><div class="k">Module status</div><div class="v" style="font-size:19px;margin-top:10px">${data.progress.module.percent}%</div><div class="s">${data.progress.module.passed ? 'Module verified' : 'Criteria remaining'}</div></div>
+      <div class="stat"><div class="k">Module status</div><div class="v" style="font-size:19px;margin-top:10px">${st ? st.percent + '%' : '—'}</div><div class="s">${st && st.passed ? 'Module verified' : 'Criteria remaining'}</div></div>
     </div>
+
+    ${data.remediation && data.remediation.length ? `<div class="section card card-pad">
+      <div class="card-head"><div><h2>Revisit these lessons</h2><p>The questions you missed map to these parts of ${esc(moduleTitle)}.</p></div></div>
+      <div class="grid auto-220">
+        ${data.remediation.map(l => `<a class="row-between" style="padding:12px 14px;border:1px solid var(--line);border-radius:11px;color:inherit" href="#/learn/${esc(moduleId)}/${esc(l.id)}">
+          <span class="row" style="gap:9px"><span class="icon-tile yellow" style="width:30px;height:30px;border-radius:8px">${String(l.number).padStart(2, '0')}</span>
+          <span class="small strong">${esc(l.title)}</span></span>${icon('right', 13)}</a>`).join('')}
+      </div>
+    </div>` : ''}
 
     <div class="section">
       <div class="section-head"><div><h2>Question feedback</h2><p>Every answer, with the reasoning. Use this to decide what to revise.</p></div></div>
@@ -1168,7 +1239,7 @@ function renderAssessmentResult(data, my) {
           <div class="fq" style="margin-top:7px">${i + 1}. ${esc(d.prompt)}</div>
           <div class="fa">Your answer: <b>${d.chosen != null ? esc(d.options[d.chosen]) : 'No answer'}</b></div>
           ${d.is_correct ? '' : `<div class="fa">Correct answer: <b>${esc(d.options[d.correct])}</b></div>`}
-          <div class="fe">${esc(d.explanation)}</div>
+          <div class="fe">${esc(d.explanation)}${d.lesson ? ` · <a href="#/learn/${esc(moduleId)}/${esc(d.lesson.id)}">Revisit lesson ${d.lesson.number}: ${esc(d.lesson.title)}</a>` : ''}</div>
         </div>`).join('')}
       </div>
     </div>
@@ -1176,10 +1247,10 @@ function renderAssessmentResult(data, my) {
     <div class="section card card-pad">
       <div class="row-between wrap" style="gap:12px">
         <div><h3 style="margin-bottom:4px">${passed ? 'Keep the momentum' : 'Revise, then retake'}</h3>
-          <p class="small muted" style="margin:0">${passed ? 'Your result is saved. Complete the remaining criteria to finish the module.' : 'The relevant lesson is linked below; retries are unlimited and your best pass is what counts.'}</p></div>
+          <p class="small muted" style="margin:0">${passed ? 'Your result is saved. Complete the remaining criteria to finish the module.' : 'The exact lessons are listed above; retries are unlimited and your best pass is what counts.'}</p></div>
         <div class="row wrap">
-          <a class="btn btn-outline" href="#/learn/strategy">${icon('learn', 14)} Review lessons</a>
-          <button class="btn btn-primary" type="button" data-action="retry-assessment" data-kind="${data.kind}">${icon('refresh', 14)} Retry</button>
+          <a class="btn btn-outline" href="#/learn/${esc(moduleId)}">${icon('learn', 14)} Review lessons</a>
+          <button class="btn btn-primary" type="button" data-action="retry-assessment" data-kind="${data.kind}" data-module="${esc(moduleId)}">${icon('refresh', 14)} Retry</button>
           ${passed ? `<a class="btn btn-teal" href="${nextHref}">${nextLabel} ${icon('right', 14)}</a>` : ''}
         </div>
       </div>
@@ -1187,25 +1258,28 @@ function renderAssessmentResult(data, my) {
 }
 
 /* ------------------------------------------------------------------ practical */
-async function viewPractical(my) {
-  const data = await api('/api/practical');
+async function viewPractical(my, moduleId = 'strategy') {
+  state.practicalModule = moduleId;
+  const data = await api('/api/module/' + encodeURIComponent(moduleId) + '/practical');
   if (my !== seq) return;
   const sub = data.submission;
   const showForm = state.practicalForm || !sub || (sub.status === 'reviewed' && !sub.passed);
   const standard = data.standards;
+  const moduleTitle = data.module.title;
 
   if (showForm) {
     const existing = sub ? sub.responses : {};
     mount(`
-      <div class="row" style="gap:8px;margin-bottom:14px"><a class="link-arrow" href="#/test">${icon('left', 13)} Assessment centre</a>
+      <div class="row" style="gap:8px;margin-bottom:14px"><a class="link-arrow" href="#/test/${esc(moduleId)}">${icon('left', 13)} ${esc(moduleTitle)} assessments</a>
         <span class="chip chip-grey">Practical assignment</span></div>
       <div class="section-head" style="margin-top:0">
-        <div><div class="eyebrow">Test Your Skills · Practical</div><h1>${esc(data.practical.title)}</h1>
+        <div><div class="eyebrow">Test Your Skills · ${esc(moduleTitle)}</div><h1>${esc(data.practical.title)}</h1>
         <p>${esc(data.practical.intro)}</p></div>
       </div>
       <div class="split">
         <div class="card card-pad">
           <form data-form="practical">
+            <input type="hidden" name="module_id" value="${esc(moduleId)}">
             ${data.practical.prompts.map((pr, i) => `<div class="field">
               <label for="${pr.id}">${i + 1}. ${esc(pr.label)}</label>
               <textarea class="textarea" id="${pr.id}" name="${pr.id}" rows="5" placeholder="${esc(pr.placeholder)}" required minlength="30">${esc(existing[pr.id] || '')}</textarea>
@@ -1235,10 +1309,10 @@ async function viewPractical(my) {
 
   const rubric = sub.rubric || {};
   mount(`
-    <div class="row" style="gap:8px;margin-bottom:14px"><a class="link-arrow" href="#/test">${icon('left', 13)} Assessment centre</a>
+    <div class="row" style="gap:8px;margin-bottom:14px"><a class="link-arrow" href="#/test/${esc(moduleId)}">${icon('left', 13)} ${esc(moduleTitle)} assessments</a>
       <span class="chip chip-grey">Practical assignment</span></div>
     <div class="section-head" style="margin-top:0">
-      <div><div class="eyebrow">Practical assignment</div><h1>${sub.status === 'reviewed' ? (sub.passed ? 'Reviewed and passed' : 'Reviewed — revision needed') : 'Submitted for review'}</h1>
+      <div><div class="eyebrow">Practical assignment · ${esc(moduleTitle)}</div><h1>${sub.status === 'reviewed' ? (sub.passed ? 'Reviewed and passed' : 'Reviewed — revision needed') : 'Submitted for review'}</h1>
         <p>Submitted ${fmtDate(sub.created_at)}${sub.reviewed_at ? ' · reviewed ' + fmtDate(sub.reviewed_at) : ''}.</p></div>
       <span class="chip ${sub.status === 'reviewed' ? (sub.passed ? 'chip-teal' : 'chip-red') : 'chip-yellow'}">${sub.status === 'reviewed' ? (sub.passed ? 'Verified pass' : 'Not passed') : 'Awaiting review'}</span>
     </div>
@@ -1261,7 +1335,7 @@ async function viewPractical(my) {
 
     <div class="card card-pad">
       <div class="card-head"><div><h2>Your submission</h2><p>What you wrote, kept as the record of this attempt.</p></div>
-        ${sub.status === 'reviewed' && !sub.passed ? `<button class="btn btn-primary btn-sm" type="button" data-action="revise-practical">${icon('edit', 13)} Revise and resubmit</button>` : ''}</div>
+        ${sub.status === 'reviewed' && !sub.passed ? `<button class="btn btn-primary btn-sm" type="button" data-action="revise-practical" data-module="${esc(moduleId)}">${icon('edit', 13)} Revise and resubmit</button>` : ''}</div>
       ${data.practical.prompts.map((pr, i) => `<div class="answer-block"><div class="k">${i + 1}. ${esc(pr.label)}</div><div class="v">${esc(sub.responses[pr.id] || '—')}</div></div>`).join('')}
     </div>`, my);
 }
@@ -1271,20 +1345,32 @@ async function viewProgress(my) {
   const p = await api('/api/progress');
   if (my !== seq) return;
   state.progress = p;
-  const st = p.module;
+  const st = p.focus_module || p.module;
   const levels = ['Beginner', 'Developing', 'Structured', 'Optimising'];
   const levelIdx = levels.indexOf(p.mastery.level);
-  const criteria = [
+  const history = [];
+  if (p.diagnostic) history.push({ name: 'Business Check-Up', kind: 'diagnostic', score: p.diagnostic.overall, passed: null, at: p.diagnostic.created_at });
+  p.attempts.forEach(a => history.push({
+    name: (a.module_title || compName(a.component)) + ' · ' + (a.kind === 'quiz' ? 'Knowledge quiz' : 'Scenario test'),
+    kind: a.kind, score: a.score, passed: a.passed, at: a.created_at,
+  }));
+  p.modules.forEach(m => {
+    if (m.practical) history.push({
+      name: m.title + ' · Practical',
+      kind: 'practical',
+      score: m.practical.average != null ? m.practical.average + '/4' : '—',
+      passed: m.practical.status === 'reviewed' ? m.practical.passed : null,
+      at: m.practical.reviewed_at || m.practical.created_at,
+      pending: m.practical.status === 'pending',
+    });
+  });
+  history.sort((a, b) => new Date(b.at) - new Date(a.at));
+  const focusCriteria = [
     { t: `Lessons (${st.lessons_done}/${st.lessons_total})`, s: 'Mark each lesson complete as you work through it', ok: st.lessons_done === st.lessons_total },
     { t: `Knowledge quiz (${st.quiz ? st.quiz.score + '%' : 'not passed'})`, s: `Pass mark ${st.standards.quiz_pass}%`, ok: st.quiz_passed },
     { t: `Scenario test (${st.scenario ? st.scenario.score + '%' : 'not passed'})`, s: `Pass mark ${st.standards.scenario_pass}%`, ok: st.scenario_passed },
-    { t: `Practical (${st.practical ? (st.practical.average != null ? st.practical.average + '/4' : 'pending') : 'not submitted'})`, s: 'Reviewed against four criteria', ok: st.practical_passed },
+    { t: `Practical (${st.practical ? (st.practical.average != null ? st.practical.average + '/4' : 'pending') : 'not submitted'})`, s: 'Reviewed against the module rubric', ok: st.practical_passed },
   ];
-  const history = [];
-  if (p.diagnostic) history.push({ name: 'Business Check-Up', kind: 'diagnostic', score: p.diagnostic.overall, passed: null, at: p.diagnostic.created_at });
-  p.attempts.forEach(a => history.push({ name: a.kind === 'quiz' ? 'Knowledge quiz' : 'Scenario test', kind: a.kind, score: a.score, passed: a.passed, at: a.created_at }));
-  if (st.practical) history.push({ name: 'Practical assignment', kind: 'practical', score: st.practical.average != null ? st.practical.average + '/4' : '—', passed: st.practical.status === 'reviewed' ? st.practical.passed : null, at: st.practical.reviewed_at || st.practical.created_at, pending: st.practical.status === 'pending' });
-  history.sort((a, b) => new Date(b.at) - new Date(a.at));
 
   mount(`
     <div class="section-head" style="margin-top:0">
@@ -1301,7 +1387,7 @@ async function viewProgress(my) {
           return `<div class="stat">
             <div class="k">${esc(a.label)}</div>
             <div class="v">${s.score != null ? s.score : '—'}<small>${s.score != null ? '%' : ''}</small></div>
-            <div class="s">${s.score != null ? 'Self-assessed baseline' : 'Not assessed yet'}</div>
+            <div class="s">${s.score != null ? 'Self-assessed baseline' : (s.verified ? 'Verified module · check-up not taken' : 'Not assessed yet')}</div>
             <div style="margin-top:9px">${bar(s.score == null ? 0 : s.score)}</div>
             <p class="tiny muted" style="margin:8px 0 0;line-height:1.45">${esc(a.blurb)}</p>
             ${s.verified ? `<div style="margin-top:8px"><span class="chip chip-teal" style="font-size:9.5px;padding:2px 7px">${s.verified}/${s.total} verified</span></div>` : ''}
@@ -1322,7 +1408,7 @@ async function viewProgress(my) {
                 <h2 style="font-size:26px;margin-bottom:6px">${esc(p.mastery.level)}</h2>
                 <p class="small muted" style="margin:0">${esc(p.mastery.basis)}</p>
                 <div class="row wrap" style="gap:6px;margin-top:10px">
-                  <span class="chip chip-navy">${st.passed ? '1 module passed' : '0 modules passed'}</span>
+                  <span class="chip chip-navy">${p.modules_passed} of ${p.modules_total} modules passed</span>
                   <span class="chip chip-grey">${p.attempts.length} scored attempts</span>
                 </div>
               </div>
@@ -1339,7 +1425,7 @@ async function viewProgress(my) {
 
         <div class="grid auto-220" style="margin-top:16px">
           <div class="stat"><div class="k">Diagnostic</div><div class="v">${p.diagnostic ? p.diagnostic.overall : '—'}<small>${p.diagnostic ? '%' : ''}</small></div><div class="s">${p.diagnostic ? fmtDate(p.diagnostic.created_at) : 'Not taken yet'}</div></div>
-          <div class="stat"><div class="k">Module progress</div><div class="v">${st.percent}<small>%</small></div><div class="s">${st.lessons_done}/${st.lessons_total} lessons · ${[st.quiz_passed, st.scenario_passed, st.practical_passed].filter(Boolean).length}/3 criteria</div></div>
+          <div class="stat"><div class="k">Next module</div><div class="v">${st.percent}<small>%</small></div><div class="s">${esc(st.title)} · ${st.lessons_done}/${st.lessons_total} lessons · ${[st.quiz_passed, st.scenario_passed, st.practical_passed].filter(Boolean).length}/3 criteria</div></div>
           <div class="stat"><div class="k">Action plan</div><div class="v">${p.plan_done}<small>/${p.plan.length}</small></div><div class="s">Steps marked complete</div></div>
         </div>
       </div>
@@ -1350,9 +1436,9 @@ async function viewProgress(my) {
         <p style="margin-bottom:12px">Levels are never assigned from confidence, logins or unfinished work.</p>
         <div class="small" style="color:#D3E4F1;line-height:1.75">
           <div><b style="color:#fff">Beginner</b> — check-up complete, no module assessment passed.</div>
-          <div><b style="color:#fff">Developing</b> — at least one scored assessment passed.</div>
-          <div><b style="color:#fff">Structured</b> — full module verified: quiz, scenario and reviewed practical.</div>
-          <div><b style="color:#fff">Optimising</b> — module verified with quiz ≥ 90%, practical ≥ 3.5/4 and two plan items completed.</div>
+          <div><b style="color:#fff">Developing</b> — assessment attempts recorded, or a partial module passed.</div>
+          <div><b style="color:#fff">Structured</b> — at least one full module verified: quiz, scenario and reviewed practical.</div>
+          <div><b style="color:#fff">Optimising</b> — modules verified with quiz ≥ 90%, practical ≥ 3.5/4 and a completed plan item.</div>
         </div>
         <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.14)" class="tiny">
           <span style="color:#9FBDD5">Components without a scored assessment show “Not assessed”.</span>
@@ -1368,10 +1454,10 @@ async function viewProgress(my) {
           ${p.components.map((c, i) => `<tr>
             <td class="comp-name"><div class="row" style="gap:9px"><span class="swatch">${String(i + 1).padStart(2, '0')}</span><b>${esc(c.name)}</b></div></td>
             <td style="min-width:120px">${c.score != null ? `<div class="row" style="gap:8px">${bar(c.score)}<span class="small strong">${c.score}%</span></div>` : '<span class="tiny muted">—</span>'}</td>
-            <td>${c.id === 'strategy' ? (st.passed ? '<span class="chip chip-teal">Passed</span>' : '<span class="chip chip-yellow">In progress</span>') : '<span class="chip chip-grey">Next release</span>'}</td>
+            <td>${c.status === 'passed' ? '<span class="chip chip-teal">Passed</span>' : c.status === 'in-progress' ? '<span class="chip chip-yellow">In progress</span>' : c.status === 'diagnostic' ? '<span class="chip chip-grey">Not assessed</span>' : '<span class="chip chip-grey">Not started</span>'}</td>
             <td>${pill(c.mastery)}</td>
             <td class="tiny muted">${esc(c.source || '—')}</td>
-            <td>${c.id === 'strategy' ? `<a class="link-arrow" href="#/learn/strategy">Open ${icon('right', 12)}</a>` : ''}</td>
+            <td>${c.module_id ? `<a class="link-arrow" href="#/learn/${esc(c.module_id)}">Open ${icon('right', 12)}</a>` : ''}</td>
           </tr>`).join('')}
         </tbody>
       </table></div></div>
@@ -1379,13 +1465,17 @@ async function viewProgress(my) {
 
     <div class="section split">
       <div class="card card-pad">
-        <div class="card-head"><div><h2>Module criteria</h2><p>The four requirements for this module. Profile and diagnostic are baseline steps, tracked above.</p></div><span class="chip ${st.passed ? 'chip-teal' : 'chip-yellow'}">${st.passed ? 'Complete' : 'In progress'}</span></div>
+        <div class="card-head"><div><h2>Next module to finish</h2><p>${esc(st.title)} · the four requirements for this module.</p></div><span class="chip ${st.passed ? 'chip-teal' : 'chip-yellow'}">${st.passed ? 'Complete' : 'In progress'}</span></div>
         <div class="checklist">
-          ${criteria.map(c => `<div class="checklist-row ${c.ok ? 'done' : ''}">
+          ${focusCriteria.map(c => `<div class="checklist-row ${c.ok ? 'done' : ''}">
             <span class="tick">${c.ok ? icon('check', 11) : ''}</span>
             <div class="txt">${esc(c.t)}<span>${esc(c.s)}</span></div>
             <span class="st">${c.ok ? 'Verified' : 'Pending'}</span>
           </div>`).join('')}
+        </div>
+        <div class="row-between" style="margin-top:14px">
+          <a class="link-arrow" href="#/test/${esc(st.id)}">Open assessments ${icon('right', 12)}</a>
+          <a class="link-arrow" href="#/learn/${esc(st.id)}">Open lessons ${icon('right', 12)}</a>
         </div>
         <p class="tiny muted" style="margin-top:12px">Mastery is assigned only after a module's quiz, scenario and practical are verified. Diagnostic scores are shown as a baseline, not as a mastery level.</p>
       </div>
@@ -1584,15 +1674,14 @@ async function viewAdmin(my, sub) {
       <div class="card card-pad">
         <div class="card-head"><div><h2>Learners</h2><p>Live progress calculated from stored attempts and reviews.</p></div></div>
         <div class="table-wrap"><table class="table">
-          <thead><tr><th>Learner</th><th>Business</th><th>Check-up</th><th>Overall</th><th>Mastery</th><th>Module</th><th>Practical</th></tr></thead>
+          <thead><tr><th>Learner</th><th>Business</th><th>Check-up</th><th>Overall</th><th>Mastery</th><th>Modules</th></tr></thead>
           <tbody>${data.learners.map(l => `<tr>
             <td><b>${esc(l.name)}</b><div class="tiny muted">${esc(l.email)}</div></td>
             <td>${esc(l.business_name || '—')}<div class="tiny muted">${esc(l.sector || '')}</div></td>
             <td>${l.diagnostic != null ? l.diagnostic + '%' : '—'}</td>
             <td style="min-width:120px"><div class="row" style="gap:8px">${bar(l.overall_percent)}<span class="small strong">${l.overall_percent}%</span></div></td>
             <td>${pill(l.mastery)}</td>
-            <td>${l.module_passed ? '<span class="chip chip-teal">Passed</span>' : '<span class="chip chip-grey">In progress</span>'}</td>
-            <td>${l.practical_status === 'pending' ? '<span class="chip chip-yellow">Pending</span>' : l.practical_status === 'reviewed' ? '<span class="chip chip-grey">Reviewed</span>' : '<span class="tiny muted">—</span>'}</td>
+            <td><span class="chip ${l.modules_passed ? 'chip-teal' : 'chip-grey'}">${l.modules_passed}/${l.modules_total} passed</span></td>
           </tr>`).join('')}</tbody>
         </table></div>
       </div>`, my);
@@ -1609,14 +1698,15 @@ async function viewAdmin(my, sub) {
         <div class="row-between wrap" style="gap:10px;margin-bottom:10px">
           <div class="row" style="gap:10px"><div class="avatar" style="background:#E9EFF6;color:#16406A">${esc(initials(s.learner))}</div>
             <div><b class="small">${esc(s.learner)}</b><div class="tiny muted">${esc(s.email)} · submitted ${fmtDate(s.created_at)}</div></div></div>
-          <span class="chip ${s.status === 'reviewed' ? (s.passed ? 'chip-teal' : 'chip-red') : 'chip-yellow'}">${s.status === 'reviewed' ? (s.passed ? 'Passed · ' + s.average + '/4' : 'Not passed · ' + s.average + '/4') : 'Awaiting review'}</span>
+          <div class="row wrap" style="gap:6px"><span class="chip chip-navy">${esc(s.module_title)}</span>
+          <span class="chip ${s.status === 'reviewed' ? (s.passed ? 'chip-teal' : 'chip-red') : 'chip-yellow'}">${s.status === 'reviewed' ? (s.passed ? 'Passed · ' + s.average + '/4' : 'Not passed · ' + s.average + '/4') : 'Awaiting review'}</span></div>
         </div>
         <details ${s.status === 'pending' ? 'open' : ''}>
           <summary class="small strong" style="cursor:pointer;color:var(--navy-700)">View submission and rubric</summary>
           <div style="margin-top:12px">
-            ${data.prompts.map((pr, i) => `<div class="answer-block"><div class="k">${i + 1}. ${esc(pr.label)}</div><div class="v">${esc(s.responses[pr.id] || '—')}</div></div>`).join('')}
+            ${s.prompts.map((pr, i) => `<div class="answer-block"><div class="k">${i + 1}. ${esc(pr.label)}</div><div class="v">${esc(s.responses[pr.id] || '—')}</div></div>`).join('')}
             <div class="rubric-grid">
-              ${data.criteria.map(c => `<label>${esc(c.label)}<span>${esc(c.hint)}</span></label>
+              ${s.criteria.map(c => `<label>${esc(c.label)}<span>${esc(c.hint)}</span></label>
                 <select class="select" data-crit="${c.id}" aria-label="${esc(c.label)}">
                   ${[0, 1, 2, 3, 4].map(n => `<option value="${n}" ${s.rubric && s.rubric[c.id] === n ? 'selected' : (!s.rubric && n === 3 ? 'selected' : '')}>${n} / 4</option>`).join('')}
                 </select>`).join('')}
@@ -1934,8 +2024,18 @@ document.addEventListener('click', async (e) => {
     } catch (err) { toast(err.message, 'err'); }
     return;
   }
-  if (action === 'retry-assessment') { startAssessment(el.dataset.kind); return; }
-  if (action === 'revise-practical') { state.practicalForm = true; viewPractical(begin()); return; }
+  if (action === 'retry-assessment') { startAssessment(el.dataset.kind, el.dataset.module || 'strategy'); return; }
+  if (action === 'start-assessment') {
+    state.assessmentResult = null;
+    const target = '#/test/' + el.dataset.module + '/' + el.dataset.kind;
+    if (location.hash === target) router(); else location.hash = target;
+    return;
+  }
+  if (action === 'revise-practical') {
+    state.practicalForm = true;
+    viewPractical(begin(), el.dataset.module || state.practicalModule);
+    return;
+  }
   if (action === 'plan-toggle') {
     try {
       await api('/api/plan/' + el.dataset.id, { method: 'PATCH', body: JSON.stringify({ done: el.dataset.done !== '1' }) });
@@ -2090,12 +2190,15 @@ document.addEventListener('submit', async (e) => {
   if (kind === 'practical') {
     const responses = {};
     form.querySelectorAll('textarea').forEach(t => { responses[t.name] = t.value.trim(); });
+    const moduleId = (form.elements.module_id && form.elements.module_id.value) || state.practicalModule || 'strategy';
     try {
-      const data = await api('/api/practical/submit', { method: 'POST', body: JSON.stringify({ responses }) });
+      const data = await api('/api/module/' + encodeURIComponent(moduleId) + '/practical/submit', {
+        method: 'POST', body: JSON.stringify({ responses }),
+      });
       state.practicalForm = false;
       state.progress = null;
       toast(data.message, 'ok');
-      viewPractical(begin());
+      viewPractical(begin(), moduleId);
     } catch (err) { toast(err.message, 'err'); }
     return;
   }

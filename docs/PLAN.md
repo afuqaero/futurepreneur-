@@ -1,6 +1,6 @@
 # futurePreneur — Build Plan (v1)
 
-**Status:** Phase 1 complete (20 October 2026). Phases 2–10 planned, awaiting go-ahead.
+**Status:** Phases 1–5 complete (21 October 2026). Phase 5 shipped module-scoped assessments for all eight modules.
 **Date:** 19 October 2026
 **Purpose:** Turn the existing working prototype into the complete futurePreneur platform described in the brief — 8 components, verified assessments, real progress tracking, admin-managed content, and a coach that never pretends.
 
@@ -259,11 +259,13 @@ Expanded profile (type, stage, staff, customers, revenue band, main challenge); 
 ### Phase 4 — Learn & Improve, modules 2–8 ✅ (content complete, 7 of 7)
 Same structure as strategy for all 8. Per module: 4 lessons, 2 templates, mini quiz, lesson completion, progress within module, "next lesson" flow; lessons render as story cards with illustration, case file, do/don't and a mission.
 **Delivered:** Marketing & Sales, Operations & Quality, Financial Management, People & Leadership, Systems & SOP, Legal & Risk, Digitalisation & Growth — 4 lessons and 2 templates each, plus 10 quiz + 5 scenario questions and a practical rubric per module; JSON seeding pipeline; per-module assessment scoping.
-**Next:** Phase 5 wires the quiz/scenario/practical screens for modules 2–8. The module UI currently labels those as "Arrives in Phase 5" and never links to the wrong quiz.
-**Acceptance:** all 8 open and render; lesson completion persists across logout; templates download with correct filename/type; quiz unlocks only after lessons; no placeholder lorem anywhere.
+**Next:** Phase 5 completed the assessment screens for modules 2–8; those “Arrives in Phase 5” labels are gone.
+**Acceptance:** all 8 open and render; lesson completion persists across logout; templates download with correct filename/type; no placeholder lorem anywhere.
 
-### Phase 5 — Assessment centre (≈ 4–5 h)
+### Phase 5 — Assessment centre ✅ (21 October 2026)
 Question banks (8 × 10 quiz, 8 × 5 scenario), 8 practical assignments with 4-criterion rubrics, server-side scoring, immediate per-question feedback with explanations, pass/retry, attempt history, remediation list mapping missed topics → lessons, submission → admin review queue.
+**Delivered:** module-scoped routes (`/api/module/<id>/assessment/<kind>/...`, `/api/module/<id>/practical`), strict isolation from Strategy's legacy endpoints, per-module attempt history, per-submission criteria in the admin queue, and cross-module progress aggregation. Every wrong answer carries a lesson link from the explicit 120-question map (`server/remediation.py`, keyword fallback for admin-authored questions). Module pass stays assessment-only; lessons remain optional learning.
+**Evidence:** 59/59 tests pass, including module isolation, hidden inactive questions, wrong-rubric rejection, exact remediation lessons, unreviewed practical staying unpassed and marketing passing without passing Strategy. Headless Chrome: 8 test cards, module-scoped runner, 0% result listing 4 lessons, no horizontal scroll at 390px, zero JS exceptions.
 **Acceptance:** boundary tests pass; a failed attempt lists the exact lessons to revisit; retake does not overwrite history; practical cannot pass without reviewer scoring; unpublished questions never appear.
 
 ### Phase 6 — AI Business Coach (≈ 3–4 h)

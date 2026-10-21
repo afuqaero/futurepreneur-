@@ -129,6 +129,8 @@ def module_state(conn, user_id, module_id=content_repo.DEFAULT_MODULE_ID):
     percent = (
         (lessons_done / total) * 20 if total else 0
     ) + (30 if quiz_passed else 0) + (25 if scenario_passed else 0) + (25 if practical_passed else 0)
+    if module_passed:
+        percent = 100
     return {
         "id": module_id,
         "title": module["title"] if module else "",
@@ -160,39 +162,54 @@ def mastery_level(score):
     return "Beginner"
 
 
+def _focus_module(modules):
+    if not modules:
+        return None
+    started = [m for m in modules if m["lessons_done"] or m["quiz"] or m["scenario"] or m["practical"]]
+    incomplete = [m for m in modules if not m["passed"]]
+    if incomplete:
+        for module in incomplete:
+            if module in started:
+                return module
+        return incomplete[0]
+    return modules[0]
+
+
 def build_progress(conn, user):
     uid = user["id"]
     diag = diagnostic_summary(conn, uid)
     profile = conn.execute("SELECT * FROM profiles WHERE user_id = ?", (uid,)).fetchone()
-    mod = module_state(conn, uid)
+    modules = [
+        module_state(conn, uid, row["id"])
+        for row in content_repo.list_modules(conn, published_only=True)
+    ]
+    default_module = next((m for m in modules if m["id"] == content_repo.DEFAULT_MODULE_ID), modules[0] if modules else None)
+    focus = _focus_module(modules)
+    passed_modules = [m for m in modules if m["passed"]]
+    modules_passed = len(passed_modules)
+    modules_total = len(modules)
+
     plan_rows = conn.execute("SELECT * FROM plan_items WHERE user_id = ? ORDER BY done, id", (uid,)).fetchall()
     plan = [dict(r) for r in plan_rows]
     plan_done = len([p for p in plan if p["done"]])
-    plan_fraction = (plan_done / len(plan)) if plan else 0
 
-    overall = 0
-    if profile:
-        overall += 10
-    if diag:
-        overall += 20
-    overall += (mod["lessons_done"] / mod["lessons_total"] * 15) if mod["lessons_total"] else 0
-    if mod["quiz_passed"]:
-        overall += 20
-    if mod["scenario_passed"]:
-        overall += 15
-    if mod["practical_passed"]:
-        overall += 15
-    overall += plan_fraction * 5
-    overall = round(overall)
+    overall = round(sum(m["percent"] for m in modules) / modules_total) if modules_total else 0
 
-    if mod["passed"]:
-        practical_avg = (mod["practical"] or {}).get("average") or 0
-        quiz_score = (mod["quiz"] or {}).get("score") or 0
-        level = "Optimising" if (quiz_score >= 90 and practical_avg >= 3.5 and plan_done >= 2) else "Structured"
-        basis = "Verified module results"
-    elif mod["quiz_passed"] or mod["scenario_passed"] or (mod["practical"] and mod["practical"]["status"] == "reviewed"):
+    any_assessment = any(m["quiz"] or m["scenario"] or m["practical"] for m in modules)
+    if passed_modules:
+        quiz_scores = [m["quiz"]["score"] for m in passed_modules if m["quiz"]]
+        practical_avgs = [m["practical"]["average"] for m in passed_modules if m["practical"] and m["practical"]["average"] is not None]
+        avg_quiz = sum(quiz_scores) / len(quiz_scores) if quiz_scores else 0
+        avg_practical = sum(practical_avgs) / len(practical_avgs) if practical_avgs else 0
+        if avg_quiz >= 90 and avg_practical >= 3.5 and plan_done >= 1:
+            level = "Optimising"
+            basis = f"{modules_passed} of {modules_total} modules verified · quiz {round(avg_quiz)}% · practical {avg_practical:.2f}/4"
+        else:
+            level = "Structured"
+            basis = f"{modules_passed} of {modules_total} modules fully verified"
+    elif any_assessment:
         level = "Developing"
-        basis = "Partial assessment results"
+        basis = "Assessment attempts recorded — complete all three criteria to pass a module"
     elif diag:
         level = "Beginner"
         basis = "Diagnostic only — no module assessment passed yet"
@@ -200,17 +217,21 @@ def build_progress(conn, user):
         level = "Not assessed"
         basis = "No verified assessment yet"
 
+    by_component = {m["component"]: m for m in modules}
     components = []
     for comp in content_repo.components_public(conn):
         score = (diag or {}).get("components", {}).get(comp["id"])
+        module = by_component.get(comp["id"])
         status = "not-started"
         source = None
         level_c = "Not assessed"
-        if comp["id"] == mod["component"] and mod["passed"]:
+        if module and module["passed"]:
             status = "passed"
-            level_c = "Optimising" if level == "Optimising" else "Structured"
+            quiz_score = (module["quiz"] or {}).get("score") or 0
+            practical_avg = (module["practical"] or {}).get("average") or 0
+            level_c = "Optimising" if quiz_score >= 90 and practical_avg >= 3.5 else "Structured"
             source = "Module verified"
-        elif comp["id"] == mod["component"] and (mod["quiz_passed"] or mod["scenario_passed"]):
+        elif module and (module["quiz_passed"] or module["scenario_passed"] or module["practical"]):
             status = "in-progress"
             level_c = "Developing"
             source = "Partial module results"
@@ -219,45 +240,76 @@ def build_progress(conn, user):
             source = "Diagnostic only — module not assessed"
         components.append({
             "id": comp["id"], "name": comp["name"], "short": comp["short"],
-            "available": comp["available"], "score": score, "status": status,
-            "mastery": level_c, "source": source,
+            "available": comp["available"], "module_id": comp["module_id"],
+            "score": score, "status": status, "mastery": level_c, "source": source,
         })
 
     attempts = [
         dict(r) for r in conn.execute(
-            "SELECT kind, component, score, passed, created_at FROM attempts WHERE user_id = ? ORDER BY id DESC LIMIT 20",
+            "SELECT a.kind, a.module_id, a.component, a.score, a.passed, a.created_at, m.title AS module_title"
+            " FROM attempts a LEFT JOIN modules m ON m.id = a.module_id"
+            " WHERE a.user_id = ? ORDER BY a.id DESC LIMIT 40",
             (uid,),
         ).fetchall()
     ]
-    for a in attempts:
-        a["passed"] = bool(a["passed"])
+    for item in attempts:
+        item["passed"] = bool(item["passed"])
 
     next_steps = []
     if not profile:
-        next_steps.append({"title": "Create your business profile", "detail": "Five questions so the platform can tailor your results.", "route": "checkup"})
+        next_steps.append({"title": "Create your business profile", "detail": "A few questions so the check-up and coaching fit your business.", "route": "checkup"})
     if not diag:
         next_steps.append({"title": "Take the 24-question Business Check-Up", "detail": "Identify strengths and weaknesses across all eight areas.", "route": "checkup"})
-    if mod["lessons_done"] < mod["lessons_total"]:
-        nxt = mod["lessons_done"] + 1
-        next_steps.append({"title": f"Continue lesson {nxt} of {mod['lessons_total']}", "detail": "About 10 minutes, with a practical exercise.", "route": "module"})
-    if not mod["quiz_passed"]:
-        next_steps.append({"title": "Pass the knowledge quiz", "detail": f"Score {mod['standards']['quiz_pass']}% or higher. Retries are unlimited.", "route": "test"})
-    if not mod["scenario_passed"]:
-        next_steps.append({"title": "Try the scenario test", "detail": f"Five real-world decisions; pass mark {mod['standards']['scenario_pass']}%.", "route": "test"})
-    if not mod["practical"]:
-        next_steps.append({"title": "Submit the practical assignment", "detail": "Apply the module to your own business.", "route": "test"})
-    elif mod["practical"]["status"] == "pending":
-        next_steps.append({"title": "Practical assignment awaiting review", "detail": "A reviewer will score it against the rubric.", "route": "test"})
-    elif mod["practical"]["status"] == "reviewed" and not mod["practical"]["passed"]:
-        next_steps.append({"title": "Revise the practical assignment", "detail": "Read the reviewer note and resubmit.", "route": "test"})
-    if mod["passed"] and len(next_steps) == 0:
-        next_steps.append({"title": "Turn results into action", "detail": "Pick one item in your action plan and finish it this week.", "route": "progress"})
+    if focus:
+        if focus["passed"]:
+            next_steps.append({"title": "Turn your results into action", "detail": "Pick one item in your improvement plan and finish it this week.", "route": "progress"})
+        elif focus["lessons_done"] < focus["lessons_total"]:
+            nxt = focus["lessons_done"] + 1
+            next_steps.append({
+                "title": f"Continue {focus['title']}: lesson {nxt} of {focus['lessons_total']}",
+                "detail": "About 10 minutes, with a practical exercise you can apply this week.",
+                "route": f"learn/{focus['id']}",
+            })
+        elif not focus["quiz_passed"]:
+            next_steps.append({
+                "title": f"Pass the {focus['title']} knowledge quiz",
+                "detail": f"Score {focus['standards']['quiz_pass']}% or higher. Retries are unlimited.",
+                "route": f"test/{focus['id']}/quiz",
+            })
+        elif not focus["scenario_passed"]:
+            next_steps.append({
+                "title": f"Try the {focus['title']} scenario test",
+                "detail": f"Real decisions with a {focus['standards']['scenario_pass']}% pass mark.",
+                "route": f"test/{focus['id']}/scenario",
+            })
+        elif not focus["practical"]:
+            next_steps.append({
+                "title": f"Submit the {focus['title']} practical",
+                "detail": "Apply the module to your own business and send it for review.",
+                "route": f"test/{focus['id']}/practical",
+            })
+        elif focus["practical"]["status"] == "pending":
+            next_steps.append({
+                "title": f"{focus['title']} practical is awaiting review",
+                "detail": "A reviewer will score it against the rubric before the module can pass.",
+                "route": f"test/{focus['id']}/practical",
+            })
+        elif focus["practical"]["status"] == "reviewed" and not focus["practical"]["passed"]:
+            next_steps.append({
+                "title": f"Revise the {focus['title']} practical",
+                "detail": "Read the reviewer note and resubmit with the gaps fixed.",
+                "route": f"test/{focus['id']}/practical",
+            })
 
     return {
         "user": public_user(user),
         "profile": dict(profile) if profile else None,
         "diagnostic": diag,
-        "module": mod,
+        "modules": modules,
+        "modules_passed": modules_passed,
+        "modules_total": modules_total,
+        "focus_module": focus,
+        "module": default_module,
         "overall_percent": overall,
         "mastery": {"level": level, "basis": basis},
         "components": components,

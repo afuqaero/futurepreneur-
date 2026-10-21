@@ -108,7 +108,8 @@ class WorkflowTests(ServerCase):
         self.assertTrue(progress["module"]["passed"])
         self.assertEqual(progress["mastery"]["level"], "Structured")
         self.assertEqual(progress["components"][0]["mastery"], "Structured")
-        self.assertEqual(progress["overall_percent"], 75)
+        self.assertEqual(progress["modules_passed"], 1)
+        self.assertEqual(progress["overall_percent"], 100)
 
     def test_quiz_failure_lists_topics_and_retake_is_recorded(self):
         client, _ = self.register_fresh("quizfail")
