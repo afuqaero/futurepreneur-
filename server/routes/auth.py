@@ -78,7 +78,7 @@ def handle(h, conn, method, path, query):
         data = {
             "components": content_repo.components_public(conn),
             "settings": settings_public(conn),
-            "ai": ai_status(),
+            "ai": ai_status(conn),
             "user": public_user(user) if user else None,
         }
         if user:

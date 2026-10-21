@@ -31,6 +31,10 @@ TRUST_PROXY = os.environ.get("BIZREADY_TRUST_PROXY") == "1"
 LOGIN_MAX_FAILURES = 5
 LOGIN_WINDOW_SECONDS = 15 * 60
 
+# Coach request window and conversation limits.
+COACH_RATE_LIMIT = int(os.environ.get("BIZREADY_COACH_RATE_LIMIT", "20"))
+COACH_RATE_WINDOW = int(os.environ.get("BIZREADY_COACH_RATE_WINDOW", "600"))
+
 # JSON module seeding can be disabled for deterministic tests.
 SEED_MODULES = os.environ.get("BIZREADY_SEED_MODULES", "1") == "1"
 

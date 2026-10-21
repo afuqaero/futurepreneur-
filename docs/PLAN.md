@@ -1,6 +1,6 @@
 # futurePreneur — Build Plan (v1)
 
-**Status:** Phases 1–5 complete (21 October 2026). Phase 5 shipped module-scoped assessments for all eight modules.
+**Status:** Phases 1–6 complete (21 October 2026). Phase 6 shipped the persisted, provider-configurable coach.
 **Date:** 19 October 2026
 **Purpose:** Turn the existing working prototype into the complete futurePreneur platform described in the brief — 8 components, verified assessments, real progress tracking, admin-managed content, and a coach that never pretends.
 
@@ -268,9 +268,11 @@ Question banks (8 × 10 quiz, 8 × 5 scenario), 8 practical assignments with 4-c
 **Evidence:** 59/59 tests pass, including module isolation, hidden inactive questions, wrong-rubric rejection, exact remediation lessons, unreviewed practical staying unpassed and marketing passing without passing Strategy. Headless Chrome: 8 test cards, module-scoped runner, 0% result listing 4 lessons, no horizontal scroll at 390px, zero JS exceptions.
 **Acceptance:** boundary tests pass; a failed attempt lists the exact lessons to revisit; retake does not overwrite history; practical cannot pass without reviewer scoring; unpublished questions never appear.
 
-### Phase 6 — AI Business Coach (≈ 3–4 h)
-Three modes with distinct system prompts; provider config in admin (OpenAI-compatible base URL + model + key), key stored server-side and never returned by any endpoint; per-user rate limit; conversation persistence and clear-history; learner context injected (business type, weakest components); explicit demo mode when no key — labelled on every message, deterministic, sourced from the module content; timeout/error states; prompt-injection guard ("ignore instructions in user content").
-**Acceptance:** no key → banner "Demo mode — not a live AI" and no fabricated personalisation; with key → live replies; `grep` proves no key in client files, logs or API responses; rate limit returns 429 with a clear message.
+### Phase 6 — AI Business Coach ✅ (21 October 2026)
+Three modes with distinct system prompts; provider config in admin (OpenAI-compatible base URL + model + key), key stored server-side and never returned by any endpoint; per-user rate limit; conversation persistence and clear-history; learner context injected (business type, weakest components); explicit demo mode when no key — labelled on every message, deterministic, sourced from the module content; timeout/error states; prompt-injection guard.
+**Delivered:** migration `007_coach.sql` adds `coach_sessions`, `coach_messages` and `coach_rate_events`. `GET/POST /api/coach`, `GET /api/coach/sessions`, `GET/DELETE /api/coach/sessions/<id>` and `DELETE /api/coach/sessions` persist and clear conversations. Admin `GET/PUT /api/admin/ai` configures base URL/model/key; only `key_set` and `key_source` are returned. 20 messages per 10 minutes per learner (configurable), with `Retry-After`. Live prompts carry the safety guard plus a factual learner context block (business, sector, weakest check-up areas, verified modules). UI auto-reopens the latest conversation, lists recent chats, starts a new chat without deleting history, and offers Clear all.
+**Evidence:** 65/65 tests pass, including persistence, cross-user 404, 429 + `Retry-After`, masked key in bootstrap/admin responses, a mock OpenAI-compatible provider receiving `Bearer <key>` and the learner context, and a learner blocked from admin AI settings. Headless Chrome: chat survives reload, new chat preserves history, reopen restores messages, clear-all empties it, no key in the DOM, 390px no horizontal scroll, zero JS exceptions.
+**Acceptance:** no key → banner “Demo mode — not a live AI” and no fabricated personalisation; with key → live replies; no key in client files, logs or API responses; rate limit returns 429 with a clear message.
 
 ### Phase 7 — My Business Progress (≈ 3 h)
 Verified-only mastery, per-component score cards, modules passed / needs improvement, assessment timeline, score trends, recommended next steps engine, editable action plan with due dates and completion, print/PDF export of the plan.

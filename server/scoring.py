@@ -318,5 +318,5 @@ def build_progress(conn, user):
         "plan_done": plan_done,
         "next_steps": next_steps,
         "settings": settings_public(conn),
-        "ai": ai_status(),
+        "ai": ai_status(conn),
     }

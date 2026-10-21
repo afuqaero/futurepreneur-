@@ -5,7 +5,8 @@ import re
 import secrets
 
 import content
-from .. import content_repo
+from .. import config, content_repo
+from ..ai import ai_source, load_ai_config
 from ..clock import iso
 from ..errors import ApiError, clean_text
 from ..models import settings_public
@@ -121,6 +122,62 @@ def handle(h, conn, method, path, user):
         conn.commit()
         h.send_json({"ok": True, "average": avg, "passed": passed, "standard": s["rubric_min"]})
         return True
+
+    if path == "/api/admin/ai":
+        if method == "GET":
+            cfg = load_ai_config(conn)
+            h.send_json({
+                "configured": bool(cfg.get("api_key")),
+                "mode": "live" if cfg.get("api_key") else "demo",
+                "base_url": cfg.get("base_url", ""),
+                "model": cfg.get("model", ""),
+                "key_set": bool(cfg.get("api_key")),
+                "key_source": ai_source(conn),
+                "rate_limit": config.COACH_RATE_LIMIT,
+                "rate_window": config.COACH_RATE_WINDOW,
+            })
+            return True
+        if method == "PUT":
+            body = h.read_json()
+            base_url = clean_text(body.get("base_url"), 500, "Base URL")
+            model = clean_text(body.get("model"), 120, "Model")
+            if not (base_url.startswith("http://") or base_url.startswith("https://")):
+                raise ApiError(400, "Base URL must start with http:// or https://.", "invalid_input")
+            if len(model) < 2:
+                raise ApiError(400, "Enter a model name.", "invalid_input")
+            api_key = body.get("api_key")
+            if api_key is not None:
+                api_key = clean_text(api_key, 500, "API key")
+            changes = {"base_url": base_url, "model": model}
+            if body.get("clear_key"):
+                conn.execute("DELETE FROM settings WHERE key = 'ai_api_key'")
+                changes["key"] = "cleared"
+            elif api_key:
+                conn.execute(
+                    "INSERT INTO settings (key, value) VALUES ('ai_api_key', ?)"
+                    " ON CONFLICT(key) DO UPDATE SET value = excluded.value", (api_key,)
+                )
+                changes["key"] = "updated"
+            for key, value in (("ai_base_url", base_url), ("ai_model", model)):
+                conn.execute(
+                    "INSERT INTO settings (key, value) VALUES (?,?)"
+                    " ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value)
+                )
+            content_repo.audit(conn, user["id"], "ai.config", "settings", "ai", changes)
+            conn.commit()
+            cfg = load_ai_config(conn)
+            h.send_json({
+                "ok": True,
+                "configured": bool(cfg.get("api_key")),
+                "mode": "live" if cfg.get("api_key") else "demo",
+                "base_url": cfg.get("base_url", ""),
+                "model": cfg.get("model", ""),
+                "key_set": bool(cfg.get("api_key")),
+                "key_source": ai_source(conn),
+                "rate_limit": config.COACH_RATE_LIMIT,
+                "rate_window": config.COACH_RATE_WINDOW,
+            })
+            return True
 
     # -- content: modules ---------------------------------------------------
     if path == "/api/admin/modules" and method == "GET":
