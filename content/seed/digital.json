@@ -1,0 +1,234 @@
+{
+  "id": "digital",
+  "component": "digital",
+  "title": "Digitalisation & Growth",
+  "tagline": "Use tools that save hours — not apps that add work.",
+  "level": "Foundation",
+  "hours": "45–60 min",
+  "outcome": "By the end, you will have a tool audit, one automation that removes real work, a stronger online presence, and a two-week growth experiment with a decision rule.",
+  "intro": [
+    "Digitalisation is not buying software. It is removing repeated manual work and making it easier for customers to find you, trust you and buy from you. Done badly, it adds subscriptions, logins and admin.",
+    "This module starts with the process, then the tool, then the experiment. Every change must save time, reduce errors or bring measurable revenue — otherwise it is a hobby."
+  ],
+  "practical": {
+    "title": "Practical assignment: one automation and one experiment",
+    "intro": "Use your real business. A reviewer scores each criterion from 0 to 4; the module passes at an average of 3 or more, with no criterion below 2.",
+    "criteria": [
+      { "id": "process_ready", "label": "Process first", "hint": "The process is defined before the tool is chosen." },
+      { "id": "tool_choice", "label": "Tool choice", "hint": "Cost, integration, export and training time are compared." },
+      { "id": "presence", "label": "Online presence", "hint": "Findable, trustworthy and responsive on the channel customers use." },
+      { "id": "experiment", "label": "Growth experiment", "hint": "One metric, a two-week test and a decision rule." }
+    ],
+    "prompts": [
+      { "id": "p1", "criterion": "process_ready", "label": "Which process are you digitising, and what are its steps today?", "placeholder": "Trigger, steps, where it breaks, volume per week." },
+      { "id": "p2", "criterion": "tool_choice", "label": "Which tool did you choose, and why?", "placeholder": "Cost per month, integration, data export, training time, what you will stop using." },
+      { "id": "p3", "criterion": "presence", "label": "How does a new customer find and contact you online?", "placeholder": "Profile, catalogue, response time, reviews, payment method." },
+      { "id": "p4", "criterion": "experiment", "label": "Describe your growth experiment and decision rule.", "placeholder": "Hypothesis, metric, two-week window, pass/fail threshold, next action." }
+    ]
+  },
+  "lessons": [
+    {
+      "id": "dg1",
+      "title": "Fix the process before you digitise it",
+      "minutes": 10,
+      "summary": "A tool cannot fix a process nobody has defined.",
+      "explanation": [
+        "Automating a messy process produces faster mess. Before choosing software, write the current steps, the volume, and the point where it breaks. If orders arrive in three channels and nobody owns confirmation, a new app will simply collect the confusion in one more place.",
+        "Decide what the tool must do in one sentence, for example: 'confirm every WhatsApp order with a payment link within 10 minutes'. Then list the steps that will disappear, the steps that remain manual, and who owns the tool.",
+        "Choose the simplest tool that covers the must-haves. Pen and paper, a shared sheet or a WhatsApp catalogue are valid answers for a small volume. Move to paid software when the volume or error cost justifies it, not because the app looks modern."
+      ],
+      "example": {
+        "title": "Aina's Kitchen — orders in WhatsApp, calls and walk-ins",
+        "text": "Aina took orders from three places and wrote them in one notebook. She thought she needed an ordering system. Mapping the process showed the real problem: no single confirmation step, so two staff sometimes accepted the same slot. She created one order form linked in her WhatsApp profile, with a cutoff time and automatic confirmation. She kept the notebook as a backup for walk-ins. Orders stopped colliding, and she did not pay for software until volume justified it."
+      },
+      "do": [
+        "Write the current steps and where they break.",
+        "Define the one job the tool must do.",
+        "List what becomes automatic and what stays manual.",
+        "Start with the simplest option that covers the must-haves."
+      ],
+      "dont": [
+        "Do not buy software to avoid defining a process.",
+        "Do not digitise a step you should remove entirely.",
+        "Do not add a tool without naming its owner."
+      ],
+      "why": "Process first prevents subscription sprawl. It also makes training faster because the standard exists before the screen.",
+      "mistakes": [
+        "Choosing a tool from an advertisement instead of a requirement.",
+        "Assuming staff will adopt a tool with no training or owner.",
+        "Keeping the old process and the new tool running in parallel forever."
+      ],
+      "exercise": {
+        "prompt": "Define one process before choosing a tool.",
+        "steps": [
+          "Write the trigger and the finish line.",
+          "List the steps and mark where errors happen.",
+          "Write one sentence describing what the tool must do.",
+          "List what will still be manual and who owns it.",
+          "Choose the simplest tool that meets the requirement."
+        ]
+      }
+    },
+    {
+      "id": "dg2",
+      "title": "Pick tools that earn their keep",
+      "minutes": 11,
+      "summary": "Compare cost, integration, export and training time — then cancel something.",
+      "explanation": [
+        "Every tool has four costs: the subscription, the integration work, the training time and the switching cost when you leave. A cheap app that does not connect to your accounts can cost more than a slightly pricier one that does.",
+        "Keep one source of truth for customers, orders and money. If two tools both claim to be the customer list, one will drift. Before subscribing, check whether you can export your data in a usable format and whether the price rises after a trial.",
+        "Run a quarterly tool audit: what it costs, what it saves, who uses it, and when it was last opened. Cancel anything that does not save time, reduce errors or produce revenue. A small business with four useful tools beats one with twelve icons."
+      ],
+      "example": {
+        "title": "Online seller — seven subscriptions, one spreadsheet",
+        "text": "An online seller paid for seven tools: invoicing, stock, chat, ads, a landing page, a scheduler and a review app. Orders still lived in a spreadsheet because none of the tools talked to each other. The audit found two tools nobody had opened in 60 days and three that duplicated the same customer list. She cancelled five, kept the accounting tool and the chat tool, and moved stock into the accounting tool's inventory. Monthly cost fell by RM210 and reconciliation time fell from four hours to one."
+      },
+      "do": [
+        "Compare monthly cost, integration, export and training time.",
+        "Keep one source of truth for customers, orders and money.",
+        "Check the price after the trial and the cancellation terms.",
+        "Audit tools quarterly and cancel what is not used."
+      ],
+      "dont": [
+        "Do not pay for overlapping tools that hold duplicate data.",
+        "Do not choose a tool you cannot export data from.",
+        "Do not keep a subscription because cancelling feels like failure."
+      ],
+      "why": "Tool sprawl costs money and attention. A small, connected stack is easier to train, audit and hand over.",
+      "mistakes": [
+        "Buying annual plans before a one-month trial with real data.",
+        "Letting each staff member choose their own tool.",
+        "Ignoring the time cost of moving data later."
+      ],
+      "exercise": {
+        "prompt": "Audit your current tools.",
+        "steps": [
+          "List every paid and free tool you use.",
+          "Write monthly cost and the job it does.",
+          "Mark the last time you opened it.",
+          "Identify duplicates and tools with no export.",
+          "Cancel or downgrade at least one thing this month."
+        ]
+      }
+    },
+    {
+      "id": "dg3",
+      "title": "Be findable, trusted and quick to answer",
+      "minutes": 11,
+      "summary": "A complete profile, clear offer and fast reply beat a fancy website.",
+      "explanation": [
+        "Most local customers check three things before buying: can I find you, do you look real, and how fast will you reply? A complete Google Business Profile, a WhatsApp catalogue with prices, recent reviews and a clear location often matter more than a custom website.",
+        "Make the first response fast and useful. An auto-reply that confirms opening hours and asks for the order details is better than silence. If you sell online, show delivery cost, cutoff time and return terms before checkout, not after.",
+        "Collect reviews systematically: ask at the moment of satisfaction, send one direct link, and reply to every review. Trust is built from specific, recent evidence, not from a slogan."
+      ],
+      "example": {
+        "title": "Aircon service — found on Maps, booked on WhatsApp",
+        "text": "A two-person aircon service relied on word of mouth. The owner completed a Google Business Profile with service area, photos, prices for basic servicing and a WhatsApp link. He asked every satisfied customer for a review at the end of the visit using a short link. Within three months, Maps calls rose from two to eleven a week, and the WhatsApp auto-reply filtered basic price questions from real bookings. No website was built."
+      },
+      "do": [
+        "Complete the profile customers actually use to find you.",
+        "Show prices, service area, hours and a direct contact link.",
+        "Reply fast, even if the answer is 'I will confirm by 3pm'.",
+        "Ask for reviews at the moment of satisfaction."
+      ],
+      "dont": [
+        "Do not hide prices to force a conversation.",
+        "Do not leave an inactive page as your only presence.",
+        "Do not argue publicly with a negative review."
+      ],
+      "why": "Findability and trust shorten the distance between interest and a paid order. Speed of response is often the deciding factor.",
+      "mistakes": [
+        "Building a website before claiming the free local profile.",
+        "Using the same generic reply for every enquiry.",
+        "Collecting reviews only when business is slow."
+      ],
+      "exercise": {
+        "prompt": "Fix your online front door.",
+        "steps": [
+          "Search for your business the way a customer would.",
+          "Complete the profile: hours, area, photos, prices or range.",
+          "Add one direct contact link and a useful auto-reply.",
+          "Ask three recent customers for a review with a direct link.",
+          "Reply to every review this month."
+        ]
+      }
+    },
+    {
+      "id": "dg4",
+      "title": "Grow by experiment, not by hoping",
+      "minutes": 11,
+      "summary": "One metric, a two-week test, and a decision rule written before you start.",
+      "explanation": [
+        "Growth is a series of small tests, not one big gamble. Pick one metric that matters now: bookings, repeat orders, average basket, or reply-to-order rate. Change one thing, run it for a fixed period, and decide with a rule you wrote before seeing the result.",
+        "Separate acquisition from retention. A new customer costs more than a repeat customer. If repeat orders are low, a discount campaign may add revenue while hiding a product or service problem. Fix retention before scaling acquisition.",
+        "Write the experiment on one page: hypothesis, action, metric, baseline, two-week window, pass threshold and next action. At the end, keep, adjust or stop. A failed test that teaches you something is cheaper than a year of guessing."
+      ],
+      "example": {
+        "title": "Tuition centre — more ads or better follow-up?",
+        "text": "A tuition centre wanted to spend RM1,500 on ads. Its enquiry-to-enrolment rate was 18%, and nobody followed up after the first message. The owner ran a two-week test instead: a same-day WhatsApp reply with a trial class slot. The rate rose to 31% with no ad spend. Only then did he run a small ad test, using the improved follow-up process. The same budget produced more enrolments because the leak was fixed first."
+      },
+      "do": [
+        "Choose one metric and record the baseline.",
+        "Change one thing for a fixed two-week window.",
+        "Write the pass threshold before starting.",
+        "Decide keep, adjust or stop, and record why."
+      ],
+      "dont": [
+        "Do not change three things and credit one.",
+        "Do not scale ads before fixing follow-up or retention.",
+        "Do not run an experiment without an end date."
+      ],
+      "why": "Experiments turn guesses into decisions. They also protect cash from big campaigns that cannot be evaluated.",
+      "mistakes": [
+        "Measuring likes instead of orders or enquiries.",
+        "Ending a test early when the result looks bad.",
+        "Repeating the same failed campaign with a different colour."
+      ],
+      "exercise": {
+        "prompt": "Design one two-week growth experiment.",
+        "steps": [
+          "Pick one metric that matters now.",
+          "Record the baseline from the last four weeks.",
+          "Choose one change and one channel.",
+          "Write the pass threshold and the end date.",
+          "At the end, decide keep, adjust or stop and note the evidence."
+        ]
+      }
+    }
+  ],
+  "templates": [
+    {
+      "slug": "digital-tool-audit",
+      "title": "Tool audit",
+      "description": "CSV audit of cost, job, usage, duplicates and export.",
+      "format": "CSV",
+      "filename": "futurepreneur-digital-tool-audit.csv",
+      "body": "tool,monthly_cost,job_it_does,last_opened,duplicate_of,can_export,decision\nAccounting,45,Invoices and stock,2026-11-07,,yes,keep\nScheduler,29,Social posts,2026-09-02,,no,cancel\n"
+    },
+    {
+      "slug": "digital-growth-experiment",
+      "title": "Two-week growth experiment",
+      "description": "One-page hypothesis, metric, threshold and decision rule.",
+      "format": "Markdown",
+      "filename": "futurepreneur-digital-growth-experiment.md",
+      "body": "# Growth experiment\n\nMetric:\nBaseline (last 4 weeks):\nHypothesis:\nChange (one thing):\nChannel:\nStart date:\nEnd date:\nPass threshold:\n\n## Decision rule\n- Keep if:\n- Adjust if:\n- Stop if:\n\n## Result\n- Actual:\n- Decision:\n- Evidence:\n- Next test:\n"
+    }
+  ],
+  "questions": [
+    { "id": "dg-q1", "kind": "quiz", "topic": "Process first", "prompt": "What should come before choosing a digital tool?", "options": ["A logo", "A defined process with steps and a clear requirement", "A bigger budget", "A competitor's stack"], "correct": 1, "explanation": "Automating an undefined process makes the mess faster." },
+    { "id": "dg-q2", "kind": "quiz", "topic": "Requirements", "prompt": "Which is a useful tool requirement?", "options": ["It looks modern", "Confirm every order with a payment link within 10 minutes", "It has many features", "It is free"], "correct": 1, "explanation": "A requirement describes the job and the standard, not the look." },
+    { "id": "dg-q3", "kind": "quiz", "topic": "Tool cost", "prompt": "Which cost is usually forgotten?", "options": ["Subscription", "Training time and switching cost", "Tax", "Electricity"], "correct": 1, "explanation": "The hidden costs decide whether a tool actually saves money." },
+    { "id": "dg-q4", "kind": "quiz", "topic": "Data", "prompt": "Why check data export before subscribing?", "options": ["To share with competitors", "So you can leave without losing customers, orders or history", "To print more", "To increase storage"], "correct": 1, "explanation": "No export means the tool owns your business data." },
+    { "id": "dg-q5", "kind": "quiz", "topic": "Tool sprawl", "prompt": "What should a quarterly tool audit do?", "options": ["Add more tools", "Check cost, use, duplicates and export, then cancel what does not earn its keep", "Change every tool", "Ignore free tools"], "correct": 1, "explanation": "Audit for value, not for novelty." },
+    { "id": "dg-q6", "kind": "quiz", "topic": "Findability", "prompt": "What usually matters most for a local business?", "options": ["A custom website", "A complete local profile, clear offer, reviews and fast replies", "A viral video", "A blog"], "correct": 1, "explanation": "Findability and trust come before a fancy site." },
+    { "id": "dg-q7", "kind": "quiz", "topic": "Response", "prompt": "What is a good first reply to an enquiry?", "options": ["Silence", "A fast, useful answer with hours, next step and a time you will confirm", "A generic catalogue", "A discount"], "correct": 1, "explanation": "Speed plus usefulness decides whether the conversation continues." },
+    { "id": "dg-q8", "kind": "quiz", "topic": "Growth", "prompt": "What makes a growth experiment valid?", "options": ["Changing many things at once", "One metric, a fixed window and a threshold written beforehand", "Running until it works", "Copying a competitor"], "correct": 1, "explanation": "A pre-written decision rule prevents moving the goalposts." },
+    { "id": "dg-q9", "kind": "quiz", "topic": "Retention", "prompt": "Repeat orders are low. What should you fix before buying ads?", "options": ["Ad creative", "The retention or service problem", "The logo", "The website font"], "correct": 1, "explanation": "Scaling acquisition on a leaky process wastes cash." },
+    { "id": "dg-q10", "kind": "quiz", "topic": "Decision", "prompt": "An experiment misses its threshold. What is the right next step?", "options": ["Pretend it worked", "Record the evidence and decide to adjust or stop", "Double the budget immediately", "Change the metric"], "correct": 1, "explanation": "The value is the decision, not a positive result." },
+    { "id": "dg-s1", "kind": "scenario", "topic": "Order chaos", "prompt": "Orders arrive on three channels and collide. What is the soundest first move?", "options": ["Buy an ordering system", "Map the process and create one confirmation step", "Hire more staff", "Close two channels"], "correct": 1, "explanation": "The collision is a process gap, not a software gap." },
+    { "id": "dg-s2", "kind": "scenario", "topic": "Subscriptions", "prompt": "You pay for seven tools and still reconcile in a spreadsheet. What should you do?", "options": ["Buy an eighth tool", "Audit, cancel duplicates and keep one source of truth", "Ignore it", "Move everything to paper"], "correct": 1, "explanation": "Fewer connected tools reduce cost and reconciliation time." },
+    { "id": "dg-s3", "kind": "scenario", "topic": "Online presence", "prompt": "A service business has no website but wants more local bookings. What should it do first?", "options": ["Build a website", "Complete its local profile with services, area, photos and a contact link", "Run ads", "Hire an agency"], "correct": 1, "explanation": "A complete local profile is faster and cheaper than a site." },
+    { "id": "dg-s4", "kind": "scenario", "topic": "Follow-up leak", "prompt": "Enquiries are plentiful but enrolment is low, and nobody follows up. What should come before ads?", "options": ["More ad spend", "A same-day follow-up process", "A new logo", "Longer opening hours"], "correct": 1, "explanation": "Fix the conversion leak before paying for more traffic." },
+    { "id": "dg-s5", "kind": "scenario", "topic": "Experiment", "prompt": "A two-week test misses its threshold. What is the correct response?", "options": ["Extend until it passes", "Record the result and adjust or stop", "Change the metric", "Ignore the data"], "correct": 1, "explanation": "A clear decision rule keeps experiments honest." }
+  ]
+}
