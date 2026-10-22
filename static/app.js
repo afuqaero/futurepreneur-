@@ -3,7 +3,7 @@
 
 /* ------------------------------------------------------------------ utils */
 const $ = (sel, root = document) => root.querySelector(sel);
-const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+const $all = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
 const state = {
   user: null,
@@ -431,7 +431,7 @@ function renderShell(active) {
 }
 
 function setActiveNav(active) {
-  $$('.sidebar .nav a[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === active));
+  $all('.sidebar .nav a[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === active));
 }
 
 /* ------------------------------------------------------------------ router */
@@ -2354,7 +2354,7 @@ document.addEventListener('click', async (e) => {
   if (action === 'admin-review') {
     const card = el.closest('.review-card');
     const scores = {};
-    $$('select[data-crit]', card).forEach(s => { scores[s.dataset.crit] = Number(s.value); });
+    $all('select[data-crit]', card).forEach(s => { scores[s.dataset.crit] = Number(s.value); });
     const note = $('textarea[data-note]', card).value;
     try {
       const res = await api('/api/admin/submissions/' + el.dataset.id + '/review', {
