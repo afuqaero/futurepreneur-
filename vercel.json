@@ -1,24 +1,15 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bash scripts/build_static.sh",
-  "outputDirectory": "public",
-  "regions": ["iad1"],
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.js" },
+    { "source": "/static/:path*", "destination": "/static/:path*" },
+    { "source": "/(.*)", "destination": "/static/index.html" }
+  ],
   "functions": {
-    "api/index.py": {
-      "maxDuration": 60,
-      "includeFiles": "{server/**,content/**,content.py}"
-    },
-    "api/assets.py": {
-      "includeFiles": "static/**"
+    "api/index.js": {
+      "maxDuration": 30
     }
-  },
-  "routes": [
-    { "src": "/assets/(.*)", "dest": "/api/index?route=assets/$1" },
-    { "src": "/static/(.*)", "dest": "/api/index?route=assets/$1" },
-    { "src": "/api/?", "dest": "/api/index" },
-    { "src": "/api/(.*)", "dest": "/api/index?route=$1" },
-    { "src": "/static/(.*)", "dest": "/api/assets?path=$1" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  }
 }
+
