@@ -13,7 +13,7 @@
     }
   },
   "routes": [
-    { "src": "/assets/(.*)", "dest": "/api/assets?path=$1" },
+    { "src": "/assets/(.*)", "dest": "/api/index?route=assets/$1" },
     { "src": "/api/?", "dest": "/api/index" },
     { "src": "/api/(.*)", "dest": "/api/index?route=$1" },
     { "src": "/static/(.*)", "dest": "/api/assets?path=$1" },
