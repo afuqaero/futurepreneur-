@@ -56,9 +56,21 @@ class handler(Handler):
         return True
 
     def do_GET(self):
+        parsed = urlparse(self.path)
+        route = parse_qs(parsed.query).get("route", [""])[0]
+        if route.startswith("assets/"):
+            rel = route[len("assets/"):].replace("..", "")
+            target = os.path.join(ROOT, "static", rel)
+            if os.path.isfile(target):
+                types = {".js": "application/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml"}
+                body = open(target, "rb").read()
+                self.send_response(200)
+                self.send_header("Content-Type", types.get(os.path.splitext(target)[1], "application/octet-stream"))
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers(); self.wfile.write(body)
+                return
         if self._prepare():
             super().do_GET()
-
     def do_POST(self):
         if self._prepare():
             super().do_POST()
