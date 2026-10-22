@@ -790,3 +790,11 @@ svg { flex: none; }
   .print-foot { font-size: 7.4pt; color: #5B6683; border-top: 1px solid #E6E9F5; padding-top: 6px; margin-top: 12px; }
   .card, .section, .split { break-inside: avoid; }
 }
+
+.loading-skeleton { padding: 34px clamp(18px, 4vw, 56px); max-width: 980px; margin: 0 auto; }
+.skeleton { background: linear-gradient(90deg, rgba(220,227,241,.55), rgba(245,247,252,.95), rgba(220,227,241,.55)); background-size: 220% 100%; animation: skeleton-shimmer 1.4s ease-in-out infinite; border-radius: 14px; }
+.skeleton-title { width: min(420px, 70%); height: 34px; margin-bottom: 24px; }
+.skeleton-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.skeleton-card { height: 132px; }
+.skeleton-wide { height: 220px; margin-top: 20px; }
+@keyframes skeleton-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
