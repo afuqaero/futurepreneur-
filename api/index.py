@@ -67,6 +67,7 @@ class handler(Handler):
                 self.send_response(200)
                 self.send_header("Content-Type", types.get(os.path.splitext(target)[1], "application/octet-stream"))
                 self.send_header("Content-Length", str(len(body)))
+                self.send_header("Cache-Control", "public, max-age=31536000, immutable")
                 self.end_headers(); self.wfile.write(body)
                 return
         if self._prepare():
