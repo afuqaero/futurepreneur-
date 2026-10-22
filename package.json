@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "test": "node --test"
+    "test": "node --test",
+    "build": "bash scripts/build_static.sh",
+    "vercel-build": "bash scripts/build_static.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0"
