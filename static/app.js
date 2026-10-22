@@ -258,6 +258,24 @@ function mount(html, mySeq) {
 }
 
 /* ------------------------------------------------------------------ auth */
+function renderLanding() {
+  document.title = 'futurePreneur — Business readiness platform';
+  $('#app').innerHTML = `
+  <div class="auth">
+    <section class="auth-art" style="width:100%;min-height:100vh">
+      <div class="auth-brand"><div class="brand-mark">f</div><div class="auth-brand-text"><div class="brand-name">futurePreneur</div><div class="brand-sub" style="color:#7FA2C4">Business readiness platform</div></div></div>
+      <div class="auth-copy" style="max-width:760px;margin:auto">
+        <div class="eyebrow" style="color:#62DED2">Built for owners, not accountants</div>
+        <h1>Turn experience into a business that <em>runs on purpose.</em></h1>
+        <p class="lead">Assess your business, learn the structure behind it, and test what you know — one practical step at a time.</p>
+        <ul class="auth-flow"><li><span class="num">01</span> Business Check-Up across eight core areas</li><li><span class="num">02</span> Practical lessons built for micro and small businesses</li><li><span class="num">03</span> A coach that helps you think it through</li><li><span class="num">04</span> Scored assessments and a verified progress record</li></ul>
+        <button class="btn btn-primary btn-lg" type="button" data-action="go-login">Start your business journey ${icon('right', 16)}</button>
+      </div>
+      <div class="auth-foot">4 of 8 modules live · built for micro-business owners.</div>
+    </section>
+  </div>`;
+}
+
 function renderAuth() {
   document.title = 'Sign in · futurePreneur';
   const isLogin = state.authMode === 'login';
@@ -436,7 +454,7 @@ function setActiveNav(active) {
 
 /* ------------------------------------------------------------------ router */
 async function router() {
-  if (!state.user) { renderAuth(); return; }
+  if (!state.user) { if (!location.hash || location.hash === '#/' || location.hash === '#') renderLanding(); else renderAuth(); return; }
   const raw = location.hash.replace(/^#\/?/, '') || 'dashboard';
   const parts = raw.split('/').filter(Boolean);
   const root = parts[0] || 'dashboard';
@@ -2156,6 +2174,7 @@ document.addEventListener('click', async (e) => {
   if (action === 'open-menu') { $('#sidebar').classList.add('open'); $('#backdrop').classList.add('show'); return; }
   if (action === 'close-menu') { closeSidebar(); return; }
   if (action === 'reload') { router(); return; }
+  if (action === 'go-login') { location.hash = '#/login'; return; }
   if (action === 'logout') {
     try { await api('/api/auth/logout', { method: 'POST' }); } catch (_) {}
     state.user = null; state.progress = null; state.checkupResult = null; state.runner = null;
