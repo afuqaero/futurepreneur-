@@ -1,6 +1,0 @@
-server/
-run.py
-content.py
-content/
-*.pyc
-__pycache__/
