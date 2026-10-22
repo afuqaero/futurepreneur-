@@ -1,0 +1,234 @@
+{
+  "id": "finance",
+  "component": "finance",
+  "title": "Financial Management",
+  "tagline": "Know what you earn, what you keep, and how long your cash can carry you.",
+  "level": "Foundation",
+  "hours": "55–70 min",
+  "outcome": "By the end, you will have a weekly money routine, a 13-week cash forecast, a contribution and break-even number, and a pricing rule you can defend.",
+  "intro": [
+    "Profit is an opinion until you calculate it. Cash is a fact you can see in the bank. Most small businesses fail on cash timing, not on a bad idea — a profitable month can still leave you unable to pay wages if customers pay late or stock eats the money first.",
+    "This module gives you four habits: separate money, read the numbers weekly, forecast cash, and price with contribution in mind. You will use your own figures, even rough ones, because a rough number you use beats a precise number you avoid."
+  ],
+  "practical": {
+    "title": "Practical assignment: your numbers, written down",
+    "intro": "Use your real business figures, rounded where needed. A reviewer scores each criterion from 0 to 4; the module passes at an average of 3 or more, with no criterion below 2.",
+    "criteria": [
+      { "id": "separation", "label": "Money separation", "hint": "Business and personal money are separated, with a weekly routine." },
+      { "id": "cash_forecast", "label": "Cash forecast", "hint": "A 13-week view showing the lowest point and how it is covered." },
+      { "id": "margin", "label": "Contribution & margin", "hint": "Contribution per sale calculated correctly for the main offer." },
+      { "id": "pricing_breakeven", "label": "Pricing & break-even", "hint": "A price rule and a break-even number, with a buffer." }
+    ],
+    "prompts": [
+      { "id": "p1", "criterion": "separation", "label": "How do you separate business and personal money, and what is your weekly routine?", "placeholder": "Accounts, cards, who checks what, on which day, and what gets recorded." },
+      { "id": "p2", "criterion": "cash_forecast", "label": "Show your next 13 weeks of cash in and out, and the lowest point.", "placeholder": "Opening balance, expected receipts by week, payments by week, closing balance." },
+      { "id": "p3", "criterion": "margin", "label": "Calculate contribution per sale for your main offer.", "placeholder": "Price, direct costs, contribution, contribution margin %." },
+      { "id": "p4", "criterion": "pricing_breakeven", "label": "State your pricing rule, break-even volume and buffer.", "placeholder": "Minimum margin, break-even units, cash buffer months, what you will refuse." }
+    ]
+  },
+  "lessons": [
+    {
+      "id": "fn1",
+      "title": "Separate the money, then read it weekly",
+      "minutes": 11,
+      "summary": "One business account, one weekly review, and a clear line between business and personal cash.",
+      "explanation": [
+        "When business and personal money share an account, every number becomes a guess. You cannot tell whether a good week paid for next month's rent or funded a family expense. Separation is not bureaucracy; it is the minimum required to see the truth.",
+        "You do not need accounting software to start. A dedicated business account, a simple record of money in and money out, and a fixed weekly review time are enough. The review matters more than the tool: twenty minutes every week, same day, looking at the same five numbers.",
+        "Those five numbers are: money in, money out, current balance, money owed to you, and money you owe. If you track only these, you will catch most surprises early enough to act. Add categories later, when the habit exists."
+      ],
+      "example": {
+        "title": "Aina's Kitchen — one account, one Friday review",
+        "text": "Aina used one account for business and household spending. She often felt busy but broke. She opened a business account, moved a fixed weekly draw to personal, and started a Friday 20-minute review: sales in, supplier payments out, balance, unpaid invoices, upcoming bills. Within a month she could see that weekends were profitable but Wednesday deliveries were being paid from the following week's sales. The fix was a small deposit policy for catering orders, not more sales."
+      },
+      "do": [
+        "Open a dedicated business account and pay yourself a fixed, recorded draw.",
+        "Record money in and money out at least weekly, with a short description.",
+        "Review five numbers every week at a fixed time.",
+        "Keep receipts in one place, physical or digital, as you go."
+      ],
+      "dont": [
+        "Do not pay business costs from personal cash without recording it.",
+        "Do not rely on the bank balance alone; it includes money already promised to suppliers.",
+        "Do not postpone the weekly review until month-end."
+      ],
+      "why": "Separation turns a blur into a picture. The weekly habit catches cash problems while you still have options, instead of after a payment fails.",
+      "mistakes": [
+        "Using the business account as a personal wallet.",
+        "Recording sales only when the customer pays, and forgetting deposits already received.",
+        "Reviewing numbers monthly, too late to change the month."
+      ],
+      "exercise": {
+        "prompt": "Set up a 20-minute weekly money review.",
+        "steps": [
+          "Choose the day and time; put it in the calendar as a recurring event.",
+          "Write the five numbers you will check each week.",
+          "Create one place for receipts and one simple sheet for entries.",
+          "Separate a fixed personal draw from business spending.",
+          "Run the review for four weeks and note one decision it changed."
+        ]
+      }
+    },
+    {
+      "id": "fn2",
+      "title": "Cash flow is not profit",
+      "minutes": 12,
+      "summary": "Forecast the next 13 weeks so a late payment does not become a crisis.",
+      "explanation": [
+        "Profit is revenue minus costs over a period. Cash is what is available today. A catering job can be profitable on paper and still drain the bank for six weeks while you buy stock and wait to be paid. Both numbers matter, but cash decides whether you can operate.",
+        "A 13-week forecast is a simple table: opening balance, expected money in by week, expected money out by week, closing balance. Thirteen weeks is long enough to see a gap forming and short enough to be realistic. Update it every week with actuals, and keep the future weeks as estimates.",
+        "The most useful output is the lowest point. If the lowest balance is negative, you have three levers: collect sooner (deposits, shorter terms, follow-up), pay later (supplier terms), or reduce outflow (delay a purchase, renegotiate). Raising sales is usually the slowest lever, which is why it should not be the only plan."
+      ],
+      "example": {
+        "title": "Caterer — a RM24,000 contract that nearly stopped wages",
+        "text": "A caterer won a RM24,000 contract, bought RM9,000 of stock, and was paid 45 days after delivery. The job had a healthy margin, but for six weeks the business funded the client. Wages and rent fell due in week three. The forecast showed a RM6,000 hole. The owner negotiated 30% upfront on the next contract, moved one supplier to 30-day terms, and set a rule: any job above RM10,000 needs a deposit. The next large job did not create a cash crisis."
+      },
+      "do": [
+        "Build a 13-week table with opening balance, receipts, payments and closing balance.",
+        "Enter actuals weekly and update the remaining weeks.",
+        "Identify the lowest point and the week it occurs.",
+        "Choose one collection lever and one payment lever before the gap arrives."
+      ],
+      "dont": [
+        "Do not count an invoice as cash until it is received.",
+        "Do not use next month's deposits for this month's costs.",
+        "Do not hide a shortfall from yourself or your suppliers."
+      ],
+      "why": "A forecast gives you time. Time is the difference between choosing an option and accepting whatever the bank decides for you.",
+      "mistakes": [
+        "Forecasting revenue instead of receipts.",
+        "Forgetting quarterly payments, tax, insurance or loan instalments.",
+        "Assuming every customer pays on the invoice date."
+      ],
+      "exercise": {
+        "prompt": "Build a 13-week cash forecast and find the lowest point.",
+        "steps": [
+          "List expected receipts by week, based on actual payment behaviour.",
+          "List fixed and variable payments by week, including tax and loans.",
+          "Calculate closing balance week by week.",
+          "Mark the lowest point and the cause.",
+          "Write one action to raise or protect cash before that week."
+        ]
+      }
+    },
+    {
+      "id": "fn3",
+      "title": "Contribution, margin and pricing for profit",
+      "minutes": 13,
+      "summary": "Know what each sale leaves behind before you discount, bundle or add a product.",
+      "explanation": [
+        "Contribution is what remains from one sale after the direct cost of delivering it. It is the money that pays rent, wages, your time and profit. If you do not know it, you cannot judge a discount, a new product or a large order.",
+        "Margin is contribution as a percentage of price. A RM12 lunch set with RM6.50 direct cost contributes RM5.50, a 46% margin. A RM32 wholesale order with RM22 direct cost contributes RM10, a 31% margin. The second order is larger but leaves less per unit of work and capacity.",
+        "Pricing for profit starts with a floor: the contribution you need per sale to cover fixed costs and target profit at a realistic volume. Then compare with the market. If the market price is below your floor, the answer is usually a different customer, a smaller cost base, or a different offer — not a permanent discount."
+      ],
+      "example": {
+        "title": "Home baker — the big order that paid less",
+        "text": "A baker sells 60 cakes a month at RM45, with RM22 direct cost, so contribution is RM23 each. A café offers to buy 40 cakes at RM32. Direct cost stays RM22, so contribution falls to RM10, and the order uses her only oven for two days. The order looks like RM1,280 of revenue but contributes RM400 for two days of capacity, against RM1,380 from normal sales over the same period. She declined, then offered a smaller weekly order at RM38 with a fixed pickup slot, which protected RM16 contribution and her capacity."
+      },
+      "do": [
+        "Calculate direct cost per sale, including packaging, delivery and platform fees.",
+        "Calculate contribution and contribution margin before any price change.",
+        "Set a minimum contribution floor for your main offers.",
+        "Test a new price on one product or one customer group first."
+      ],
+      "dont": [
+        "Do not treat revenue as profit.",
+        "Do not discount without calculating the volume needed to stand still.",
+        "Do not copy a competitor's price without knowing their cost base."
+      ],
+      "why": "Contribution connects price, cost and capacity. It lets you say no to work that looks big but leaves too little to pay for the business.",
+      "mistakes": [
+        "Forgetting your own time as a cost when it is the constraint.",
+        "Adding a product that increases complexity without increasing contribution.",
+        "Using average margin to justify a low-margin order that consumes the bottleneck."
+      ],
+      "exercise": {
+        "prompt": "Calculate contribution and set a price floor.",
+        "steps": [
+          "List price and all direct costs for your main offer.",
+          "Calculate contribution and margin percentage.",
+          "Calculate fixed monthly costs and the contribution needed per month.",
+          "Divide by realistic monthly volume to get a contribution floor per sale.",
+          "Compare with your current price and decide one change to test."
+        ]
+      }
+    },
+    {
+      "id": "fn4",
+      "title": "Break-even, buffers and tax",
+      "minutes": 12,
+      "summary": "Know the volume that covers fixed costs, then protect the months that do not.",
+      "explanation": [
+        "Break-even is the number of sales that covers fixed costs at a given contribution. If fixed costs are RM1,650 a month and contribution per set is RM5.50, break-even is 300 sets. That single number turns vague worry into a target you can check weekly.",
+        "Break-even is a floor, not a goal. Above it, contribution becomes profit; below it, every sale still helps but the month loses money. Seasonal businesses should calculate break-even for a slow month, not an average one, and keep a cash buffer sized to the slow period.",
+        "Tax and statutory payments are not surprises; they are scheduled outflows. Set aside a percentage of each receipt into a separate account, or diarise the payment dates and include them in the 13-week forecast. A business that spends tax money before it is due is borrowing at the worst possible interest rate: penalties and stress."
+      ],
+      "example": {
+        "title": "Warung — break-even 300 sets, buffer two months",
+        "text": "A warung has fixed costs of RM1,650 and contribution of RM5.50 per set, so break-even is 300 sets a month. In a normal month it sells 420. In a rainy month it sells 240 — a RM330 loss. The owner set a two-month fixed-cost buffer of RM3,300, reviewed it quarterly, and moved one supplier to weekly instead of monthly ordering to reduce cash tied up in stock. The rainy month still hurt, but it no longer threatened rent."
+      },
+      "do": [
+        "Calculate break-even volume from fixed costs and contribution.",
+        "Calculate break-even for your slowest realistic month, not the average.",
+        "Keep a buffer of one to three months of fixed costs, depending on volatility.",
+        "Set aside tax and statutory payments as they are received."
+      ],
+      "dont": [
+        "Do not spend tax money on stock or expansion.",
+        "Do not size the buffer from your best month.",
+        "Do not treat break-even as a target; treat it as the floor."
+      ],
+      "why": "Break-even tells you what must be true. A buffer buys time when it is not. Together they turn seasonal swings from emergencies into planned periods.",
+      "mistakes": [
+        "Forgetting loan repayments, owner's draw or quarterly costs in fixed costs.",
+        "Calculating break-even with an optimistic contribution that ignores delivery or fees.",
+        "Keeping the buffer in the same account and spending it without noticing."
+      ],
+      "exercise": {
+        "prompt": "Calculate your break-even and set a buffer.",
+        "steps": [
+          "List fixed monthly costs, including your draw and loan payments.",
+          "Use contribution per sale from the previous lesson.",
+          "Calculate break-even units for an average and a slow month.",
+          "Set a buffer target in ringgit and a date to reach it.",
+          "Add tax dates and amounts to your 13-week forecast."
+        ]
+      }
+    }
+  ],
+  "templates": [
+    {
+      "slug": "finance-13-week-cashflow",
+      "title": "13-week cash flow forecast",
+      "description": "CSV with opening balance, receipts, payments and closing balance for 13 weeks.",
+      "format": "CSV",
+      "filename": "futurepreneur-finance-13-week-cashflow.csv",
+      "body": "week,week_start,opening_balance,receipts,payments,closing_balance,notes\n1,2026-11-02,5000,4200,3800,5400,normal week\n2,2026-11-09,5400,3900,4100,5200,supplier payment\n3,2026-11-16,5200,3600,5600,3200,rent + wages\n"
+    },
+    {
+      "slug": "finance-pricing-worksheet",
+      "title": "Pricing & break-even worksheet",
+      "description": "Calculate direct cost, contribution, margin, fixed costs and break-even in one page.",
+      "format": "Markdown",
+      "filename": "futurepreneur-finance-pricing-worksheet.md",
+      "body": "# Pricing & break-even worksheet\n\n## Offer\n- Offer name:\n- Price:\n\n## Direct costs per sale\n- Materials / stock:\n- Packaging:\n- Delivery / platform fee:\n- Other direct:\n- Total direct cost:\n\n## Contribution\n- Contribution = price − direct cost:\n- Contribution margin % = contribution ÷ price:\n\n## Fixed costs (monthly)\n- Rent:\n- Wages / owner draw:\n- Utilities:\n- Loan / lease:\n- Other:\n- Total fixed:\n\n## Break-even\n- Break-even units = fixed costs ÷ contribution:\n- Slow-month break-even:\n- Buffer target (1–3 months fixed costs):\n\n## Price floor\n- Minimum contribution per sale:\n- Current price vs floor:\n"
+    }
+  ],
+  "questions": [
+    { "id": "fn-q1", "kind": "quiz", "topic": "Money separation", "prompt": "Why separate business and personal money?", "options": ["To pay more tax", "So the business numbers are readable and decisions are based on facts", "Because banks require it", "To impress customers"], "correct": 1, "explanation": "Mixed money hides whether the business is actually covering its costs." },
+    { "id": "fn-q2", "kind": "quiz", "topic": "Weekly review", "prompt": "Which set belongs in a 20-minute weekly money review?", "options": ["Followers, likes, reach, engagement, saves", "Money in, money out, balance, owed to you, you owe", "Revenue, headcount, square footage, years", "Price, logo, slogan, colours"], "correct": 1, "explanation": "These five show the cash position and what is coming." },
+    { "id": "fn-q3", "kind": "quiz", "topic": "Cash vs profit", "prompt": "A profitable job is paid 45 days after delivery. What is the main risk?", "options": ["Tax increases", "A cash gap while you fund stock and wages", "The customer forgets you", "The invoice is too detailed"], "correct": 1, "explanation": "Profit on paper does not pay this week's wages." },
+    { "id": "fn-q4", "kind": "quiz", "topic": "Forecasting", "prompt": "What should a 13-week forecast use for money in?", "options": ["Invoices issued", "Expected receipts based on actual payment behaviour", "Revenue targets", "Last year's sales"], "correct": 1, "explanation": "Cash arrives when customers pay, not when you invoice." },
+    { "id": "fn-q5", "kind": "quiz", "topic": "Contribution", "prompt": "Price RM12, direct costs RM6.50. What is contribution?", "options": ["RM18.50", "RM5.50", "RM6.50", "RM12"], "correct": 1, "explanation": "Contribution = price − direct cost = RM5.50." },
+    { "id": "fn-q6", "kind": "quiz", "topic": "Margin", "prompt": "Contribution RM5.50 on a RM12 price is roughly what margin?", "options": ["55%", "46%", "22%", "12%"], "correct": 1, "explanation": "5.50 ÷ 12 = 45.8%, about 46%." },
+    { "id": "fn-q7", "kind": "quiz", "topic": "Discounting", "prompt": "You cut price 10% on a 46% margin. What happens to contribution per sale?", "options": ["Falls slightly", "Falls by more than 20%", "Stays the same", "Rises"], "correct": 1, "explanation": "A 10% price cut removes RM1.20 from RM5.50 contribution — about 22%." },
+    { "id": "fn-q8", "kind": "quiz", "topic": "Break-even", "prompt": "Fixed costs RM1,650, contribution RM5.50. Break-even volume?", "options": ["150 sets", "300 sets", "330 sets", "1,650 sets"], "correct": 1, "explanation": "1,650 ÷ 5.50 = 300 sets." },
+    { "id": "fn-q9", "kind": "quiz", "topic": "Buffers", "prompt": "How should a seasonal business size its cash buffer?", "options": ["From its best month", "From its slowest realistic period", "From last year's revenue", "From supplier credit"], "correct": 1, "explanation": "The buffer exists for the slow period, so it must be sized for that." },
+    { "id": "fn-q10", "kind": "quiz", "topic": "Tax", "prompt": "What is the safest routine for tax money?", "options": ["Spend it on stock and repay later", "Set it aside as receipts arrive and diarise the payment date", "Pay it only when reminded", "Use it for ads"], "correct": 1, "explanation": "Tax is a scheduled outflow, not working capital." },
+    { "id": "fn-s1", "kind": "scenario", "topic": "Cash gap", "prompt": "A caterer wins a large contract paid in 45 days and must buy stock now. What is the soundest response?", "options": ["Accept and hope", "Negotiate a deposit and check the 13-week forecast before committing", "Cut staff wages", "Borrow from a friend without a plan"], "correct": 1, "explanation": "A deposit and a forecast protect the weeks where wages fall due." },
+    { "id": "fn-s2", "kind": "scenario", "topic": "Big order", "prompt": "A café offers a baker a large order at a price that leaves RM10 contribution instead of RM23, using her only oven for two days. What should she do?", "options": ["Accept for the exposure", "Decline or counter with a price and volume that protects contribution and capacity", "Buy a second oven immediately", "Cut quality"], "correct": 1, "explanation": "The order consumes the bottleneck for less contribution per day." },
+    { "id": "fn-s3", "kind": "scenario", "topic": "Late payers", "prompt": "Two customers consistently pay 30 days late. What is the most effective first step?", "options": ["Stop selling to them silently", "Invoice immediately, state terms, and follow up on a fixed schedule", "Raise prices for everyone", "Accept it as normal"], "correct": 1, "explanation": "Clear terms and a follow-up routine fix most late payment before it becomes a cash crisis." },
+    { "id": "fn-s4", "kind": "scenario", "topic": "Break-even", "prompt": "A warung breaks even at 300 sets but sells 240 in rainy months. What should the owner do?", "options": ["Ignore it; sunny months cover it", "Plan a slow-month break-even, build a buffer and adjust orders", "Raise every price 30%", "Open longer hours regardless of demand"], "correct": 1, "explanation": "Plan for the slow month with a buffer and tighter purchasing." },
+    { "id": "fn-s5", "kind": "scenario", "topic": "Tax", "prompt": "A good month leaves extra cash, and a tax payment is due next month. What should happen first?", "options": ["Buy stock in bulk", "Move the tax amount to a separate account now", "Pay a bonus", "Run a discount campaign"], "correct": 1, "explanation": "The tax liability is already spent money; separate it before it is used." }
+  ]
+}

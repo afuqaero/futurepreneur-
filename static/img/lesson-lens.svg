@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" fill="none" role="img" aria-label="Illustration of a magnifying glass over a chart">
+  <rect x="8" y="8" width="344" height="204" rx="30" fill="#EDF1FA"/>
+  <rect x="58" y="46" width="196" height="132" rx="20" fill="#fff" stroke="#0A1733" stroke-width="3.5"/>
+  <rect x="78" y="120" width="18" height="36" rx="6" fill="#D7E0F2"/>
+  <rect x="106" y="102" width="18" height="54" rx="6" fill="#D7E0F2"/>
+  <rect x="134" y="112" width="18" height="44" rx="6" fill="#FFC93C"/>
+  <rect x="162" y="78" width="18" height="78" rx="6" fill="#0F2A66"/>
+  <path d="M78 88l26 12 26-18 26 10 28-24" stroke="#0F2A66" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="78" y="64" width="66" height="8" rx="4" fill="#0A1733" opacity=".7"/>
+
+  <g transform="translate(188 96)">
+    <circle cx="34" cy="34" r="32" fill="#FFC93C" fill-opacity=".28" stroke="#0A1733" stroke-width="4"/>
+    <circle cx="34" cy="34" r="21" fill="#fff" fill-opacity=".55"/>
+    <path d="M57 57l22 22" stroke="#0A1733" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="27" cy="27" r="5" fill="#fff"/>
+  </g>
+
+  <path d="M292 44l6 14 14 6-14 6-6 14-6-14-14-6 14-6 6-14Z" fill="#FFC93C" stroke="#0A1733" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="304" cy="168" r="9" fill="#0F2A66"/>
+  <circle cx="46" cy="184" r="6" fill="#FFC93C"/>
+</svg>

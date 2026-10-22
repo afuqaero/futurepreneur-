@@ -1,0 +1,233 @@
+{
+  "id": "marketing",
+  "component": "marketing",
+  "title": "Marketing & Sales",
+  "tagline": "Find the people who already need you, make one clear offer, and sell without guessing.",
+  "level": "Foundation",
+  "hours": "50–65 min",
+  "outcome": "By the end, you will have one primary customer group, one testable offer, one measured channel, and a 14-day follow-up routine.",
+  "intro": [
+    "Most small businesses do not have a marketing problem. They have a clarity problem: a message aimed at everyone, an offer that is hard to say yes to, and no record of which channel actually produced paying customers.",
+    "This module fixes that in four lessons. You will use your own business as the case study, and finish with a one-page customer-and-offer canvas plus a channel test you can run for two weeks."
+  ],
+  "practical": {
+    "title": "Practical assignment: a 14-day marketing test",
+    "intro": "Use your own business. Write short, specific answers. A reviewer scores each criterion from 0 to 4; the module passes at an average of 3 or more, with no criterion below 2.",
+    "criteria": [
+      { "id": "customer_clarity", "label": "Customer clarity", "hint": "One primary customer group, described specifically enough to find and contact." },
+      { "id": "offer_strength", "label": "Offer strength", "hint": "A clear outcome, a price, proof, and a reason to act now." },
+      { "id": "channel_math", "label": "Channel math", "hint": "One channel with a realistic cost per enquiry and cost per order." },
+      { "id": "follow_up", "label": "Follow-up", "hint": "A specific follow-up routine with timing and a stop rule." }
+    ],
+    "prompts": [
+      { "id": "p1", "criterion": "customer_clarity", "label": "Who is your primary customer, and what problem are they trying to solve?", "placeholder": "Describe one group, their day, what they use today, and why that is not good enough." },
+      { "id": "p2", "criterion": "offer_strength", "label": "Write your offer in one sentence: outcome, price, proof and next step.", "placeholder": "For [customer] who [need], we provide [outcome] for [price], proven by [proof]. Next step: [action]." },
+      { "id": "p3", "criterion": "channel_math", "label": "Choose one channel and show the numbers for a 14-day test.", "placeholder": "Spend, expected enquiries, expected orders, contribution per order, break-even number of orders." },
+      { "id": "p4", "criterion": "follow_up", "label": "Write your follow-up routine and your stop rule.", "placeholder": "Who you contact, when, with what message, how many attempts, and when you stop." }
+    ]
+  },
+  "lessons": [
+    {
+      "id": "mk1",
+      "title": "Who actually buys from you",
+      "minutes": 11,
+      "summary": "A narrow customer group makes every marketing decision cheaper and clearer.",
+      "explanation": [
+        "Most owners describe their customer as 'anyone who needs what we sell'. That feels safe, but it makes every decision harder: which photo to post, which words to use, which price to show, which channel to pay for. A message for everyone is a message for no one.",
+        "A useful customer group is specific enough that you can find them, describe their day, and name what they use instead of you. 'Busy office workers within one kilometre who get less than 30 minutes for lunch' is a group you can act on. 'People who like good food' is not.",
+        "You do not need market research to find this. Your existing customers already tell you. Look at your last 20 sales: who came back, who paid on time, who complained least, who bought the higher-margin item? That pattern is your primary group. You can still serve others; you simply optimise your message and offer for the group that keeps the business healthy."
+      ],
+      "example": {
+        "title": "Aina's Kitchen — lunch versus weekend market",
+        "text": "Aina promoted to everyone: office workers, families, weekend shoppers. Her margin told a different story. Weekday lunch sets sold at RM12 with RM5.50 contribution, and 60% of orders came from five nearby offices. Weekend market sales looked busy but needed two staff and a van, leaving RM2.10 per item. She kept the weekend stall for exposure but wrote every weekday offer for one group: nearby office workers who need a hot lunch in under 15 minutes. Same kitchen, clearer target, less wasted promotion."
+      },
+      "do": [
+        "List your last 20 customers and mark repeat buyers, high-margin buyers and easy-to-serve buyers.",
+        "Write one primary group in a sentence that names who, where and when.",
+        "Name the two alternatives they use today and why those alternatives frustrate them."
+      ],
+      "dont": [
+        "Do not define the group as 'everyone' or 'people who like our product'.",
+        "Do not pick a group you cannot reach with a realistic budget.",
+        "Do not change the group every month because one enquiry came from elsewhere."
+      ],
+      "why": "A specific group tells you what to say, where to say it and what to charge. It also protects your capacity: you stop spending money attracting customers who are expensive to serve.",
+      "mistakes": [
+        "Confusing a demographic with a need: 'aged 25–40' says nothing about what they are trying to get done.",
+        "Choosing a group because they are fashionable rather than because they already pay you.",
+        "Serving every group with the same message, then blaming the market when nobody responds."
+      ],
+      "exercise": {
+        "prompt": "Find your primary customer group from evidence you already have.",
+        "steps": [
+          "Export or list your last 20 sales with amount and repeat status.",
+          "Mark the five customers you would clone if you could.",
+          "Write the common pattern: who they are, when they buy, what they need.",
+          "Write one sentence describing that group without using the word 'everyone'.",
+          "Name the alternative they use today and one reason it disappoints them."
+        ]
+      }
+    },
+    {
+      "id": "mk2",
+      "title": "Make one offer worth saying yes to",
+      "minutes": 12,
+      "summary": "An offer is an outcome, a price, proof, and a reason to act — not a product list.",
+      "explanation": [
+        "An offer is not a discount and it is not a list of features. It is a specific outcome for a specific customer, at a known price, with evidence that you can deliver it, and a clear next step. When those four pieces are present, the customer does not have to work out why they should buy.",
+        "Small businesses often compete by adding more options. That shifts the work to the customer: compare twelve packages, guess which is right, worry about choosing wrong. A smaller number of clear offers usually sells better, because the customer can see themselves in one of them.",
+        "Proof does not need to be a glossy testimonial. A photo of the actual portion, a before-and-after, the number of repeat customers, a named guarantee, or a short case with a number all reduce risk. The strongest proof answers the question the customer is too polite to ask: 'what if this does not work for me?'"
+      ],
+      "example": {
+        "title": "Tuition centre — from 'enrol now' to an exam-readiness check",
+        "text": "A tuition centre posted 'Enrol now for all subjects' with no response. It replaced the post with one offer: a 45-minute exam-readiness check for Form 5 students, RM30, with a written topic-gap report and a suggested four-week plan. The check was useful even if the parent did not enrol. Thirty enquiries produced ten paid checks, and six of those became monthly students. The offer sold a small, low-risk first step instead of a year-long commitment."
+      },
+      "do": [
+        "Write the offer as: for [customer] who [need], we provide [outcome] for [price], proven by [proof].",
+        "Put one clear next step in every message: book, reply, visit, order.",
+        "Add proof that answers the biggest risk the customer sees.",
+        "Keep a smaller number of offers and make each one easy to compare."
+      ],
+      "dont": [
+        "Do not lead with a discount before the value is clear.",
+        "Do not list every feature and hope the customer assembles the benefit.",
+        "Do not make the first step expensive or complicated."
+      ],
+      "why": "A clear offer shortens the conversation. It lets a customer decide without a meeting, and it lets you compare results across weeks instead of guessing why sales moved.",
+      "mistakes": [
+        "Calling a product an offer: 'we sell cakes' is a category, not a reason to buy today.",
+        "Adding a free extra instead of removing a risk the customer actually worries about.",
+        "Changing the offer every week, so no test ever produces a usable result."
+      ],
+      "exercise": {
+        "prompt": "Write and stress-test one offer for your primary customer.",
+        "steps": [
+          "Write the one-sentence offer in the format above.",
+          "Name the biggest risk the customer sees and add one piece of proof against it.",
+          "Set a first step that takes under five minutes for the customer.",
+          "Ask two existing customers whether the sentence is clear.",
+          "Rewrite it using their words, not yours."
+        ]
+      }
+    },
+    {
+      "id": "mk3",
+      "title": "One channel, measured for 14 days",
+      "minutes": 12,
+      "summary": "Pick the channel where your group already is, then measure cost per enquiry and per order.",
+      "explanation": [
+        "Being on every platform feels like progress, but it spreads a small budget and a small amount of attention across channels that cannot all be measured. A two-week test on one channel produces a number you can act on; five half-efforts produce opinions.",
+        "Choose the channel based on where the customer already spends attention. Nearby office workers may see a flyer, a WhatsApp broadcast through building managers, or a Google Business Profile. Online buyers may use a marketplace search or short video. Service businesses often get the best return from a Google Business Profile plus WhatsApp follow-up, because the customer is searching with intent.",
+        "The numbers that matter are cost per enquiry and cost per order, not views or likes. If RM300 produces 40 enquiries and 8 orders, cost per enquiry is RM7.50 and cost per order is RM37.50. Compare that with contribution per order. If contribution is RM25, the channel is losing money before fixed costs — volume will not fix it."
+      ],
+      "example": {
+        "title": "Norli's skincare shop — one channel, one number",
+        "text": "Norli was posting on three platforms and could not say which produced sales. For 14 days she used only WhatsApp: a broadcast to past customers and a RM300 boost to a nearby postcode, pointing to one bundle. She tracked every conversation in a spreadsheet. Result: 62 enquiries, 19 orders, average order RM85, contribution RM32 per order. Spend RM300 plus RM120 in packaging and delivery = RM420; contribution RM608. The channel was profitable, so she repeated it and dropped the platform she could not measure."
+      },
+      "do": [
+        "Choose one channel your customer already uses and set a 14-day window.",
+        "Record spend, enquiries, orders and contribution in one sheet every day.",
+        "Calculate cost per enquiry and cost per order before you decide to scale.",
+        "Write a stop rule: the number that means stop, not 'try harder'."
+      ],
+      "dont": [
+        "Do not count likes, views or followers as sales.",
+        "Do not run several offers at once, or you cannot tell what worked.",
+        "Do not scale spending on a channel with negative contribution."
+      ],
+      "why": "A measured channel turns marketing from a cost you hope works into a decision you can repeat, adjust or stop. It also protects cash in a small business, where one bad month is harder to absorb.",
+      "mistakes": [
+        "Measuring reach instead of paying customers.",
+        "Changing the offer halfway through the test, then comparing incomparable weeks.",
+        "Forgetting delivery, packaging and platform fees when calculating contribution."
+      ],
+      "exercise": {
+        "prompt": "Design a 14-day test with a real break-even number.",
+        "steps": [
+          "Pick one channel and write why your customer is already there.",
+          "Set a total spend you can afford to lose.",
+          "Estimate enquiries and orders from a realistic conversion rate.",
+          "Calculate contribution per order and the number of orders needed to break even.",
+          "Write the stop rule and the date you will review it."
+        ]
+      }
+    },
+    {
+      "id": "mk4",
+      "title": "Follow up and sell again",
+      "minutes": 10,
+      "summary": "The cheapest sale is the customer who already bought from you and was forgotten.",
+      "explanation": [
+        "Most small businesses spend all their marketing money finding new customers and none on the customers they already have. Yet a past customer already knows the quality, trusts the price and needs no convincing that you exist. A simple follow-up routine often produces more revenue than a new channel.",
+        "Follow-up needs a reason and a timing, not a mood. A café can message corporate accounts on Thursday about next week's lunch; an air-conditioning service can remind customers six months after installation; a skincare seller can check in after seven days to see whether the routine is working. Each of those is useful, not pestering.",
+        "Keep the list simple enough that you will actually use it: name, contact, what they bought, when to contact next, and the outcome. A spreadsheet or a WhatsApp label is enough. The failure is not the tool; it is having no routine at all."
+      ],
+      "example": {
+        "title": "Raj's air-conditioner servicing — the six-month reminder",
+        "text": "Raj installed units for 40 customers in a year but only heard from them when something broke. He added a six-month reminder with a short message: 'It has been about six months since we installed your unit. A basic service now is RM90 and usually prevents the RM300 repair later. Want me to book a slot?' Twelve of 40 replied, nine booked, and three added a second unit service. The message cost nothing and produced RM1,080 in work."
+      },
+      "do": [
+        "Record every buyer with what they bought and a next-contact date.",
+        "Send one useful reminder tied to their purchase, not a generic promotion.",
+        "Ask for a reorder or referral at the moment the customer is happiest.",
+        "Review the list weekly and remove people who asked not to be contacted."
+      ],
+      "dont": [
+        "Do not blast the same promotion to everyone on your list.",
+        "Do not wait for the customer to remember you.",
+        "Do not keep contacting someone who has said no twice."
+      ],
+      "why": "Repeat customers cost less to reach and usually spend more over time. A predictable follow-up routine smooths seasonal dips without extra ad spend.",
+      "mistakes": [
+        "Treating follow-up as a one-off campaign instead of a routine.",
+        "Only contacting customers when you need money, with no useful reason.",
+        "Collecting contact details without permission or a way to opt out."
+      ],
+      "exercise": {
+        "prompt": "Build a follow-up list you can run this week.",
+        "steps": [
+          "List your last 30 buyers with contact and purchase date.",
+          "Choose the natural next-contact moment for each type of purchase.",
+          "Write one short, useful message template for each moment.",
+          "Set a weekly 20-minute slot to send and record replies.",
+          "Track bookings or reorders produced, not messages sent."
+        ]
+      }
+    }
+  ],
+  "templates": [
+    {
+      "slug": "marketing-customer-offer-canvas",
+      "title": "Customer & offer canvas",
+      "description": "One page: primary customer, problem, alternatives, offer sentence, proof, price and next step.",
+      "format": "Markdown",
+      "filename": "futurepreneur-marketing-customer-offer-canvas.md",
+      "body": "# Customer & offer canvas\n\n## 1. Primary customer\n- Who exactly (role, location, situation):\n- When do they need you:\n- What are they trying to get done:\n\n## 2. Problem and alternatives\n- Problem in their words:\n- What they use today:\n- Why that is not good enough:\n\n## 3. Offer sentence\nFor [customer] who [need], we provide [outcome] for [price], proven by [proof].\n\nNext step: [book / reply / visit / order]\n\n## 4. Proof\n- Number, photo, guarantee or named result:\n\n## 5. Price and contribution\n- Price:\n- Direct cost per sale:\n- Contribution per sale:\n\n## 6. Channel\n- One channel:\n- Why they are already there:\n\n## 7. Follow-up\n- First follow-up date:\n- Message reason:\n"
+    },
+    {
+      "slug": "marketing-channel-test-tracker",
+      "title": "14-day channel test tracker",
+      "description": "CSV for daily spend, enquiries, orders and contribution. Open in Excel or Sheets.",
+      "format": "CSV",
+      "filename": "futurepreneur-marketing-channel-test.csv",
+      "body": "date,channel,spend_rm,enquiries,orders,revenue_rm,direct_cost_rm,contribution_rm,notes\n2026-11-01,WhatsApp broadcast,0,12,3,255,90,165,repeat customers first\n2026-11-02,WhatsApp broadcast,50,9,2,170,60,110,boost started\n2026-11-03,WhatsApp broadcast,50,6,1,85,30,55,\n"
+    }
+  ],
+  "questions": [
+    { "id": "mk-q1", "kind": "quiz", "topic": "Customer group", "prompt": "Which description is specific enough to act on this week?", "options": ["People who like good food", "Office workers within 1km who get under 30 minutes for lunch", "Adults aged 25–45", "Anyone who needs catering"], "correct": 1, "explanation": "A usable group names who, where and when, so you can choose a channel and write a message." },
+    { "id": "mk-q2", "kind": "quiz", "topic": "Offer", "prompt": "What are the four parts of a clear offer?", "options": ["Logo, slogan, discount, hashtag", "Outcome, price, proof, next step", "Product, feature, benefit, warranty", "Audience, budget, channel, reach"], "correct": 1, "explanation": "Outcome, price, proof and next step let the customer decide without a meeting." },
+    { "id": "mk-q3", "kind": "quiz", "topic": "Proof", "prompt": "Which is the strongest proof for a small food business?", "options": ["A stock photo of food", "The number of repeat lunch accounts and a photo of the actual portion", "A list of ingredients", "A discount code"], "correct": 1, "explanation": "Repeat customers and the real portion answer the customer's risk question with evidence." },
+    { "id": "mk-q4", "kind": "quiz", "topic": "Channel math", "prompt": "RM300 produces 40 enquiries and 8 orders. What is the cost per order?", "options": ["RM7.50", "RM37.50", "RM8.00", "RM300"], "correct": 1, "explanation": "RM300 ÷ 8 orders = RM37.50 per order. Compare that with contribution per order." },
+    { "id": "mk-q5", "kind": "quiz", "topic": "Channel math", "prompt": "Contribution per order is RM25 and cost per order is RM37.50. What should you do?", "options": ["Spend more to get volume", "Stop or fix the channel before scaling", "Raise the ad budget", "Count more likes"], "correct": 1, "explanation": "Every order loses RM12.50 before fixed costs; volume makes the loss bigger." },
+    { "id": "mk-q6", "kind": "quiz", "topic": "Measurement", "prompt": "Which metric is a leading indicator of sales?", "options": ["Followers", "Repeat orders per week", "Last year's revenue", "Website visits"], "correct": 1, "explanation": "Repeat orders move early enough to act on and directly reflect paying customers." },
+    { "id": "mk-q7", "kind": "quiz", "topic": "Follow-up", "prompt": "When is a follow-up most likely to work?", "options": ["Six months later with a generic promotion", "At a useful moment tied to what they bought", "Every day until they reply", "Only when you need cash"], "correct": 1, "explanation": "A reason tied to the purchase makes the message useful rather than pestering." },
+    { "id": "mk-q8", "kind": "quiz", "topic": "Offers", "prompt": "A customer says the price is too high. What is the best first response?", "options": ["Discount immediately", "Clarify the outcome and compare it with the cost of the problem", "Add more features for free", "Walk away"], "correct": 1, "explanation": "Price resistance is often unclear value; make the outcome and alternative cost explicit before discounting." },
+    { "id": "mk-q9", "kind": "quiz", "topic": "Channel choice", "prompt": "A plumber wants more emergency repair jobs. Which channel fits best?", "options": ["TikTok dance videos", "A complete Google Business Profile with reviews and a click-to-call number", "A monthly email newsletter", "A billboard"], "correct": 1, "explanation": "Emergency customers search with intent; a complete local profile captures that demand." },
+    { "id": "mk-q10", "kind": "quiz", "topic": "Testing", "prompt": "What makes a 14-day marketing test valid?", "options": ["Changing the offer daily", "One channel, one offer, tracked spend and orders", "Running five platforms at once", "Counting impressions only"], "correct": 1, "explanation": "One variable with daily numbers lets you compare results and decide." },
+    { "id": "mk-s1", "kind": "scenario", "topic": "Quiet weekdays", "prompt": "A café is busy at weekends but quiet on weekdays. It has RM400 to spend. What is the soundest first move?", "options": ["Discount every item by 20% all week", "Build one weekday lunch offer for nearby offices and test one channel for 14 days", "Open a second outlet", "Increase weekend advertising"], "correct": 1, "explanation": "Target the specific gap with a specific group and measure one channel before spending more." },
+    { "id": "mk-s2", "kind": "scenario", "topic": "Negative contribution", "prompt": "An online seller spends RM9 on ads per order and makes RM7.50 contribution per order. Sales are growing. What should they do?", "options": ["Increase ad spend to grow faster", "Fix contribution or repeat rate before scaling", "Add more products", "Lower prices"], "correct": 1, "explanation": "Growth at negative contribution increases losses; fix the unit economics first." },
+    { "id": "mk-s3", "kind": "scenario", "topic": "Price objection", "prompt": "A cleaning service keeps losing quotes on price. The owner discovers customers cannot see what is included. What is the best response?", "options": ["Cut the price by 15%", "Make the scope and outcome explicit, then compare with the cost of a bad clean", "Add a free extra", "Stop quoting"], "correct": 1, "explanation": "The quote is being compared without scope; clarity changes the comparison before price does." },
+    { "id": "mk-s4", "kind": "scenario", "topic": "Follow-up", "prompt": "A baker has 60 past customers and no repeat system. Which routine is most likely to produce orders this month?", "options": ["A mass discount blast to everyone", "A short useful message to recent buyers with a reorder reason and date", "Waiting for them to return", "Posting more often on five platforms"], "correct": 1, "explanation": "Recent buyers with a relevant reason and a specific next step convert best." },
+    { "id": "mk-s5", "kind": "scenario", "topic": "Channel test", "prompt": "A tuition centre gets 30 enquiries from a flyer but only 3 sign-ups. Where should it look first?", "options": ["Print more flyers", "The enquiry-to-signup step: response time, clarity of offer and follow-up", "Raise prices", "Change the logo"], "correct": 1, "explanation": "The channel produces enquiries; the conversion step is the leak." }
+  ]
+}

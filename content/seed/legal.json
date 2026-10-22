@@ -1,0 +1,234 @@
+{
+  "id": "legal",
+  "component": "legal",
+  "title": "Legal & Risk",
+  "tagline": "Cover the basics before they cost you the business.",
+  "level": "Foundation",
+  "hours": "50–65 min",
+  "outcome": "By the end, you will have a contract checklist, a compliance calendar, a risk register with cover decisions, and a simple data and disputes routine.",
+  "intro": [
+    "Most small businesses do not fail because of a clever legal attack. They fail because nothing was written down, a licence expired, or one uninsured event wiped out the cash reserve. Legal risk is usually boring, predictable and cheap to reduce early.",
+    "This module is practical risk management, not legal advice. For a specific contract, licence or dispute, confirm the current requirement with the relevant authority or a qualified professional."
+  ],
+  "practical": {
+    "title": "Practical assignment: close your three biggest gaps",
+    "intro": "Use your real business. A reviewer scores each criterion from 0 to 4; the module passes at an average of 3 or more, with no criterion below 2.",
+    "criteria": [
+      { "id": "contract_clarity", "label": "Contract clarity", "hint": "Scope, price, payment, cancellation and liability are written." },
+      { "id": "compliance", "label": "Compliance", "hint": "Licences and renewals have an owner and a date." },
+      { "id": "risk_cover", "label": "Risk cover", "hint": "Top risks are ranked, with a decision to avoid, reduce, transfer or accept." },
+      { "id": "data_disputes", "label": "Data & disputes", "hint": "Customer data is minimised and protected; a dispute path exists." }
+    ],
+    "prompts": [
+      { "id": "p1", "criterion": "contract_clarity", "label": "Show the terms you use for your main service or product.", "placeholder": "Scope, price, deposit, payment date, cancellation, liability, who owns the work." },
+      { "id": "p2", "criterion": "compliance", "label": "List your licences and renewals, with owner and date.", "placeholder": "Business registration, local licence, food handling, halal, signboard, insurance renewal." },
+      { "id": "p3", "criterion": "risk_cover", "label": "Rank your top risks and say how each is handled.", "placeholder": "Risk, likelihood, impact, avoid/reduce/transfer/accept, owner." },
+      { "id": "p4", "criterion": "data_disputes", "label": "How do you collect and protect customer data, and handle a dispute?", "placeholder": "What you collect, why, where it is stored, who sees it, refund/complaint steps." }
+    ]
+  },
+  "lessons": [
+    {
+      "id": "lg1",
+      "title": "Know what you have actually agreed to",
+      "minutes": 12,
+      "summary": "Scope, price, payment, cancellation and liability belong in writing — even for small jobs.",
+      "explanation": [
+        "A contract does not need to be long to be useful. Five terms prevent most small-business disputes: what is included, what it costs, when payment is due, what happens if either side cancels, and who is responsible if something goes wrong.",
+        "Written terms beat memory. A WhatsApp message can form a contract, but it is hard to rely on when the conversation is buried under six months of chat. Send a one-page confirmation after the conversation: scope, price, deposit, date, and what is not included. Ask the customer to reply 'agreed'.",
+        "Watch the terms that quietly create unlimited obligations. 'Unlimited revisions', 'delivery by whenever the customer needs it' and 'we will handle anything else that comes up' are how a profitable job becomes unpaid work. Put a number or a boundary on every open-ended promise."
+      ],
+      "example": {
+        "title": "Caterer — the job with no cancellation term",
+        "text": "A caterer accepted a 200-pax wedding order with a 30% deposit, then bought stock. Two weeks before the event, the customer halved the order. There was no cancellation term, so the caterer absorbed the unused stock and the lost preparation time. The next contract added three lines: deposit non-refundable within 14 days, final headcount due 10 days before, and any reduction above 10% charged at 50%. The same customer booked again and accepted the terms without argument."
+      },
+      "do": [
+        "Write scope, price, deposit, payment date, cancellation and liability in one page.",
+        "State what is not included, not just what is.",
+        "Put limits on revisions, timelines and 'extras'.",
+        "Confirm verbal agreements in writing the same day."
+      ],
+      "dont": [
+        "Do not rely on a chat thread as your only record.",
+        "Do not accept unlimited revisions or open-ended delivery dates.",
+        "Do not take a large order without a deposit and a cancellation term."
+      ],
+      "why": "Clear terms prevent most disputes and make the difficult conversation easier when something changes. They also protect the customer from unclear expectations.",
+      "mistakes": [
+        "Using a template from another industry without checking the scope.",
+        "Assuming a deposit is legally non-refundable because you called it that.",
+        "Letting a customer add scope repeatedly without a change note."
+      ],
+      "exercise": {
+        "prompt": "Write or fix the one-page terms for your main offer.",
+        "steps": [
+          "List what is included and what is not.",
+          "State price, deposit and payment date.",
+          "Add cancellation and rescheduling terms.",
+          "Cap revisions, changes or extra visits.",
+          "Send it to your next customer and ask for written agreement."
+        ]
+      }
+    },
+    {
+      "id": "lg2",
+      "title": "Licences, renewals and the paperwork that stops you",
+      "minutes": 11,
+      "summary": "A compliance calendar is cheaper than a closure notice.",
+      "explanation": [
+        "Different businesses need different approvals, and the rules change by location and activity. A food business, a signboard, a delivery fleet and a home-based online seller do not carry the same obligations. The risk is not only the fine; it is the days or weeks of lost trading while a licence is sorted.",
+        "Build a compliance calendar with four columns: item, authority, renewal date, owner. Include business registration, local authority licence, food handling or hygiene requirements, halal certification if you claim it, signboard approval, vehicle permits and insurance renewals. Put the dates in the same calendar you already use.",
+        "Verify requirements with the relevant authority rather than copying another business. If you operate from home, check whether your local council allows the activity and whether your insurer covers stock kept there. A cheap premise can become expensive if the use is not permitted."
+      ],
+      "example": {
+        "title": "Home baker — the order that exposed an unlicensed kitchen",
+        "text": "A home baker took a 500-box corporate order, then discovered the building's use did not permit commercial food production at that scale. She had to move production to a rented commercial kitchen two weeks before delivery, cutting her margin by 40%. After that, she listed her registrations and approvals in one calendar, added the commercial kitchen as a fixed cost, and capped orders at the volume her licence allowed."
+      },
+      "do": [
+        "List every registration, licence and renewal that applies to your activity.",
+        "Record the authority, date and owner for each.",
+        "Set reminders 60 and 14 days before renewal.",
+        "Check that your premises and insurer allow what you actually do."
+      ],
+      "dont": [
+        "Do not assume another business's licence covers yours.",
+        "Do not wait for a notice before checking a renewal.",
+        "Do not claim a certification you have not obtained."
+      ],
+      "why": "Compliance protects trading continuity. One closure or stop-work order can cost more than years of renewal fees.",
+      "mistakes": [
+        "Keeping licences in a drawer with no renewal dates.",
+        "Assuming a home address is automatically allowed for the activity.",
+        "Forgetting signboard, vehicle or delivery-related approvals."
+      ],
+      "exercise": {
+        "prompt": "Build your compliance calendar.",
+        "steps": [
+          "List every approval you currently rely on.",
+          "Add the issuing authority and expiry date.",
+          "Mark anything missing or unverified.",
+          "Assign one owner and set two reminders per item.",
+          "Ask the relevant authority about one requirement you are unsure of."
+        ]
+      }
+    },
+    {
+      "id": "lg3",
+      "title": "Insure what would actually hurt",
+      "minutes": 11,
+      "summary": "Rank risks by impact, then avoid, reduce, transfer or accept them deliberately.",
+      "explanation": [
+        "Insurance is one way to handle risk, not the only one. Start with a risk register: what could happen, how likely it is, and what it would cost. Then choose a response — avoid the activity, reduce the likelihood, transfer the cost through insurance or a contract, or accept it with a funded buffer.",
+        "For most micro-businesses the top risks are fire or water damage to stock and equipment, injury to a customer or worker, a vehicle accident, theft, and the loss of the one person who holds key knowledge. Insurance can cover some of these; a second key holder, a backup supplier and a cash buffer cover others.",
+        "Read the exclusions before buying. A policy that excludes stock kept at home, delivery by motorcycle or work performed at customer premises may not cover the risk you think you transferred. Match the cover to the actual activity, and review it when the business changes."
+      ],
+      "example": {
+        "title": "Laundry — the fire that was not covered",
+        "text": "A laundry's dryer caught fire overnight, damaging machines and customer garments. The owner had contents insurance, but the policy excluded damage caused by lack of maintenance and capped customer goods at a low amount. The business closed for 11 days and paid customers from cash. After reopening, the owner added maintenance records, a heat sensor, a higher customer-goods limit and a written notice on the ticket limiting liability for unclaimed items."
+      },
+      "do": [
+        "List your top five risks with a rough cost for each.",
+        "Choose avoid, reduce, transfer or accept for each one.",
+        "Check policy exclusions against how you actually operate.",
+        "Keep maintenance and incident records that support a claim."
+      ],
+      "dont": [
+        "Do not buy insurance and assume every scenario is covered.",
+        "Do not leave the only key knowledge with one person.",
+        "Do not accept a high-impact risk without a funded plan."
+      ],
+      "why": "A ranked risk register turns vague worry into decisions. It also stops you paying for cover you do not need while missing the risk that would close you.",
+      "mistakes": [
+        "Insuring low-cost items and leaving the high-impact risk uninsured.",
+        "Forgetting customer property held on the premises.",
+        "Never reviewing cover after adding a vehicle, staff or location."
+      ],
+      "exercise": {
+        "prompt": "Build a five-row risk register.",
+        "steps": [
+          "List five things that could seriously hurt the business.",
+          "Score likelihood and impact from 1 to 5.",
+          "Choose a response for each.",
+          "Check whether your current policy actually covers the top two.",
+          "Set one preventive action with a date and owner."
+        ]
+      }
+    },
+    {
+      "id": "lg4",
+      "title": "Customer data, deposits and disputes",
+      "minutes": 11,
+      "summary": "Collect less data, protect what you keep, and make the refund path clear.",
+      "explanation": [
+        "Customer data is an asset and a liability. Collect only what you need to deliver the service, know where it is stored, and limit who can see it. A notebook of phone numbers, a shared spreadsheet and a personal phone gallery all count as storage.",
+        "Under Malaysia's Personal Data Protection Act, businesses handling personal data generally need to be clear about why data is collected, protect it, and handle access or correction requests. You do not need a legal department to do the basics: a short privacy notice, a locked device, a clean-up of old lists, and a rule against sharing customer details in group chats.",
+        "Deposits and disputes need a written path. State what the deposit secures, when it is refundable, how a complaint is raised, and how long a resolution takes. A predictable process reduces angry escalations and protects your reputation even when the answer is no."
+      ],
+      "example": {
+        "title": "Online seller — a customer list in a group chat",
+        "text": "An online seller pasted a spreadsheet of 300 customer phone numbers into a staff group chat so a part-timer could follow up. A former staff member kept the file after leaving. The seller now keeps customer data in one shared drive with access limited to two people, removes phone numbers from chats, and deletes order details after 12 months. The change cost nothing and removed a risk that could not be undone."
+      },
+      "do": [
+        "Collect only the data you need to deliver and support the sale.",
+        "Store it in one access-controlled place, not personal chats.",
+        "Write a short privacy notice and a retention period.",
+        "Publish deposit, refund and complaint steps in plain language."
+      ],
+      "dont": [
+        "Do not share customer lists in group chats.",
+        "Do not keep data forever because deleting feels like losing an asset.",
+        "Do not promise a refund policy you cannot administer."
+      ],
+      "why": "Good data handling protects customers and your reputation. A clear dispute path turns a conflict into a process instead of a public argument.",
+      "mistakes": [
+        "Collecting IC numbers, addresses and birthdays with no use for them.",
+        "Letting every staff member access the full customer list.",
+        "Using a deposit to cover losses without stating the terms upfront."
+      ],
+      "exercise": {
+        "prompt": "Tighten one data or dispute process.",
+        "steps": [
+          "List every place customer data is stored.",
+          "Delete or archive anything you no longer need.",
+          "Limit access to the people who actually need it.",
+          "Write a three-line privacy notice and a refund path.",
+          "Add both to your website or order confirmation."
+        ]
+      }
+    }
+  ],
+  "templates": [
+    {
+      "slug": "legal-contract-checklist",
+      "title": "Contract checklist",
+      "description": "Eight terms to confirm before you accept a job or send an order.",
+      "format": "Markdown",
+      "filename": "futurepreneur-legal-contract-checklist.md",
+      "body": "# Contract checklist\n\n- [ ] Scope: what is included\n- [ ] Exclusions: what is not included\n- [ ] Price and taxes\n- [ ] Deposit and payment date\n- [ ] Delivery date and dependencies\n- [ ] Cancellation and rescheduling\n- [ ] Liability and customer property\n- [ ] Who owns the work or materials\n\n## Change rule\nAny change after agreement is confirmed in writing with price and date.\n\n## Records\nKeep the signed page, order confirmation and change notes together.\n"
+    },
+    {
+      "slug": "legal-risk-register",
+      "title": "Risk register",
+      "description": "CSV for risk, likelihood, impact, response, owner and review date.",
+      "format": "CSV",
+      "filename": "futurepreneur-legal-risk-register.csv",
+      "body": "risk,likelihood_1_5,impact_1_5,response,action,owner,review_date\nDryer fire,2,5,Reduce + transfer,Maintenance log + heat sensor + insurance review,Owner,2026-12-01\nCustomer data leak,3,4,Reduce,Restrict drive access and delete old lists,Owner,2026-11-15\nLate licence renewal,2,4,Avoid,Calendar with 60/14 day reminders,Admin,2026-11-30\n"
+    }
+  ],
+  "questions": [
+    { "id": "lg-q1", "kind": "quiz", "topic": "Contract basics", "prompt": "Which five terms prevent most small-business disputes?", "options": ["Logo, colour, font, slogan, tagline", "Scope, price, payment, cancellation, liability", "Followers, likes, shares, reach, saves", "Name, address, phone, email, website"], "correct": 1, "explanation": "These are the terms customers and owners argue about most." },
+    { "id": "lg-q2", "kind": "quiz", "topic": "Written terms", "prompt": "A customer agrees on WhatsApp. What should you do?", "options": ["Nothing, the chat is enough", "Send a one-page confirmation with scope, price, dates and ask them to agree", "Call them", "Start work and discuss later"], "correct": 1, "explanation": "A clear confirmation is easier to rely on than a buried chat." },
+    { "id": "lg-q3", "kind": "quiz", "topic": "Scope", "prompt": "Which promise creates unlimited work?", "options": ["Two revisions included", "Unlimited revisions until you are happy", "Delivery within 10 working days", "Deposit 30%"], "correct": 1, "explanation": "Open-ended promises have no boundary or price." },
+    { "id": "lg-q4", "kind": "quiz", "topic": "Deposits", "prompt": "What makes a deposit term usable?", "options": ["Calling it non-refundable", "Stating what it secures and when it is refundable", "Keeping it silent", "Making it 100%"], "correct": 1, "explanation": "The term must be clear and agreed before payment." },
+    { "id": "lg-q5", "kind": "quiz", "topic": "Compliance", "prompt": "What belongs in a compliance calendar?", "options": ["Only tax dates", "Item, authority, renewal date and owner", "A list of competitors", "Marketing campaigns"], "correct": 1, "explanation": "Ownership and dates prevent lapses." },
+    { "id": "lg-q6", "kind": "quiz", "topic": "Premises", "prompt": "You run a food business from home. What should you check?", "options": ["Whether the neighbours mind", "Whether the activity is permitted and insured at that address", "Whether you need a new logo", "Whether delivery is cheaper"], "correct": 1, "explanation": "Use and insurance restrictions can stop the business unexpectedly." },
+    { "id": "lg-q7", "kind": "quiz", "topic": "Risk response", "prompt": "Which is a valid risk response?", "options": ["Ignore it", "Avoid, reduce, transfer or accept with a plan", "Insure everything", "Blame the supplier"], "correct": 1, "explanation": "A deliberate response is better than unmanaged exposure." },
+    { "id": "lg-q8", "kind": "quiz", "topic": "Insurance", "prompt": "What should you check before relying on a policy?", "options": ["The colour of the certificate", "Exclusions against how you actually operate", "The insurer's social media", "The agent's car"], "correct": 1, "explanation": "Exclusions decide whether the risk was really transferred." },
+    { "id": "lg-q9", "kind": "quiz", "topic": "Customer data", "prompt": "What is the safest basic data rule?", "options": ["Collect everything in case it is useful", "Collect only what you need and limit access", "Share lists in group chats", "Keep data forever"], "correct": 1, "explanation": "Minimising collection and access reduces harm." },
+    { "id": "lg-q10", "kind": "quiz", "topic": "Disputes", "prompt": "What makes a complaint path effective?", "options": ["A promise to always refund", "Clear steps, a named owner and a response time", "Ignoring messages", "Public arguments"], "correct": 1, "explanation": "A predictable process reduces escalation." },
+    { "id": "lg-s1", "kind": "scenario", "topic": "Large order", "prompt": "A customer halves a large order two weeks before the event. What would have reduced the loss?", "options": ["A larger deposit only", "A cancellation and headcount term agreed upfront", "A verbal warning", "Ignoring it"], "correct": 1, "explanation": "The term must exist before the change happens." },
+    { "id": "lg-s2", "kind": "scenario", "topic": "Licence lapse", "prompt": "A renewal date is approaching and nobody owns it. What is the soundest fix?", "options": ["Wait for a reminder", "Assign an owner and set 60/14-day reminders", "Pay a fine later", "Ask a competitor"], "correct": 1, "explanation": "Ownership plus reminders prevents a trading interruption." },
+    { "id": "lg-s3", "kind": "scenario", "topic": "Risk ranking", "prompt": "You can only afford one new control. Which risk should you address first?", "options": ["The most likely minor annoyance", "The highest impact risk that is realistically possible", "The cheapest fix", "The one a friend mentioned"], "correct": 1, "explanation": "Cost of impact, not frequency alone, should drive the first spend." },
+    { "id": "lg-s4", "kind": "scenario", "topic": "Data handling", "prompt": "A part-timer needs to follow up with customers. What is the safest approach?", "options": ["Send the full customer list to a group chat", "Give limited access to only the needed records", "Share your personal login", "Print everything"], "correct": 1, "explanation": "Least access for the shortest time is the basic principle." },
+    { "id": "lg-s5", "kind": "scenario", "topic": "Dispute", "prompt": "A customer demands a full refund after using most of the service. What should you do first?", "options": ["Refuse and block them", "Follow your published complaint path and check the agreed terms", "Pay immediately", "Post about it"], "correct": 1, "explanation": "Terms plus a process give you a fair, defensible answer." }
+  ]
+}

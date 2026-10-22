@@ -1,0 +1,234 @@
+{
+  "id": "systems",
+  "component": "systems",
+  "title": "Systems & SOP",
+  "tagline": "Write it once, so the business stops living in your head.",
+  "level": "Foundation",
+  "hours": "45–60 min",
+  "outcome": "By the end, you will have one usable SOP, one checklist, a document register, and a review rhythm that keeps them current.",
+  "intro": [
+    "A system is not software. It is the agreed way a repeated piece of work gets done, written somewhere other than the owner's memory. Without it, quality depends on who is working and the owner becomes the emergency contact for everything.",
+    "This module keeps documentation small: one page per process, written with the person who does the work, stored in one place, and reviewed when reality changes."
+  ],
+  "practical": {
+    "title": "Practical assignment: one process, written properly",
+    "intro": "Choose a process that is repeated, risky, or already delegated. A reviewer scores each criterion from 0 to 4; the module passes at an average of 3 or more, with no criterion below 2.",
+    "criteria": [
+      { "id": "scope", "label": "Scope", "hint": "The process is repeated or risky, with a clear start and end." },
+      { "id": "sop_quality", "label": "SOP quality", "hint": "Steps are specific, ordered, and usable by someone new." },
+      { "id": "findability", "label": "Findability", "hint": "The document has one home, a name, an owner and a version." },
+      { "id": "review", "label": "Review", "hint": "A test run and a review trigger are defined." }
+    ],
+    "prompts": [
+      { "id": "p1", "criterion": "scope", "label": "Which process did you document, and why this one?", "placeholder": "Trigger, end point, how often it runs, what goes wrong today." },
+      { "id": "p2", "criterion": "sop_quality", "label": "Paste or summarise the SOP steps.", "placeholder": "Numbered steps, owner, materials, exception path, definition of done." },
+      { "id": "p3", "criterion": "findability", "label": "Where does it live, what is it called, and who owns it?", "placeholder": "Folder link, file name, version, owner, who has access." },
+      { "id": "p4", "criterion": "review", "label": "How did you test it, and when will you review it?", "placeholder": "Who followed it cold, what confused them, next review date or trigger." }
+    ]
+  },
+  "lessons": [
+    {
+      "id": "sy1",
+      "title": "Find the work worth writing down",
+      "minutes": 10,
+      "summary": "Document the repeated, the risky and the delegated — not everything.",
+      "explanation": [
+        "Documentation fails when it tries to cover everything. A small business needs a handful of written processes, chosen by three tests: the work repeats often, a mistake is expensive or unsafe, or someone else already does it without a clear standard.",
+        "Separate three things that often get mixed together. A policy says what is allowed. A procedure, or SOP, says how a task is done step by step. A checklist is a short verification at a specific moment. Writing a policy when you need a checklist creates paperwork nobody uses.",
+        "Start with the process that causes the most repeat questions. If staff ask you the same thing weekly, that is a missing SOP. If a customer complaint repeats, that is a missing standard. Write one page, not a manual."
+      ],
+      "example": {
+        "title": "Aina's Kitchen — the same three questions every morning",
+        "text": "Aina was asked the same things every morning: how much rice to cook, which containers to use, and what to do when a delivery is late. She wrote one opening checklist and one one-page SOP for late deliveries. The questions stopped within a week. She did not document cooking technique or supplier negotiation, because those were not repeated daily problems. Three documents covered the real friction."
+      },
+      "do": [
+        "Pick work that repeats weekly or more.",
+        "Prioritise anything where a mistake costs money, safety or a customer.",
+        "Document work already delegated, so quality stops depending on memory.",
+        "Start with one page for one process."
+      ],
+      "dont": [
+        "Do not write a manual for the whole business before fixing one flow.",
+        "Do not confuse a policy with a procedure.",
+        "Do not document work that changes every time it runs."
+      ],
+      "why": "A small set of living documents removes repeat questions and reduces dependence on the owner. Volume is not the goal; use is.",
+      "mistakes": [
+        "Writing documents for work nobody does yet.",
+        "Copying a corporate template that is longer than the process.",
+        "Documenting only the ideal path and ignoring exceptions."
+      ],
+      "exercise": {
+        "prompt": "Choose the first process to document.",
+        "steps": [
+          "List the five questions staff ask you most often.",
+          "List the three mistakes that cost the most.",
+          "Circle any item that appears on both lists.",
+          "Choose one process with a clear start and end.",
+          "Write its trigger and finish line in one sentence each."
+        ]
+      }
+    },
+    {
+      "id": "sy2",
+      "title": "Write an SOP people actually follow",
+      "minutes": 12,
+      "summary": "One page, numbered steps, a real owner, and an exception path.",
+      "explanation": [
+        "A usable SOP answers six questions: when does this start, who owns it, what is needed, what are the steps in order, what does done look like, and what do you do when something goes wrong. If any of these is missing, the document creates arguments instead of consistency.",
+        "Write with the person who does the work, not about them. Their workarounds are the real process. Keep sentences short and start each step with a verb. Use a photo or a sample where a picture removes ambiguity, such as the correct packing layout or the acceptable finish.",
+        "Test the SOP by asking someone who has never done the task to follow it without help. Every question they ask is a gap. Revise once, then publish. A document that has never been tested is a draft, not a standard."
+      ],
+      "example": {
+        "title": "Cleaning company — one page for a site handover",
+        "text": "A cleaning company had a four-page SOP nobody read. The supervisor rewrote it as one page: arrive and sign in, check the supply box, clean in the order listed, take two photos, report damage, sign out. It added an exception line: if a room is locked, photograph the door and message the client before leaving. A new cleaner followed it cold and finished 20 minutes faster than the usual informal handover, with no missed rooms."
+      },
+      "do": [
+        "Write the trigger, owner, materials, numbered steps and definition of done.",
+        "Include the exception path: what to do when the normal flow breaks.",
+        "Use photos or samples for anything hard to describe.",
+        "Test with someone new and fix every question they ask."
+      ],
+      "dont": [
+        "Do not write paragraphs where a numbered list works.",
+        "Do not hide the SOP in a folder only the owner can find.",
+        "Do not publish without a test run."
+      ],
+      "why": "A tested one-page SOP produces the same result across people and shifts. It also gives you a fair basis for training and correction.",
+      "mistakes": [
+        "Writing steps at the wrong level — too vague to follow, too detailed to finish.",
+        "Forgetting the exception path, so staff improvise under pressure.",
+        "Never updating the SOP after the process changes."
+      ],
+      "exercise": {
+        "prompt": "Draft and test a one-page SOP.",
+        "steps": [
+          "Write the trigger and finish line.",
+          "List materials and the owner.",
+          "Write 6–10 numbered steps, each starting with a verb.",
+          "Add an exception path and a definition of done.",
+          "Ask someone new to follow it and note every question."
+        ]
+      }
+    },
+    {
+      "id": "sy3",
+      "title": "One home for every document",
+      "minutes": 10,
+      "summary": "Checklists, templates and SOPs need a single address and a clear owner.",
+      "explanation": [
+        "A good document in three different WhatsApp groups is not a system. People need one predictable place to look, names that make sense without opening the file, and permission that does not require asking the owner.",
+        "Keep a simple document register: name, type, owner, location, version and review date. This is not bureaucracy; it prevents two versions of the same checklist being used on different shifts. Name files with the process first and the version second, for example 'open-shop-checklist-v3'.",
+        "Checklists are the most-used documents in a small business, so keep them short and place them where the work happens: printed at the packing table, laminated in the kitchen, or pinned in the shared folder staff already open. If a checklist needs a login three clicks deep, it will not be used during a rush."
+      ],
+      "example": {
+        "title": "Online seller — returns handled three different ways",
+        "text": "An online seller had return instructions in a chat, a notebook and one staff member's memory. Two customers received different answers in the same week. The owner created one returns SOP, one returns checklist and a register entry naming the owner. The checklist was printed at the packing table and linked in the shared folder. Return handling time fell from two days to same-day, and the disagreement disappeared."
+      },
+      "do": [
+        "Choose one home for documents and tell everyone where it is.",
+        "Name files by process and version.",
+        "Record an owner and a review date for each document.",
+        "Put checklists physically or digitally at the point of work."
+      ],
+      "dont": [
+        "Do not keep the only copy on the owner's phone.",
+        "Do not use names like 'final-final-new'.",
+        "Do not require the owner to unlock every document."
+      ],
+      "why": "Findability decides whether a system exists in practice. A document nobody can locate is equivalent to no document.",
+      "mistakes": [
+        "Storing documents in a personal chat thread.",
+        "Giving everyone edit access so versions drift.",
+        "Creating a deep folder structure nobody can navigate."
+      ],
+      "exercise": {
+        "prompt": "Build a document register with your five most important documents.",
+        "steps": [
+          "List the documents staff actually need.",
+          "For each, write the owner and current location.",
+          "Rename each file using process + version.",
+          "Choose one home and move the files there.",
+          "Delete or archive duplicates so only one version remains."
+        ]
+      }
+    },
+    {
+      "id": "sy4",
+      "title": "Audit lightly, improve on triggers",
+      "minutes": 10,
+      "summary": "Review systems when reality changes, not on a paperwork calendar.",
+      "explanation": [
+        "A system that is never reviewed drifts away from reality. But a heavy audit schedule also fails in a small business. Use triggers instead: a repeat mistake, a new staff member, a supplier change, a customer complaint, or a process that now takes noticeably longer.",
+        "A light audit asks three questions: is the document still accurate, is it being used, and does the result meet the standard? Check the output, not the paperwork. If the checklist is completed but errors continue, the checklist is checking the wrong thing.",
+        "Give one person ownership of the system, including the authority to update it. A system owned by everyone is maintained by nobody. Record changes in a version line so people can tell whether they are looking at the current standard."
+      ],
+      "example": {
+        "title": "Café — the checklist was complete, the complaints continued",
+        "text": "A café's opening checklist was always ticked, yet customers kept receiving cold pastries. The audit looked at the output rather than the ticks: the checklist asked 'oven on?' but not 'oven reached temperature?'. Staff ticked the box while the oven was still heating. The owner changed one line to 'record temperature before the first bake' and added a photo of the dial. Complaints stopped without adding a single new document."
+      },
+      "do": [
+        "Review a process after a repeat mistake or a major change.",
+        "Check outputs, not just completed checklists.",
+        "Give one named owner the authority to update documents.",
+        "Record the version and date of every change."
+      ],
+      "dont": [
+        "Do not audit every document on a rigid monthly schedule.",
+        "Do not assume a tick means the standard was met.",
+        "Do not let multiple people publish competing versions."
+      ],
+      "why": "Light, trigger-based reviews keep documents true and usable. The point is a reliable result, not a complete folder.",
+      "mistakes": [
+        "Rewriting the SOP after every one-off problem.",
+        "Auditing only during a quiet season and missing peak failures.",
+        "Treating the audit as a test of staff rather than of the system."
+      ],
+      "exercise": {
+        "prompt": "Audit one system against its output.",
+        "steps": [
+          "Pick one SOP or checklist in active use.",
+          "Observe the actual output for one week.",
+          "Compare the output with the definition of done.",
+          "Find one line that is missing, vague or checking the wrong thing.",
+          "Update the document, bump the version and tell the owner."
+        ]
+      }
+    }
+  ],
+  "templates": [
+    {
+      "slug": "systems-sop-template",
+      "title": "One-page SOP template",
+      "description": "Trigger, owner, materials, numbered steps, exceptions and definition of done.",
+      "format": "Markdown",
+      "filename": "futurepreneur-systems-sop-template.md",
+      "body": "# SOP: [process name]\n\nVersion:\nOwner:\nLast reviewed:\n\n## When this starts\n\n## When this ends (definition of done)\n\n## What you need\n- \n\n## Steps\n1. \n2. \n3. \n4. \n5. \n\n## If something goes wrong\n- Problem:\n- Do this:\n- Tell:\n\n## How we know it worked\n- Check:\n"
+    },
+    {
+      "slug": "systems-document-register",
+      "title": "Document register",
+      "description": "CSV register of SOPs, checklists and templates with owner, location and review date.",
+      "format": "CSV",
+      "filename": "futurepreneur-systems-document-register.csv",
+      "body": "name,type,owner,location,version,last_reviewed,review_trigger\nopen-shop-checklist,Checklist,Supervisor,/shared/operations,3,2026-11-01,New staff or repeat opening error\nlate-delivery-sop,SOP,Owner,/shared/operations,1,2026-11-01,Supplier change or two late deliveries\n"
+    }
+  ],
+  "questions": [
+    { "id": "sy-q1", "kind": "quiz", "topic": "What to document", "prompt": "Which process should be documented first?", "options": ["The one the owner enjoys most", "A repeated process where mistakes are costly", "A task done once a year", "A process that changes every time"], "correct": 1, "explanation": "Repeated, risky or delegated work gives the highest return." },
+    { "id": "sy-q2", "kind": "quiz", "topic": "Policy vs SOP", "prompt": "What is the difference between a policy and an SOP?", "options": ["There is none", "A policy says what is allowed; an SOP says how a task is done", "An SOP is longer", "A policy is only for staff"], "correct": 1, "explanation": "Mixing them creates documents that answer the wrong question." },
+    { "id": "sy-q3", "kind": "quiz", "topic": "SOP content", "prompt": "Which belongs in a usable SOP?", "options": ["Company history", "Trigger, owner, steps, exception path and definition of done", "A list of every possible customer", "The owner's CV"], "correct": 1, "explanation": "These six elements make the process executable." },
+    { "id": "sy-q4", "kind": "quiz", "topic": "Testing", "prompt": "How do you know an SOP is usable?", "options": ["It looks professional", "Someone new can follow it without asking for help", "It is longer than one page", "The owner approves it"], "correct": 1, "explanation": "A cold test by a new person reveals the real gaps." },
+    { "id": "sy-q5", "kind": "quiz", "topic": "Exceptions", "prompt": "Why include an exception path?", "options": ["To make the document longer", "So staff know what to do when the normal flow breaks", "To avoid training", "To blame suppliers"], "correct": 1, "explanation": "Without an exception path, staff improvise under pressure." },
+    { "id": "sy-q6", "kind": "quiz", "topic": "Checklists", "prompt": "Where should a daily checklist live?", "options": ["In the owner's email", "At the point of work, where the task happens", "In a locked cabinet", "On a personal phone"], "correct": 1, "explanation": "If it is hard to reach during the rush, it will not be used." },
+    { "id": "sy-q7", "kind": "quiz", "topic": "Document register", "prompt": "What should a document register contain?", "options": ["Only file names", "Name, type, owner, location, version and review date", "Every email ever sent", "Salaries"], "correct": 1, "explanation": "Ownership and version prevent duplicate or stale documents." },
+    { "id": "sy-q8", "kind": "quiz", "topic": "Audit", "prompt": "What should an audit check first?", "options": ["Whether boxes are ticked", "Whether the output meets the standard", "Whether the folder is tidy", "Whether the document is long"], "correct": 1, "explanation": "Ticks can be completed while the real result is still wrong." },
+    { "id": "sy-q9", "kind": "quiz", "topic": "Review trigger", "prompt": "Which is a good trigger to review an SOP?", "options": ["A fixed monthly schedule for every document", "A repeat mistake or a major process change", "A new logo", "A quiet week"], "correct": 1, "explanation": "Trigger-based reviews keep effort focused where reality changed." },
+    { "id": "sy-q10", "kind": "quiz", "topic": "Ownership", "prompt": "Who should own a system?", "options": ["Everyone", "One named person with authority to update it", "The newest staff member", "Nobody"], "correct": 1, "explanation": "Shared ownership usually means no maintenance." },
+    { "id": "sy-s1", "kind": "scenario", "topic": "Repeat questions", "prompt": "Staff ask the same three questions every morning. What is the best response?", "options": ["Answer faster", "Write one checklist and one short SOP for those three points", "Hold a long training session", "Stop answering"], "correct": 1, "explanation": "Repeated questions point to a missing standard, not a training gap." },
+    { "id": "sy-s2", "kind": "scenario", "topic": "Cold test", "prompt": "A new staff member follows your SOP and asks five questions. What do you do?", "options": ["Tell them to ask a senior next time", "Treat each question as a gap and revise the SOP", "Rewrite the whole manual", "Ignore it"], "correct": 1, "explanation": "The cold test is the cheapest way to find missing steps." },
+    { "id": "sy-s3", "kind": "scenario", "topic": "Duplicate versions", "prompt": "Two shifts use different opening checklists. What is the fix?", "options": ["Let each shift choose", "Keep one version in one home, archive the duplicate and name an owner", "Print both", "Stop using checklists"], "correct": 1, "explanation": "One home, one version and one owner removes the drift." },
+    { "id": "sy-s4", "kind": "scenario", "topic": "Checklist failure", "prompt": "A checklist is always ticked but the same error repeats. What is the likely problem?", "options": ["Staff are dishonest", "The checklist verifies the wrong thing", "The checklist is too short", "There are too few documents"], "correct": 1, "explanation": "Audit the output, then change the check so it catches the actual failure." },
+    { "id": "sy-s5", "kind": "scenario", "topic": "Documentation scope", "prompt": "A five-person business asks how many SOPs it needs. What is the soundest answer?", "options": ["One for every task", "Start with the handful of repeated or risky processes, then add when a trigger appears", "None, until they reach fifty staff", "A full manual before opening"], "correct": 1, "explanation": "Documentation should follow friction and risk, not an arbitrary count." }
+  ]
+}

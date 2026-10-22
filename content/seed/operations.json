@@ -1,0 +1,234 @@
+{
+  "id": "operations",
+  "component": "operations",
+  "title": "Operations & Quality",
+  "tagline": "Deliver the same good result every time, without the owner standing over it.",
+  "level": "Foundation",
+  "hours": "50–65 min",
+  "outcome": "By the end, you will have a one-page process map, an error log, two checks staff will actually use, and a capacity and supplier plan.",
+  "intro": [
+    "Operations is the repeatable path from a customer request to a delivered result. When something goes wrong repeatedly, the cause is usually a missing standard, a missing check, or a capacity mismatch — not a person who does not care.",
+    "This module shows you how to see that path, measure where it breaks, and add the smallest possible control that fixes it. You will use your own busiest process as the case study."
+  ],
+  "practical": {
+    "title": "Practical assignment: stabilise one process",
+    "intro": "Pick the process that causes you the most repeat problems. A reviewer scores each criterion from 0 to 4; the module passes at an average of 3 or more, with no criterion below 2.",
+    "criteria": [
+      { "id": "process_clarity", "label": "Process clarity", "hint": "Steps, owners and handoffs are clear enough for someone else to follow." },
+      { "id": "error_evidence", "label": "Error evidence", "hint": "The failure is measured, with a cause identified rather than a person blamed." },
+      { "id": "checks", "label": "Checks", "hint": "A specific check at the point of failure, short enough to be used every time." },
+      { "id": "capacity_supplier", "label": "Capacity & suppliers", "hint": "A realistic capacity number and a plan for the critical supplier." }
+    ],
+    "prompts": [
+      { "id": "p1", "criterion": "process_clarity", "label": "Map the process from request to delivery: steps, owners and handoffs.", "placeholder": "List 5–8 steps. Mark who hands what to whom and where information is written down." },
+      { "id": "p2", "criterion": "error_evidence", "label": "What goes wrong, how often, and what is the actual cause?", "placeholder": "Use two weeks of counts. Show the cause, not the person." },
+      { "id": "p3", "criterion": "checks", "label": "Design the check you will add, and where it sits.", "placeholder": "One page maximum. Say exactly when it is completed and by whom." },
+      { "id": "p4", "criterion": "capacity_supplier", "label": "Show your capacity limit and your critical-supplier plan.", "placeholder": "Units per hour, peak demand, bottleneck, backup supplier and reorder point." }
+    ]
+  },
+  "lessons": [
+    {
+      "id": "op1",
+      "title": "Map the work, not the org chart",
+      "minutes": 11,
+      "summary": "A one-page process map shows where work, information and responsibility change hands.",
+      "explanation": [
+        "Most owners can describe what their business does, but not the exact sequence of steps that produces one order. That gap matters because problems rarely appear at the step where they are noticed. They start earlier, usually at a handoff where information is passed verbally or not at all.",
+        "A process map is deliberately simple: five to eight steps from customer request to delivered result, who owns each step, what goes in, what comes out, and where it is handed to someone else. It is not a manual and it should not take a week. One page you can point at during a busy shift beats a thirty-page document nobody opens.",
+        "Draw the map as it actually runs today, including the workarounds. If staff keep a second notebook, write in a group chat, or call you to confirm, those are part of the real process. The workarounds are often the strongest clue about which step is broken."
+      ],
+      "example": {
+        "title": "Laundry pickup — three handoffs, no count",
+        "text": "A laundry service kept losing garments. The owner blamed staff for carelessness. Mapping the flow showed the real issue: garments moved from the shop counter to a driver, from the driver to the plant, and from the plant back to the shop. Nobody counted at any handoff, so a missing item could have disappeared at three different points. A simple counted handover at each point — number of pieces and a signature — removed almost all losses within two weeks, without hiring anyone."
+      },
+      "do": [
+        "Choose one process that causes repeat complaints or rework.",
+        "List five to eight steps from request to delivery, in the order they actually happen.",
+        "Mark every handoff: who passes what to whom, and where it is recorded.",
+        "Write down the workarounds staff use, because they reveal weak steps."
+      ],
+      "dont": [
+        "Do not map the ideal process you wish you had; map today's reality.",
+        "Do not create a thirty-page manual before fixing one flow.",
+        "Do not confuse a department with a process."
+      ],
+      "why": "A shared map gives everyone the same picture of the work. It makes handoffs visible, which is where most errors, delays and lost information begin.",
+      "mistakes": [
+        "Mapping only the kitchen or only the front counter, so the handoff between them is invisible.",
+        "Leaving out the customer's part of the process, such as placing the order or confirming a slot.",
+        "Treating the map as a one-off document instead of something to update when the process changes."
+      ],
+      "exercise": {
+        "prompt": "Map your busiest process on one page.",
+        "steps": [
+          "Pick the process with the most repeat complaints or rework.",
+          "Write each step on a sticky note or a row in a sheet.",
+          "Add the owner and the output for each step.",
+          "Circle every handoff and note whether it is recorded anywhere.",
+          "Mark the two steps where you personally intervene most often."
+        ]
+      }
+    },
+    {
+      "id": "op2",
+      "title": "Find where errors actually happen",
+      "minutes": 11,
+      "summary": "Count the failure for two weeks, then find the cause in the process rather than in a person.",
+      "explanation": [
+        "Operations improve when errors become numbers. 'Staff keep making mistakes' cannot be fixed; 'nine wrong orders a week, seven of them between 12pm and 2pm' can. Counting for two weeks turns a feeling into a pattern you can act on.",
+        "The next step is to ask why until you reach something you can change. A wrong order may happen because the order was taken verbally during the rush, because two people write in the same book, or because the menu changed and the slip was not updated. Each cause points to a different control.",
+        "This is not about removing accountability. It is about separating two questions: is this a person choosing not to follow a standard, or is there no standard that survives a busy shift? Most small-business errors are the second kind. Fix the process first, then coach the person if the behaviour continues."
+      ],
+      "example": {
+        "title": "Café — nine wrong orders a week",
+        "text": "A café logged every wrong order for two weeks. Nine a week, with seven occurring between 12pm and 2pm. The cause was not memory or effort: orders were called verbally to the kitchen during the rush, and two staff shared one notepad. The café introduced a single numbered order slip, written by the person taking the order and clipped to the tray. Wrong orders fell to two a week, and the remaining two were traced to a modified menu item that had not been updated on the slip."
+      },
+      "do": [
+        "Define the failure precisely: what counts as an error, a delay or a rework.",
+        "Log every occurrence for two weeks with time, step and a short note.",
+        "Group the counts by time, step, person or product to find the pattern.",
+        "Ask why until you reach a cause you can change in the process."
+      ],
+      "dont": [
+        "Do not rely on memory or a single bad week.",
+        "Do not stop at 'careless' or 'lazy' — those are not causes you can fix.",
+        "Do not change three things at once, or you will not know what worked."
+      ],
+      "why": "Measured errors show whether a change actually helped. Without a count, every fix is an opinion and the same problem returns after a busy month.",
+      "mistakes": [
+        "Logging only the errors that reach the customer, not the near-misses caught by staff.",
+        "Recording the person's name but not the time and step, which hides the pattern.",
+        "Fixing the symptom (remaking the order) without changing the step that caused it."
+      ],
+      "exercise": {
+        "prompt": "Measure one failure for two weeks.",
+        "steps": [
+          "Write a one-sentence definition of the error you will count.",
+          "Create a simple log: date, time, step, what happened, who noticed.",
+          "Ask staff to record near-misses too, without punishment.",
+          "At the end of two weeks, group the counts by time and step.",
+          "Write the most likely process cause and one change to test."
+        ]
+      }
+    },
+    {
+      "id": "op3",
+      "title": "Build checks people actually use",
+      "minutes": 12,
+      "summary": "A short check at the point of failure beats a long inspection at the end.",
+      "explanation": [
+        "Most quality systems fail because the check arrives too late or costs too much attention. Checking every output at the end catches problems after the work is done. A short check at the step where errors begin prevents them while they are still cheap to fix.",
+        "Good checks share three properties: they happen at the point of work, they take seconds rather than minutes, and they make the correct action the easiest one. A laminated photo at the packing station showing the correct items is a better check than a monthly audit. A counted handover is better than a reminder to be careful.",
+        "Design the check with the person who does the work. If it adds more than a few seconds per order, it will be skipped during the rush — and a skipped check is worse than no check, because it creates false confidence."
+      ],
+      "example": {
+        "title": "Cleaning crew — photo proof at handover",
+        "text": "A cleaning company kept receiving complaints about bathrooms that had been 'done'. Supervisors inspected at the end of the day, by which time the crew had left and the evidence was gone. The company added a two-photo check at the point of completion: one wide shot and one of the sink area, uploaded to a shared album. The check took about twenty seconds per site. Complaints fell from six a month to one, and the photos also settled disputes about whether a room had been cleaned."
+      },
+      "do": [
+        "Place the check at the step where the error starts, not at final delivery.",
+        "Keep it under a minute; ideally under ten seconds.",
+        "Make the correct action physically easier than the incorrect one.",
+        "Pilot for two weeks and ask staff where the check slows them down."
+      ],
+      "dont": [
+        "Do not add a long checklist that duplicates what people already know.",
+        "Do not use checks to punish individuals; people will hide errors instead.",
+        "Do not inspect only at the end and call it quality control."
+      ],
+      "why": "Checks protect the customer and the team. They also reduce rework, which is hidden cost: remaking an order, revisiting a site or apologising costs more than the original job.",
+      "mistakes": [
+        "Writing a checklist for everything instead of the two points that actually fail.",
+        "Storing the checklist in an office folder nobody opens during a shift.",
+        "Adding checks without removing an older, redundant step."
+      ],
+      "exercise": {
+        "prompt": "Design one check and test it for a week.",
+        "steps": [
+          "Pick the step with the highest error count from your log.",
+          "Write a check that takes under 30 seconds and records a yes/no or a count.",
+          "Decide who completes it and exactly when.",
+          "Run it for one week and count both errors and skipped checks.",
+          "Keep, simplify or remove the check based on the result."
+        ]
+      }
+    },
+    {
+      "id": "op4",
+      "title": "Capacity, queues and suppliers",
+      "minutes": 12,
+      "summary": "Know your real capacity, protect the bottleneck, and never depend on one critical supplier.",
+      "explanation": [
+        "Capacity is the maximum you can deliver at the quality you promise, not the maximum you can deliver once under pressure. A kitchen that can produce 40 lunch sets an hour at a calm pace may produce 55 in a rush, but with more mistakes and exhausted staff. Knowing the honest number lets you accept or refuse work before it damages the business.",
+        "Every process has a bottleneck: the step that limits the whole flow. Adding staff elsewhere usually makes queues worse, because work piles up faster in front of the same bottleneck. Find the step with the longest queue or the highest utilisation, and fix that first — add capacity, move work away from it, or schedule demand more evenly.",
+        "Suppliers are part of your operation. A single source for packaging, a key ingredient or a critical part can stop delivery entirely. You do not need a second supplier for everything; identify the two or three items that would halt you, agree a quality specification, and keep a realistic backup or buffer."
+      ],
+      "example": {
+        "title": "Catering kitchen — 40 sets an hour, 60 at peak",
+        "text": "A catering kitchen promised 60 lunch sets between 12pm and 1pm, but its honest capacity was 40 an hour. The bottleneck was packing: two staff could pack 40 boxes an hour, while the cooking line could produce 55. Overtime and rushing produced missing items. The owner moved one prep worker to packing during the peak, pre-packed cold items before 11am, and capped peak orders at 45. Revenue per hour rose because fewer orders were remade and fewer customers received the wrong box."
+      },
+      "do": [
+        "Measure units per hour at a normal pace, including checks and packing.",
+        "Identify the bottleneck by the longest queue or the busiest step.",
+        "Shift work away from the bottleneck before adding staff.",
+        "Name your two or three critical suppliers and set a reorder point."
+      ],
+      "dont": [
+        "Do not calculate capacity from your best-ever hour.",
+        "Do not add people upstream of the bottleneck and expect more output.",
+        "Do not rely on one supplier for an item that would stop delivery."
+      ],
+      "why": "Honest capacity protects quality and cash. Overpromising creates rework, refunds and stressed staff; a supplier gap can stop revenue entirely for days.",
+      "mistakes": [
+        "Confusing demand with capacity: accepting every order and hoping the team copes.",
+        "Buying more equipment when the real limit is a manual packing step.",
+        "Negotiating supplier price but never agreeing a quality specification or backup."
+      ],
+      "exercise": {
+        "prompt": "Calculate capacity and protect one critical supplier.",
+        "steps": [
+          "Time your process for one normal hour and count completed units.",
+          "Identify the step with the longest queue or highest utilisation.",
+          "List one change that adds capacity at that step without new staff.",
+          "Name the item that would stop delivery if it ran out.",
+          "Set a reorder point and identify one backup source with a quality check."
+        ]
+      }
+    }
+  ],
+  "templates": [
+    {
+      "slug": "operations-process-map",
+      "title": "One-page process map",
+      "description": "Steps, owners, inputs, outputs, handoffs and failure points for one process.",
+      "format": "Markdown",
+      "filename": "futurepreneur-operations-process-map.md",
+      "body": "# One-page process map\n\nProcess:\nOwner:\nTrigger (customer request):\nDelivered result:\n\n| # | Step | Owner | Input | Output | Handoff to | Recorded? |\n|---|------|-------|-------|--------|------------|-----------|\n| 1 | | | | | | |\n| 2 | | | | | | |\n| 3 | | | | | | |\n| 4 | | | | | | |\n| 5 | | | | | | |\n\n## Failure points\n- Where errors are noticed:\n- Where errors actually start:\n- Workarounds staff use:\n\n## Capacity\n- Units per normal hour:\n- Bottleneck step:\n- Peak demand:\n"
+    },
+    {
+      "slug": "operations-quality-log",
+      "title": "Error & quality log",
+      "description": "Two-week CSV log for errors and near-misses, grouped by time and step.",
+      "format": "CSV",
+      "filename": "futurepreneur-operations-quality-log.csv",
+      "body": "date,time,step,what_happened,near_miss,noticed_by,cause,action\n2026-11-01,12:40,Packing,One box missing drink,yes,Driver,Verbal order during rush,Added packing check\n2026-11-01,13:05,Handover,Garment count mismatch,no,Plant staff,No counted handover,Counted handover trial\n"
+    }
+  ],
+  "questions": [
+    { "id": "op-q1", "kind": "quiz", "topic": "Process mapping", "prompt": "What is the first step to fix a process that keeps failing?", "options": ["Buy new equipment", "Map the process as it actually runs and find where it breaks", "Retrain everyone", "Add a supervisor"], "correct": 1, "explanation": "You cannot fix a flow you cannot see; map reality first, including workarounds." },
+    { "id": "op-q2", "kind": "quiz", "topic": "Handoffs", "prompt": "Why are handoffs the most common place for errors?", "options": ["Staff are careless", "Information and responsibility change hands, often without a record", "Customers change their minds", "Equipment fails"], "correct": 1, "explanation": "A handoff is where ownership and information transfer, so anything unrecorded can be lost." },
+    { "id": "op-q3", "kind": "quiz", "topic": "Error measurement", "prompt": "Which is the most useful error record?", "options": ["A note that staff keep making mistakes", "Date, time, step, what happened and who noticed", "A list of customer complaints only", "A monthly revenue report"], "correct": 1, "explanation": "Time and step reveal the pattern; names alone do not." },
+    { "id": "op-q4", "kind": "quiz", "topic": "Root cause", "prompt": "What does asking 'why' repeatedly help you find?", "options": ["Someone to blame", "A process cause you can change", "A reason to raise prices", "A new supplier"], "correct": 1, "explanation": "The goal is a controllable cause, not a person to punish." },
+    { "id": "op-q5", "kind": "quiz", "topic": "Checks", "prompt": "Where should a quality check sit?", "options": ["At final delivery", "At the step where the error starts", "In a monthly meeting", "In the owner's head"], "correct": 1, "explanation": "Checking at the point of failure catches problems while they are still cheap to fix." },
+    { "id": "op-q6", "kind": "quiz", "topic": "Checklist design", "prompt": "What makes a check likely to be used during a rush?", "options": ["It is long and detailed", "It takes seconds, sits at the work point and is easy to complete", "It is stored in the office", "It is reviewed quarterly"], "correct": 1, "explanation": "Short, local and easy checks survive busy periods; long ones get skipped." },
+    { "id": "op-q7", "kind": "quiz", "topic": "Capacity", "prompt": "What is honest capacity?", "options": ["The best hour you ever had", "The maximum you can deliver at promised quality at a normal pace", "The number of staff multiplied by hours", "Your competitor's output"], "correct": 1, "explanation": "Capacity must include checks, packing and a sustainable pace, not a one-off sprint." },
+    { "id": "op-q8", "kind": "quiz", "topic": "Bottleneck", "prompt": "Packing can handle 40 orders an hour; the kitchen can produce 55. What limits output?", "options": ["The kitchen", "Packing", "The supplier", "The customer"], "correct": 1, "explanation": "The slowest step sets the throughput of the whole process." },
+    { "id": "op-q9", "kind": "quiz", "topic": "Queues", "prompt": "You add a second cook but the queue at packing stays the same. Why?", "options": ["The cook is slow", "Work now arrives faster at the same bottleneck", "Customers order more", "The queue is imaginary"], "correct": 1, "explanation": "Adding capacity upstream of the bottleneck increases work-in-progress, not output." },
+    { "id": "op-q10", "kind": "quiz", "topic": "Suppliers", "prompt": "Which supplier needs a backup plan first?", "options": ["The cheapest one", "The one whose failure would stop delivery", "The newest one", "The one with the longest contract"], "correct": 1, "explanation": "Protect single points of failure first, not every line item." },
+    { "id": "op-s1", "kind": "scenario", "topic": "Lost items", "prompt": "A laundry loses garments between pickup and delivery. What is the soundest first fix?", "options": ["Ask staff to be more careful", "Add a counted, signed handover at each transfer point", "Buy a new van", "Offer refunds faster"], "correct": 1, "explanation": "The loss happens at unrecorded handoffs; a count and signature closes the gap." },
+    { "id": "op-s2", "kind": "scenario", "topic": "Lunch rush", "prompt": "A café is slow at lunch. Prep is fast, plating is fast, but one person packs every takeaway order. What should the owner do first?", "options": ["Hire another cook", "Move a staff member to packing during the peak", "Reduce the menu", "Open later"], "correct": 1, "explanation": "Packing is the bottleneck; adding capacity there raises throughput without new equipment." },
+    { "id": "op-s3", "kind": "scenario", "topic": "Quality checks", "prompt": "A cleaning company gets repeat complaints after crews leave. What check is most likely to work?", "options": ["A monthly supervisor audit", "A 20-second photo check at completion", "A longer training session", "A customer survey"], "correct": 1, "explanation": "A check at the point of work prevents the complaint rather than discovering it later." },
+    { "id": "op-s4", "kind": "scenario", "topic": "Supplier risk", "prompt": "One packaging supplier raises prices twice and runs out once. What is the best response?", "options": ["Accept it and absorb the cost", "Agree a specification, set a reorder point and qualify a backup supplier", "Switch to the cheapest option immediately", "Buy a year of stock"], "correct": 1, "explanation": "A spec plus reorder point plus backup reduces both quality and supply risk." },
+    { "id": "op-s5", "kind": "scenario", "topic": "Wrong items", "prompt": "An online seller sends wrong items about twice a week. Orders are picked from memory. What is the soundest fix?", "options": ["Ask pickers to focus harder", "Use a printed pick list and a scan or tick check before sealing", "Offer partial refunds", "Add more products"], "correct": 1, "explanation": "A pick list plus a sealing check makes the correct action easier than memory." }
+  ]
+}
