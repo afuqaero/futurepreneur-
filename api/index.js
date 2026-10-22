@@ -120,7 +120,7 @@ function adminClient() {
   });
 }
 
-export default async function handler(request) {
+async function handle(request) {
   if (!supabaseUrl || !serviceRoleKey || !process.env.SUPABASE_ANON_KEY) {
     return json({ error: 'Supabase environment variables are not configured.' }, 503);
   }
@@ -246,4 +246,30 @@ export default async function handler(request) {
   }
 
   return json({ error: 'Route not migrated yet.' }, 501);
+}
+
+// Vercel's Node runtime invokes default exports with (req, res). Keep the
+// application logic in the Fetch-style handler above, then bridge the two
+// interfaces explicitly so responses are always written to the socket.
+export default async function handler(req, res) {
+  try {
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host || 'localhost';
+    const headers = { ...req.headers };
+    const hasBody = !['GET', 'HEAD'].includes(req.method || 'GET');
+    const request = new Request(`${protocol}://${host}${req.url || '/'}`, {
+      method: req.method,
+      headers,
+      body: hasBody ? req : undefined,
+      duplex: hasBody ? 'half' : undefined,
+    });
+    const response = await handle(request);
+    res.statusCode = response.status;
+    response.headers.forEach((value, key) => res.setHeader(key, value));
+    res.end(await response.text());
+  } catch (error) {
+    res.statusCode = 500;
+    res.setHeader('content-type', 'application/json; charset=utf-8');
+    res.end(JSON.stringify({ error: error?.message || 'Internal server error.' }));
+  }
 }
