@@ -1,6 +1,7 @@
 # futurePreneur — Build Plan (v1)
 
 **Status:** Phases 1–7 complete (21 October 2026). Phase 7 shipped the verified progress report, trends and one-page print plan.
+**Deployment:** Vercel production `https://futurepreneur-pink.vercel.app`, serverless Python API + Neon Postgres, region `iad1`.
 **Date:** 19 October 2026
 **Purpose:** Turn the existing working prototype into the complete futurePreneur platform described in the brief — 8 components, verified assessments, real progress tracking, admin-managed content, and a coach that never pretends.
 

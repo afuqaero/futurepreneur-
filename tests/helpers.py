@@ -119,6 +119,8 @@ class ServerCase(unittest.TestCase):
             "BIZREADY_TEMPLATES_DIR": str(Path(cls.tmpdir) / "templates"),
         })
         env.pop("BIZREADY_AI_KEY", None)
+        for db_key in ("DATABASE_URL", "POSTGRES_URL"):
+            env.pop(db_key, None)
         cls.proc = subprocess.Popen(
             [sys.executable, str(ROOT / "run.py"), "--port", str(cls.port)],
             cwd=str(ROOT), env=env,

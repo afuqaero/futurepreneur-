@@ -136,6 +136,12 @@ def _secret():
     with _secret_lock:
         if _secret_cache:
             return _secret_cache
+        if config.CSRF_SECRET:
+            try:
+                _secret_cache = bytes.fromhex(config.CSRF_SECRET)
+            except ValueError:
+                _secret_cache = hashlib.sha256(config.CSRF_SECRET.encode("utf-8")).digest()
+            return _secret_cache
         try:
             raw = config.CSRF_SECRET_PATH.read_text(encoding="utf-8").strip()
         except OSError:

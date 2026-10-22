@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bash scripts/build_static.sh",
+  "outputDirectory": "public",
+  "regions": ["iad1"],
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "includeFiles": "{server/**,content/**,content.py}"
+    }
+  },
+  "routes": [
+    { "src": "/api/?", "dest": "/api/index" },
+    { "src": "/api/(.*)", "dest": "/api/index?route=$1" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}

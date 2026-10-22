@@ -2,7 +2,7 @@
 
 A practical business-readiness platform for micro and small business owners: diagnostic check-up, eight learning modules, a coach, verified assessments, and an honest progress record.
 
-Website (responsive web app), Python standard library + SQLite + vanilla JS. No npm install, no build step.
+Website (responsive web app). Local development uses the Python standard library + SQLite; the Vercel deployment uses the same Python handlers as a serverless function with Neon Postgres. No npm install or frontend build step.
 
 ## Run
 
@@ -21,6 +21,32 @@ Demo accounts:
 | Admin | `admin@futurepreneur.app` | `Admin1234!` |
 
 The database lives at `data/bizready.db`. A timestamped backup is written to `data/backups/` on every start (last 5 kept).
+
+## Deploy on Vercel
+
+Live: **https://futurepreneur-pink.vercel.app**
+
+- Static files are built from `static/` into `public/` by `scripts/build_static.sh`.
+- `api/index.py` is the serverless entry point. It reuses `server.http.Handler`, so routes, scoring, CSRF and auth behave the same as local.
+- The production database is **Neon Postgres** (`DATABASE_URL`). `server/pg.py` translates the SQLite-era DB-API calls; migrations run automatically on the first request.
+- The function runs in `iad1` (Washington, D.C.) next to the Neon database to avoid cross-region query latency.
+
+```bash
+vercel pull --yes --environment=production
+vercel deploy --prod --yes
+```
+
+Required Vercel environment variables:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | Neon pooled Postgres URL |
+| `BIZREADY_CSRF_SECRET` | Long random secret (hex or text) |
+| `BIZREADY_SECURE_COOKIES` | `1` |
+| `BIZREADY_TRUST_PROXY` | `1` |
+| `BIZREADY_AI_KEY` | Optional; otherwise the coach stays in labelled demo mode |
+
+`vercel.json` sets the build command, output directory, API rewrites and region. The project must use the **Other** framework preset, not the Python framework preset: a framework preset takes precedence over file-based functions and would swallow `/api/*`.
 
 ## Tests
 
@@ -70,7 +96,7 @@ Environment variables (server-side only; nothing is exposed to the browser):
 
 Without a key the coach runs in **demo mode**, labelled on every reply. It never pretends to be live AI.
 
-Admins can set the provider in **Admin → Standards → AI coach provider**. The key is stored in the server-side SQLite settings table, never returned by any endpoint, and never written to the page. `BIZREADY_AI_KEY` still overrides a saved key. Conversations and their messages are stored in SQLite; learners can reopen or clear them. The coach is limited to 20 messages per 10 minutes per learner by default.
+Admins can set the provider in **Admin → Standards → AI coach provider**. The key is stored in the server-side settings table (SQLite locally, Postgres on Vercel), never returned by any endpoint, and never written to the page. `BIZREADY_AI_KEY` still overrides a saved key. Conversations and their messages are stored in the same database; learners can reopen or clear them. The coach is limited to 20 messages per 10 minutes per learner by default.
 
 Optional `config.json` at the project root:
 
@@ -83,10 +109,15 @@ Keep `config.json` out of version control (already in `.gitignore`).
 ## Structure
 
 ```
-run.py                     entry point
+run.py                     local entry point
+api/index.py               Vercel serverless entry point (reuses Handler)
+vercel.json                build, routes, function and region config
+scripts/build_static.sh    copies static/ → public/ for Vercel
+requirements.txt           psycopg for the Postgres adapter
 server/
   config.py  clock.py  errors.py
   db.py                    connection, migrations, backups, seeds
+  pg.py                    Postgres DB-API adapter for Vercel
   security.py              passwords, sessions, CSRF, throttling, headers
   models.py                settings, public user
   content_service.py       module reads + overrides
@@ -96,19 +127,20 @@ server/
   ai.py                    coach proxy + labelled demo fallback
   http.py                  Handler, static files, dispatch
   routes/                  auth, checkup, learn, assess, progress, coach, admin
-  migrations/001_init.sql
+  migrations/              SQL schema + data migrations (001–008)
 static/                    index.html, app.js, styles.css
+public/                    generated Vercel static output (gitignored)
 tests/                     unittest suite + live-server harness
 content.py                 legacy seed for the Strategy module
 content/seed/*.json        authoring seed for all eight modules
 content/templates/         drop-in files: replace a template or add a download
-data/                      SQLite database + backups (gitignored)
+data/                      local SQLite database + backups (gitignored)
 docs/PLAN.md               phase plan and current status
 ```
 
 ## Security baseline (Phase 1)
 
-- PBKDF2-SHA256 passwords (200k iterations), server-side sessions in SQLite, HttpOnly + SameSite=Lax cookies.
+- PBKDF2-SHA256 passwords (200k iterations), server-side sessions in the database, HttpOnly + SameSite=Lax cookies.
 - CSRF: signed double-submit cookie (`br_csrf` + `X-CSRF-Token`) required on every POST/PUT/PATCH/DELETE.
 - Login throttling: 5 failures per 15 minutes per IP+email, `429` with `Retry-After`.
 - CSP (no inline scripts), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: no-referrer`, Permissions-Policy.
@@ -117,7 +149,7 @@ docs/PLAN.md               phase plan and current status
 - Static path traversal blocked; request bodies capped at 1 MB.
 - Admin routes re-check role on every request.
 
-**Known limits:** the server binds to `127.0.0.1` by default and uses HTTP. Do not expose it to the internet without a TLS reverse proxy, `BIZREADY_SECURE_COOKIES=1`, and `BIZREADY_TRUST_PROXY=1`. Login throttling is per-process (fine for one server, resets on restart). SQLite is single-writer; suitable for tens of concurrent learners, not hundreds.
+**Known limits:** the local server binds to `127.0.0.1` by default and uses HTTP. Do not expose it directly to the internet without a TLS reverse proxy, `BIZREADY_SECURE_COOKIES=1`, and `BIZREADY_TRUST_PROXY=1`. Login throttling is per-process (fine for one server, resets on restart). SQLite is single-writer; the Vercel deployment uses Postgres instead. Neon free-tier compute may cold-start on the first request after idle.
 
 ## Status
 

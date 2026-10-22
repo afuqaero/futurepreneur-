@@ -1691,6 +1691,7 @@ function renderCoach(my) {
   const live = state.ai.configured;
   const messages = c.messages;
   mount(`
+    <div class="coach-page">
     <div class="section-head" style="margin-top:0">
       <div><div class="eyebrow">AI Business Coach</div><h1>Think it through, out loud.</h1>
         <p>Ask about a real business problem. The coach explains, asks questions, and suggests practical steps — it will not invent your results.</p></div>
@@ -1758,6 +1759,7 @@ function renderCoach(my) {
           <p class="quote">Bring one number and one decision. “Sales are RM18k, margin is 20%, should I hire?” is easier to help with than “business is hard”.</p>
         </div>
       </aside>
+    </div>
     </div>`, my);
   if (state.coach.messages.length) requestAnimationFrame(scrollChat);
 }

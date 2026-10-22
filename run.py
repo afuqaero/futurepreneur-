@@ -35,8 +35,8 @@ def main(argv=None):
     server = make_server(args.host, args.port)
     host, port = server.server_address[0], server.server_address[1]
     print(f"\n  BizReady is running at http://{host}:{port}\n")
-    print("  Demo learner : aina@demo.bizready.app / Demo1234!")
-    print("  Admin        : admin@bizready.app / Admin1234!")
+    print("  Demo learner : aina@futurepreneur.app / Demo1234!")
+    print("  Admin        : admin@futurepreneur.app / Admin1234!")
     print("  AI coach     : " + ("live API configured" if ai_status()["configured"] else "DEMO MODE (no API key configured)") + "\n")
     try:
         server.serve_forever()

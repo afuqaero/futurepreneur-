@@ -13,6 +13,7 @@ DB_PATH = Path(os.environ.get("BIZREADY_DB_PATH") or (DATA_DIR / "bizready.db"))
 CONFIG_PATH = Path(os.environ.get("BIZREADY_CONFIG") or (ROOT / "config.json"))
 BACKUP_DIR = DATA_DIR / "backups"
 CSRF_SECRET_PATH = DATA_DIR / "csrf.key"
+CSRF_SECRET = os.environ.get("BIZREADY_CSRF_SECRET", "").strip()
 
 # Drop-in template files: replace built-ins or add new learner downloads.
 TEMPLATES_DIR = Path(os.environ.get("BIZREADY_TEMPLATES_DIR") or (ROOT / "content" / "templates"))
