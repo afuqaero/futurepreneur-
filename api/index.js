@@ -115,13 +115,13 @@ function clientFromRequest(request) {
 }
 
 function adminClient() {
-  return createClient(supabaseUrl, serviceRoleKey, {
+  return createClient(supabaseUrl, serviceRoleKey || process.env.SUPABASE_ANON_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
 
 export default async function handler(request) {
-  if (!supabaseUrl || !serviceRoleKey || !process.env.SUPABASE_ANON_KEY) {
+  if (!supabaseUrl || !process.env.SUPABASE_ANON_KEY) {
     return json({ error: 'Supabase environment variables are not configured.' }, 503);
   }
 
@@ -173,14 +173,14 @@ export default async function handler(request) {
   // service-role key to the browser.
   if (url.pathname === '/api/bootstrap' && request.method === 'GET') {
     const user = await sessionFromRequest(request);
-    const db = adminClient();
-    const apiUser = await publicUser(user, db);
+    const db = user ? adminClient() : null;
+    const apiUser = user ? await publicUser(user, db) : null;
     return json({
       user: apiUser,
       components: COMPONENTS.map(([id, name]) => ({ id, name, short: name, available: true })),
       settings: {},
       ai: { configured: Boolean(process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY), mode: (process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY) ? 'live' : 'demo' },
-      progress: await progressFor(user, db),
+      progress: user ? await progressFor(user, db) : null,
     });
   }
 
