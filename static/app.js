@@ -261,8 +261,8 @@ function mount(html, mySeq) {
 function renderLanding() {
   document.title = 'futurePreneur — Business readiness platform';
   $('#app').innerHTML = `
-  <div class="auth">
-    <section class="auth-art" style="width:100%;min-height:100vh">
+  <div class="auth" style="display:block;min-height:100vh">
+    <section class="auth-art" style="width:100%;min-height:100vh;min-width:100%">
       <div class="auth-brand"><div class="brand-mark">f</div><div class="auth-brand-text"><div class="brand-name">futurePreneur</div><div class="brand-sub" style="color:#7FA2C4">Business readiness platform</div></div></div>
       <div class="auth-copy" style="max-width:760px;margin:auto">
         <div class="eyebrow" style="color:#62DED2">Built for owners, not accountants</div>
@@ -2640,6 +2640,7 @@ window.__bizready = { state, router };
 
 /* ------------------------------------------------------------------ boot */
 (async function boot() {
+  if (!state.user && !location.hash) renderLanding();
   try {
     const data = await api('/api/bootstrap');
     state.components = data.components || [];
