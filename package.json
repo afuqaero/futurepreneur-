@@ -3,6 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": {"dev": "vercel dev", "test": "node --test"},
-  "dependencies": {"@supabase/supabase-js": "^2.57.0"}
+  "scripts": {
+    "dev": "vercel dev",
+    "test": "node --test",
+    "build": "bash scripts/build_static.sh"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.0"
+  }
 }
