@@ -121,13 +121,23 @@ function adminClient() {
 }
 
 export default async function handler(request) {
-  if (!supabaseUrl || !process.env.SUPABASE_ANON_KEY) {
-    return json({ error: 'Supabase environment variables are not configured.' }, 503);
-  }
-
   const url = new URL(request.url);
   if (url.pathname === '/api/health') {
     return json({ ok: true, service: 'futurepreneur-api' });
+  }
+
+  if (url.pathname === '/api/bootstrap' && request.method === 'GET' && !cookies(request).fp_access) {
+    return json({
+      user: null,
+      components: COMPONENTS.map(([id, name]) => ({ id, name, short: name, available: true })),
+      settings: {},
+      ai: { configured: Boolean(process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY), mode: (process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY) ? 'live' : 'demo' },
+      progress: null,
+    });
+  }
+
+  if (!supabaseUrl || !process.env.SUPABASE_ANON_KEY) {
+    return json({ error: 'Supabase environment variables are not configured.' }, 503);
   }
 
   if (url.pathname === '/api/auth/login' && request.method === 'POST') {
