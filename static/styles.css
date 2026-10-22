@@ -630,6 +630,13 @@ svg { flex: none; }
 .empty { padding: 34px 20px; text-align: center; color: var(--muted); font-size: 12.5px; }
 .empty .icon { width: 46px; height: 46px; border-radius: 50%; background: #F0F4F8; display: grid; place-items: center; margin: 0 auto 10px; color: #8EA3B7; }
 .loading { padding: 60px 20px; display: flex; justify-content: center; color: var(--muted); font-size: 13px; gap: 10px; align-items: center; }
+.loading-skeleton { padding: 34px clamp(18px, 4vw, 56px); max-width: 980px; margin: 0 auto; }
+.skeleton { background: linear-gradient(90deg, rgba(220,227,241,.55), rgba(245,247,252,.95), rgba(220,227,241,.55)); background-size: 220% 100%; animation: skeleton-shimmer 1.4s ease-in-out infinite; border-radius: 14px; }
+.skeleton-title { width: min(420px, 70%); height: 34px; margin-bottom: 24px; }
+.skeleton-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.skeleton-card { height: 132px; }
+.skeleton-wide { height: 220px; margin-top: 20px; }
+@keyframes skeleton-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #DCE6EF; border-top-color: var(--teal); animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .fade-in { animation: fadein .22s ease; }

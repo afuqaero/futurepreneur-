@@ -240,7 +240,11 @@ function pill(level) {
 }
 
 function loadingHTML() {
-  return `<div class="loading"><span class="spinner"></span> Loading your workspace…</div>`;
+  return `<div class="loading-skeleton" aria-busy="true" aria-label="Preparing dashboard">
+    <div class="skeleton skeleton-title"></div>
+    <div class="skeleton-grid"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
+    <div class="skeleton skeleton-wide"></div>
+  </div>`;
 }
 
 function errorHTML(message) {

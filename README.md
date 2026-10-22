@@ -70,6 +70,21 @@ Environment variables (server-side only; nothing is exposed to the browser):
 
 Without a key the coach runs in **demo mode**, labelled on every reply. It never pretends to be live AI.
 
+## Vercel + Supabase deployment
+
+The repository now includes the JavaScript/Vercel migration foundation in `api/`, `supabase/schema.sql`,
+`vercel.json`, and `package.json`. The migration is intentionally additive while the remaining API routes are
+ported; the original Python server remains available for local development during the transition.
+
+1. Create a Supabase project and run `supabase/schema.sql` in the SQL Editor.
+2. In Vercel, import this GitHub repository and set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and
+   `SUPABASE_SERVICE_ROLE_KEY` under Project Settings → Environment Variables.
+3. Add `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL=https://api.deepseek.com`, and
+   `DEEPSEEK_MODEL=deepseek-chat` for the live coach. Without the key, the coach stays in labelled demo mode.
+4. Deploy. The serverless health check is available at `/api/health`.
+
+Never expose `SUPABASE_SERVICE_ROLE_KEY` to browser code. It is used only by the Vercel function.
+
 Admins can set the provider in **Admin → Standards → AI coach provider**. The key is stored in the server-side SQLite settings table, never returned by any endpoint, and never written to the page. `BIZREADY_AI_KEY` still overrides a saved key. Conversations and their messages are stored in SQLite; learners can reopen or clear them. The coach is limited to 20 messages per 10 minutes per learner by default.
 
 Optional `config.json` at the project root:
