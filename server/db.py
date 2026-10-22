@@ -19,7 +19,18 @@ from .security import hash_password
 # ---------------------------------------------------------------------------
 
 
+def using_postgres():
+    return bool(os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL"))
+
+
+def database_url():
+    return os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL") or ""
+
+
 def get_db():
+    if using_postgres():
+        from .pg import PgConnection
+        return PgConnection(database_url())
     config.DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(config.DB_PATH, timeout=10)
     conn.row_factory = sqlite3.Row
@@ -45,12 +56,16 @@ def apply_migrations(conn):
         if version in applied:
             continue
         sql = path.read_text(encoding="utf-8")
-        conn.executescript(sql)
-        conn.execute(
-            "INSERT INTO schema_migrations (version, applied_at) VALUES (?,?)",
-            (version, iso()),
-        )
-        conn.commit()
+        try:
+            conn.executescript(sql)
+            conn.execute(
+                "INSERT INTO schema_migrations (version, applied_at) VALUES (?,?)",
+                (version, iso()),
+            )
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
 
 
 # ---------------------------------------------------------------------------
@@ -118,9 +133,9 @@ def seed_demo(conn):
         ("Platform Admin", "admin@futurepreneur.app", hash_password("Admin1234!"), "admin", iso(now)),
     )
     learner = conn.execute(
-        "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?,?,?,?,?)",
+        "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?,?,?,?,?) RETURNING id",
         ("Aina Rahman", "aina@futurepreneur.app", hash_password("Demo1234!"), "learner", iso(now - timedelta(days=21))),
-    ).lastrowid
+    ).fetchone()["id"]
 
     conn.execute(
         "INSERT INTO profiles (user_id, business_name, sector, stage, team_size, revenue_band, years, main_challenge, updated_at)"
@@ -142,17 +157,19 @@ def seed_demo(conn):
     )
 
     conn.execute(
-        "INSERT INTO attempts (user_id, kind, component, score, passed, detail, created_at) VALUES (?,?,?,?,?,?,?)",
-        (learner, "quiz", "strategy", 90, 1, json.dumps({"correct": 9, "total": 10}), iso(now - timedelta(days=12))),
+        "INSERT INTO attempts (user_id, module_id, kind, component, score, passed, detail, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?)",
+        (learner, "strategy", "quiz", "strategy", 90, 1, json.dumps({"correct": 9, "total": 10}), iso(now - timedelta(days=12))),
     )
     conn.execute(
-        "INSERT INTO attempts (user_id, kind, component, score, passed, detail, created_at) VALUES (?,?,?,?,?,?,?)",
-        (learner, "scenario", "strategy", 80, 1, json.dumps({"correct": 4, "total": 5}), iso(now - timedelta(days=10))),
+        "INSERT INTO attempts (user_id, module_id, kind, component, score, passed, detail, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?)",
+        (learner, "strategy", "scenario", "strategy", 80, 1, json.dumps({"correct": 4, "total": 5}), iso(now - timedelta(days=10))),
     )
     conn.execute(
-        "INSERT INTO practical_submissions (user_id, responses, status, rubric, average, passed, reviewer_note, created_at, reviewed_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?)",
-        (learner,
+        "INSERT INTO practical_submissions (user_id, module_id, responses, status, rubric, average, passed, reviewer_note, created_at, reviewed_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?)",
+        (learner, "strategy",
          json.dumps({
              "p1": "Busy office workers within 1km who need a reliable hot lunch in under 15 minutes. They currently queue at cafés, order delivery apps and wait 30–40 minutes, or skip lunch.",
              "p2": "For busy office workers nearby who need a reliable hot lunch, we provide a fixed-price set meal ready in five minutes, unlike cafés with long queues or delivery apps with uncertain arrival times.",
@@ -225,16 +242,24 @@ def seed_content(conn):
 
 
 def init_db(seed=True):
-    config.DATA_DIR.mkdir(parents=True, exist_ok=True)
-    if os.environ.get("BIZREADY_SKIP_BACKUP") != "1":
-        backup_database()
+    postgres = using_postgres()
+    if not postgres:
+        config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+        if os.environ.get("BIZREADY_SKIP_BACKUP") != "1":
+            backup_database()
     conn = get_db()
     try:
-        conn.execute("PRAGMA journal_mode = WAL")
-        conn.execute("PRAGMA synchronous = NORMAL")
+        if postgres:
+            conn.execute("SELECT pg_advisory_lock(?)", (781234567890123,))
+        else:
+            conn.execute("PRAGMA journal_mode = WAL")
+            conn.execute("PRAGMA synchronous = NORMAL")
         apply_migrations(conn)
         for key, value in config.DEFAULT_SETTINGS.items():
-            conn.execute("INSERT OR IGNORE INTO settings (key, value) VALUES (?,?)", (key, value))
+            conn.execute(
+                "INSERT INTO settings (key, value) VALUES (?,?) ON CONFLICT (key) DO NOTHING",
+                (key, value),
+            )
         if seed:
             seed_questions(conn)
             seed_demo(conn)
@@ -242,5 +267,10 @@ def init_db(seed=True):
             if config.SEED_MODULES:
                 seed_json_modules(conn)
         conn.commit()
+        if postgres:
+            conn.execute("SELECT pg_advisory_unlock(?)", (781234567890123,))
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         conn.close()

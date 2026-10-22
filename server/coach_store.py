@@ -10,11 +10,12 @@ MODES = ("teach", "solve", "test")
 def create_session(conn, user_id, mode, title=""):
     now = iso()
     cur = conn.execute(
-        "INSERT INTO coach_sessions (user_id, mode, title, created_at, updated_at) VALUES (?,?,?,?,?)",
+        "INSERT INTO coach_sessions (user_id, mode, title, created_at, updated_at) VALUES (?,?,?,?,?) RETURNING id",
         (user_id, mode, title[:90], now, now),
     )
+    session_id = cur.fetchone()["id"]
     conn.commit()
-    return get_session(conn, user_id, cur.lastrowid)
+    return get_session(conn, user_id, session_id)
 
 
 def get_session(conn, user_id, session_id):

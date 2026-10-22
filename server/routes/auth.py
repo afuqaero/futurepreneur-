@@ -26,10 +26,10 @@ def handle(h, conn, method, path, query):
         if conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone():
             raise ApiError(409, "An account with that email already exists.", "email_taken")
         cur = conn.execute(
-            "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?,?,?,?,?)",
+            "INSERT INTO users (name, email, password_hash, role, created_at) VALUES (?,?,?,?,?) RETURNING id",
             (name, email, security.hash_password(password), "learner", iso()),
         )
-        user_id = cur.lastrowid
+        user_id = cur.fetchone()["id"]
         conn.commit()
         token = security.create_session(conn, user_id)
         user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()

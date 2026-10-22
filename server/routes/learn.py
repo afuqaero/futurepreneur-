@@ -33,7 +33,8 @@ def handle(h, conn, method, path, user):
         if lesson_id not in [lesson["id"] for lesson in module["lessons"]]:
             raise ApiError(404, "Lesson not found.", "not_found")
         conn.execute(
-            "INSERT OR REPLACE INTO lesson_progress (user_id, lesson_id, completed_at) VALUES (?,?,?)",
+            "INSERT INTO lesson_progress (user_id, lesson_id, completed_at) VALUES (?,?,?)"
+            " ON CONFLICT (user_id, lesson_id) DO UPDATE SET completed_at = excluded.completed_at",
             (user["id"], lesson_id, iso()),
         )
         conn.commit()

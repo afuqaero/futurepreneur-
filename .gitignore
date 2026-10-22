@@ -14,3 +14,9 @@ node_modules/
 test-output.txt
 *.log
 dist/
+public/
+.vercel/
+.env*
+!.env.example
+.agents/
+skills-lock.json

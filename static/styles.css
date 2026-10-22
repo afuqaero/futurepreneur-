@@ -697,7 +697,10 @@ svg { flex: none; }
   .inline-form { grid-template-columns: 1fr; }
   .content-editor { grid-template-columns: 1fr; }
   .coach-side { grid-template-columns: 1fr; }
-  .chat-card { height: calc(100vh - 150px); min-height: 460px; }
+  .coach-page .section-head p { display: none; }
+  .coach-page .section-head { margin-bottom: 4px; }
+  .chat-card { height: calc(100dvh - 240px); min-height: 420px; }
+  .chat-demo { display: none; }
   .chat-body { padding: 16px; }
   .bubble { max-width: 94%; }
   .mode-hint { display: none; }

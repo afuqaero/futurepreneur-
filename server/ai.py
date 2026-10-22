@@ -218,7 +218,7 @@ TEST_BANK = [
 
 def demo_coach(mode, messages):
     last_user = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
-    prefix = "**Demo mode** — scripted guidance, not a live AI. Connect an API key on the server for personalised coaching.\n\n"
+    prefix = "**Demo mode** — scripted guidance, not a live AI.\n\n"
 
     if mode == "test":
         prior_assistant = [m["content"] for m in messages if m["role"] == "assistant"]
