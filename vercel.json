@@ -7,11 +7,15 @@
     "api/index.py": {
       "maxDuration": 60,
       "includeFiles": "{server/**,content/**,content.py}"
+    },
+    "api/assets.py": {
+      "includeFiles": "static/**"
     }
   },
   "routes": [
     { "src": "/api/?", "dest": "/api/index" },
     { "src": "/api/(.*)", "dest": "/api/index?route=$1" },
+    { "src": "/static/(.*)", "dest": "/api/assets?path=$1" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
