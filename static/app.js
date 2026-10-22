@@ -2647,7 +2647,7 @@ window.__bizready = { state, router };
     state.ai = data.ai || { configured: false, mode: 'demo' };
     state.user = data.user;
     state.progress = data.progress || null;
-    if (state.user) router(); else renderAuth();
+    if (state.user) router(); else if (location.hash) renderAuth(); else renderLanding();
   } catch (err) {
     $('#app').innerHTML = `<div style="min-height:100vh;display:grid;place-items:center;padding:24px">
       <div class="card card-pad" style="max-width:420px;text-align:center">
